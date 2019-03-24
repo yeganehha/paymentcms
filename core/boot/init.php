@@ -13,8 +13,6 @@
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
-define('INC_DIR' , __DIR__ . 'init.php/');
-define('HTTP_ROOT' , 'http://localhost/contacts/');
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -35,7 +33,7 @@ spl_autoload_register(function ($class_name_call) {
 	if ( file_exists($class_patch)) {
 		require_once $class_patch;
 	} else {
-		App\core\controller\httpErrorHandler::E500();
+		App\core\controller\httpErrorHandler::E500($class_patch);
 		exit;
 	}
 });

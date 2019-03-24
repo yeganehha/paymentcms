@@ -4,7 +4,7 @@ namespace paymentCms\component\mold;
 
 use paymentCms\component\file;
 use paymentCms\component\httpHeader;
-use paymentCms\component\string;
+use paymentCms\component\strings;
 
 /**
  * Created by Yeganehha .
@@ -322,7 +322,7 @@ class MoldFiles {
 		echo 'Mold file name : '.$file['file'].'<br><br>'."\n";
 		echo 'Error line : '.($lasterror['line']-19).'<br><br>'."\n";
 		echo 'App : '.$file['app'].'<br><br>'."\n";
-		echo 'Theme Folder : '.string::deleteWordLastString($file['folder'],'/').'<br><br>'."\n";
+		echo 'Theme Folder : '.strings::deleteWordLastString($file['folder'],'/').'<br><br>'."\n";
 		echo 'Path : '.substr($file['path'], strpos($file['path'],$file['app'])).'<br></div>'."\n";
 		if ( $themeFolder == 'theme' and $cacheFolder == 'cache')unlink($lasterror['file']);
 		exit;
@@ -359,7 +359,7 @@ class MoldFiles {
 	public function checkFileISMoldOrNOt($File){
 //		$fileName = array_pop(explode(DIRECTORY_SEPARATOR,$File) );
 		$fileExtOne = File::ext_file($File);
-		$fileExtTwo = File::ext_file(string::deleteWordLastString($File,'.'.$fileExtOne) );
+		$fileExtTwo = File::ext_file(strings::deleteWordLastString($File,'.'.$fileExtOne) );
 		if ( $fileExtTwo == 'mold' )
 			return true ;
 		// TODO: send exception and delete all cache of this file

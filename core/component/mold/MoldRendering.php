@@ -4,7 +4,7 @@ namespace paymentCms\component\mold;
 
 
 use paymentCms\component\file;
-use paymentCms\component\string;
+use paymentCms\component\strings;
 
 /**
  * Created by Yeganehha .
@@ -77,8 +77,8 @@ class MoldRendering {
 		for($i=0;$i <count($matchesInner) ; $i++){
 			$string = str_replace($matchesInner[$i][0],'moldValueInner'.$i ,$string);
 //			$this->moldShouldReplaceInTheEnd[  "'moldValueInner".$i."'" ] = $this->findName($matchesInner[$i][1]) ;
-			$matchesInner[$i][1] = string::deleteWordFirstString($matchesInner[$i][1],'[');
-			$matchesInner[$i][1] = string::deleteWordLastString($matchesInner[$i][1],']');
+			$matchesInner[$i][1] = strings::deleteWordFirstString($matchesInner[$i][1],'[');
+			$matchesInner[$i][1] = strings::deleteWordLastString($matchesInner[$i][1],']');
 			$matchesInner[$i][1] = str_replace(['[',']'] , ['{','}'] , $matchesInner[$i][1]);
 			$renderInner = new MoldRendering( '{'.$matchesInner[$i][1].'}' , $this->fileInfo ,$this->moldData , $this->version , true);
 			$this->moldShouldReplaceInTheEnd[  "moldValueInner".$i ] = $renderInner->getResult() ;
@@ -300,8 +300,8 @@ class MoldRendering {
 		$filePath = implode(DIRECTORY_SEPARATOR,$listDirToFile);
 		$cacheFilePath = \app::getAppPath('cache/theme/assets');
 		$fileContents = file_get_contents($pathAndFileName);
-		$funcName = 'assetsFileCache_'.string::generateRandomLowString();
-		$cacheFileName = string::get_unique_string( string::generateRandomLowString(5) ).'.'.$fileName;
+		$funcName = 'assetsFileCache_'.strings::generateRandomLowString();
+		$cacheFileName = strings::get_unique_string( strings::generateRandomLowString(5) ).'.'.$fileName;
 		$php = "if ( ! function_exists('".$funcName ."') ) { function ".$funcName .' ( &$moldData ) { ?>' ;
 		$phpModel = new MoldRendering($fileContents , $this->fileInfo ,$this->moldData,$this->version) ;
 		$php .= $phpModel->getResult();
@@ -329,7 +329,7 @@ class MoldRendering {
 		$php .= "\n<?php } else die('Mold can not find assets file or the file is terminated!'); ";
 		file::generate_file($cacheFilePath.DIRECTORY_SEPARATOR.$cacheFileName.'.php' , $php );
 		$link = \app::getFullRequestUrl() ;
-		$link .= ( string::strhas($link,'?') ) ? '&' : '?' ;
+		$link .= ( strings::strhas($link,'?') ) ? '&' : '?' ;
 		$link .= 'moldAssetsFileLoader='.$cacheFileName ;
 		$echo = 'echo \''.( ( $extFile == 'js') ? '<script src="' . $link . '" ></script>' : ( $extFile == 'css' ) ? '<link rel="stylesheet" type="text/css" href="'.$link.'" />' : $link ).'\' ;' ;
 
@@ -361,7 +361,7 @@ class MoldRendering {
 		$pathAndFileName = str_replace(['"','\''] ,'' ,$pathAndFileName);
 		$moldFile->checkFileISMoldOrNOt($pathAndFileName);
 		$fileContents = file_get_contents($pathAndFileName);
-		$funcName = 'assetsFileCache_'.string::generateRandomLowString();
+		$funcName = 'assetsFileCache_'.strings::generateRandomLowString();
 		$php = "if ( ! function_exists('".$funcName ."') ) { function ".$funcName .' ( &$moldData ) { ?>' ;
 		$phpModel = new MoldRendering($fileContents , $this->fileInfo ,$this->moldData,$this->version) ;
 		$php .= $phpModel->getResult();
@@ -375,7 +375,7 @@ class MoldRendering {
 		$listDirToFile = explode(DIRECTORY_SEPARATOR, $this->fileInfo['path']);
 		$fileName = array_pop($listDirToFile);
 		$linkToTemplate = implode(DIRECTORY_SEPARATOR, $listDirToFile);
-		$linkToTemplate =  string::strLastHas($link,DIRECTORY_SEPARATOR) ? $linkToTemplate : $linkToTemplate.DIRECTORY_SEPARATOR;
+		$linkToTemplate =  strings::strLastHas($link,DIRECTORY_SEPARATOR) ? $linkToTemplate : $linkToTemplate.DIRECTORY_SEPARATOR;
 
 		file::generate_file($linkToTemplate.$savePatchFileWithName , $render );
 		$this->replace($data['find'],$echo);
@@ -400,7 +400,7 @@ class MoldRendering {
 		preg_match_all($re, $this->string, $matches, PREG_SET_ORDER, 0);
 		for ( $i = 0 ; $i < count($matches) ; $i++ ){
 			$this->replace($matches[$i][0],"", false,false);
-			$name = string::deleteWordFirstString($matches[$i][0],'{map ');
+			$name = strings::deleteWordFirstString($matches[$i][0],'{map ');
 			$names = explode('}',$name);
 			$name = str_replace(['"','\''] ,'' ,trim($names[0]));
 			$name = str_replace(['/','*','~','-','.','\\'],'_', $name);
@@ -418,25 +418,25 @@ class MoldRendering {
 		switch (trim(strtolower($data['otherValues']))) {
 			case 'theme':
 				$link = \app::getAppLink('theme/' . $this->fileInfo['folder'], $this->fileInfo['app']);
-				$link =  string::strLastHas($link,'/') ? $link : $link.'/';
+				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
 			case 'patch':
 				$listDirToFile = explode(DIRECTORY_SEPARATOR, $this->fileInfo['path']);
 				$fileName = array_pop($listDirToFile);
 				$link = implode(DIRECTORY_SEPARATOR, $listDirToFile);
-				$link =  string::strLastHas($link,DIRECTORY_SEPARATOR) ? $link : $link.DIRECTORY_SEPARATOR;
+				$link =  strings::strLastHas($link,DIRECTORY_SEPARATOR) ? $link : $link.DIRECTORY_SEPARATOR;
 				break;
 			case 'current':
 				$link = \app::getFullRequestUrl();
-				$link =  string::strLastHas($link,'/') ? $link : $link.'/';
+				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
 			case '':
 				$link = \app::getAppLink();
-				$link =  string::strLastHas($link,'/') ? $link : $link.'/';
+				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
 			default :
 				$link = \app::getAppLink(null, $data['otherValues']);
-				$link =  string::strLastHas($link,'/') ? $link : $link.'/';
+				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
 		}
 		if ( $this->runFromPhp ){

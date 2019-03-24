@@ -31,8 +31,8 @@ class httpErrorHandler extends \controller {
 		exit;
 		parent::view('httpErrorHandler' , array('errorType' => '404'));
 	}
-	public static  function E500(){
-		echo '500';
+	public static  function E500($class_patch){
+		echo '500<br>'.$class_patch;
 		exit;
 		parent::view('httpErrorHandler' , array('errorType' => '500'));
 	}

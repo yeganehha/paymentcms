@@ -81,7 +81,7 @@ class App {
 			return false ;
 		$controller = self::$url[0];
 		if ( !empty($controller)) {
-			$controller = trim(strtolower($controller));
+			$controller = trim($controller);
 			$controllerPatch = self::$appPatch.self::$app.DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . $controller . '.php' ;
 			if (file_exists($controllerPatch)) {
 				if (class_exists('App\\'.self::$app.'\controller\\'.$controller)) {
@@ -89,6 +89,7 @@ class App {
 					self::$controller = $controller;
 					return true ;
 				} else {
+					echo 'App\\'.self::$app.'\controller\\'.$controller;
 					self::$app = 'core';
 					self::$controller = 'httpErrorHandler';
 					self::$method = 'E404';

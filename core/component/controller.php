@@ -10,6 +10,8 @@
  * Description of this Page :
  */
 
+use paymentCms\component\mold\Mold;
+
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
@@ -17,6 +19,17 @@ class controller {
 
 	protected $app ;
 	protected $model ;
+	protected $mold ;
+
+	public function __construct() {
+		/* @var paymentCms\component\mold\Mold $mold */
+		$mold = new Mold();
+		$mold->path('default');
+		$mold->cache(10);
+		$mold->header('header.mold.html');
+		$mold->footer('footer.mold.html');
+	}
+
 	protected function model($model = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
 		if ( $model == null )
 			$model = $this->model;

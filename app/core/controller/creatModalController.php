@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Controller;
+namespace App\core\controller;
 
 /**
  * Created by PhpStorm.
@@ -9,19 +9,19 @@ namespace App\Controller;
  * Date: 4/7/2017
  * Time: 10:00 PM
  */
-class creatModal extends \controller {
+class creatModalController extends \controller {
 	public $text ;
 	private $tableName ;
 	private $implementsClass ;
 	private $minFile;
 	private $columns ;
 	private $keyTable;
+	private $use;
 
 	/**
 	 * creatTable constructor.
 	 *
-	 * @param $db
-	 */
+	 * @param $db	 */
 	public function __construct( $minFile = false ) {
 		$this->columns = null ;
 		$this->text = null ;
@@ -39,10 +39,11 @@ class creatModal extends \controller {
 		$this->text .= $text ;
 	}
 
-	public function setNameTable( $tableName = null , $keyTable = 'id', $implementssClass = null ){
+	public function setNameTable( $tableName = null , $keyTable = 'id', $implementssClass = null, $use = null ){
 		$this->tableName  = $tableName;
 		$this->keyTable  = $keyTable;
 		$this->implementsClass  = str_replace('-' ,'\\' , $implementssClass);
+		$this->use  = str_replace('-' ,'\\' , $use);
 		return true ;
 	}
 
@@ -61,7 +62,7 @@ class creatModal extends \controller {
 	public function createClass(){
 		//$this->text .= $this->newLine().'if ( ! class_exists(\''.$this->tableName.'\')) {'.$this->newLine( );
 		if ( $this->implementsClass != null  )
-			$this->text .= $this->newLine().'use '.$this->implementsClass.' ;'.$this->newLine( );
+			$this->text .= $this->newLine().'use '.$this->use.' ;'.$this->newLine( );
 		$this->text .= $this->newLine().'class '.$this->tableName.( $this->implementsClass != null ? ' implements '.$this->implementsClass : '').' {'.$this->newLine().$this->newLine();
 		return true;
 	}
@@ -144,8 +145,8 @@ class creatModal extends \controller {
 				$this->text .= '		$array[\''.$column['Field'].'\'] = $this->'.$column['Field']. ' ;' . $this->newLine();
 		}
 		$this->text .= '		$id = \database::insert(\''.$this->tableName.'\' , $array  ); ' . $this->newLine();
-		if ( $column['Field'] != $this->keyTable )
-		$this->text .= '		$this->'.$this->keyTable .' = $id ; ' . $this->newLine();
+//		if ( $column['Field'] != $this->keyTable )
+//		$this->text .= '		$this->'.$this->keyTable .' = $id ; ' . $this->newLine();
 		$this->text .= '		if ( $id ) {' . $this->newLine();
 		$this->text .= '			$this->'.$this->keyTable .' = $id ; ' . $this->newLine();
 		$this->text .= '			return $this->returning($id) ;' . $this->newLine() ;
@@ -208,7 +209,7 @@ class creatModal extends \controller {
 		return true;
 	}
 	public function creatFile(){
-		$myfile = fopen(__DIR__ . '/../model/' .$this->tableName.'Model.php', "w") or die("Unable to open config file!");
+		$myfile = fopen(__DIR__ . '/../model/' .$this->tableName.'.php', "w") or die("Unable to open config file!");
 		if ( !fwrite($myfile, $this->text ) )
 			return false ;
 		fclose($myfile);
@@ -232,12 +233,12 @@ class creatModal extends \controller {
 		return chr(10);
 	}
 
-	public function creat($param){
-		$this->setNameTable($param[0],$param[1],$param[2]);
+	public function creat($param0,$param1,$param2,$param3,$param4){
+		$this->setNameTable($param0,$param1,$param2,$param3);
 		$this->firstLineOfFiel();
 		$this->copyRight();
-		if ( isset($param[3]))
-			$this->nameSpaceAdd(str_replace('-', '\\' ,$param[3]));
+		if ( isset($param4))
+			$this->nameSpaceAdd(str_replace('-', '\\' ,$param4));
 		$this->createClass();
 		$this->creatVariable();
 		$this->creatCunstructor();

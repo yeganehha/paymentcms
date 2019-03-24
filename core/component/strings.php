@@ -9,17 +9,17 @@ namespace paymentCms\component;
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
  * Date: 3/23/2019
  * Time: 1:31 PM
- * project : paymentCms
+ * project : paymentCMS
  * virsion : 0.0.0.1
  * update Time : 3/23/2019 - 1:31 PM
  * Discription of this Page :
  */
 
 
-if (!defined('paymentCms')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
+if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
-class string {
+class strings {
 
 	// get unique form one string by time,md5,exists,uniqid,...
 	public static function get_unique_string($string, $decoding_type = "", $pre = "", $ext = "", $i_loop = "")
