@@ -15,5 +15,8 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 return [
-	'testIng' => 'test LAng ing',
+	'dashboard' => 'داشبورد',
+	'service' => 'سرویس ها',
+	'payments' => 'پرداخت ها',
+	'done' => 'انجام شده',
 ];

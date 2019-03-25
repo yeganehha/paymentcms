@@ -4,6 +4,8 @@
 namespace App\admin\controller;
 
 
+use paymentCms\component\menu\menu;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
