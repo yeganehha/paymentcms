@@ -22,6 +22,6 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class hook extends \pluginController {
 
 	public function _adminHeaderNavbar(){
-		$this->mold->view('test.footer.mold.html');
+//		$this->mold->view('test.footer.mold.html');
 	}
 }
