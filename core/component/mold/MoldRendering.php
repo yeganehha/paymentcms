@@ -21,7 +21,7 @@ class MoldRendering {
 	private $version = null ;
 	private $string = null ;
 	private $moldData = null ;
-	private $map = [] ;
+	private static $map = [] ;
 	private $fileInfo = [] ;
 	private $runFromPhp = false ;
 	private $moldShouldReplaceInTheEnd  = [] ;
@@ -45,6 +45,9 @@ class MoldRendering {
 		}
 	}
 
+	public static function emptyMap(){
+		self::$map = [];
+	}
 	public function getResult(){
 		return $this->string;
 	}
@@ -303,7 +306,7 @@ class MoldRendering {
 		$pathAndFileName =  str_replace(['/', '\\', '>',DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, trim($value[0]));
 		$pathAndFileName = str_replace(['"','\''] ,'' ,$pathAndFileName);
 		$moldFile = new MoldFiles($this->moldData);
-		$moldFile->checkFileISMoldOrNOt($pathAndFileName);
+		$moldFile->checkFileISMoldOrNOt($pathAndFileName,$this->fileInfo['app']);
 		$listDirToFile = explode(DIRECTORY_SEPARATOR,$pathAndFileName);
 		$fileName = array_pop($listDirToFile);
 		$extFile = strtolower(file::ext_file($fileName));
@@ -369,7 +372,7 @@ class MoldRendering {
 		}
 		$pathAndFileName =  str_replace(['/', '\\', '>',DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, trim($value[0]));
 		$pathAndFileName = str_replace(['"','\''] ,'' ,$pathAndFileName);
-		$moldFile->checkFileISMoldOrNOt($pathAndFileName);
+		$moldFile->checkFileISMoldOrNOt($pathAndFileName,$this->fileInfo['app']);
 		$fileContents = file_get_contents($pathAndFileName);
 		$funcName = 'assetsFileCache_'.strings::generateRandomLowString();
 		$php = "if ( ! function_exists('".$funcName ."') ) { function ".$funcName .' ( &$moldData ) { ?>' ;
@@ -414,12 +417,12 @@ class MoldRendering {
 			$names = explode('}',$name);
 			$name = str_replace(['"','\''] ,'' ,trim($names[0]));
 			$name = str_replace(['/','*','~','-','.','\\'],'_', $name);
-			if ( isset( $this->map[$data['otherValues']] ))
-				$this->map[$name]++;
+			if ( isset( self::$map[$name] ))
+				self::$map[$name]++;
 			else
-				$this->map[$name] = 0 ;
+				self::$map[$name] = 0 ;
 			$moldRendering = new MoldRendering($matches[$i][1],$this->fileInfo,$this->moldData,$this->version );
-			$this->string .= ' <?php }  function moldBlock_'.$name.'_'.$this->map[$name].'(&$moldData){ ?>'.$moldRendering->getResult() ;
+			$this->string .= ' <?php }  function moldBlock_'.$name.'_'.self::$map[$name].'(&$moldData){ ?>'.$moldRendering->getResult() ;
 		}
 
 	}
