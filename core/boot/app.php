@@ -11,6 +11,8 @@
  */
 
 
+use paymentCms\component\strings;
+
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
@@ -157,23 +159,33 @@ class App {
 	}
 
 	public static function getAppPath($path = null , $app = null ){
+		$baseDir = 'app';
 		if ( $app == null)
 			$app = self::$app ;
+		elseif ( strings::strLastHas($app,':plugin')){
+			$baseDir = 'plugins';
+			$app = strings::deleteWordLastString($app,':plugin');
+		}
 		$path = str_replace(['\\','/','>'],DIRECTORY_SEPARATOR,$path);
 		$path = ( substr($path,-1) == DIRECTORY_SEPARATOR or is_null($path) ) ? $path : $path.DIRECTORY_SEPARATOR ;
-		return payment_path.'app'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.(( ! is_null($path) ) ? $path : '' );
+		return payment_path.$baseDir.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.(( ! is_null($path) ) ? $path : '' );
 	}
 
 	public static function getAppLink($path = null , $app = null ){
 		$baseUrl = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
 		$protocol = 'http';
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") $protocol = 'https';
+		$baseDir = 'app';
 		if ( $app == null)
 			$app = self::$app ;
+		elseif ( strings::strLastHas($app,':plugin')){
+			$baseDir = 'plugins';
+			$app = strings::deleteWordLastString($app,':plugin');
+		}
 		$path = str_replace(['\\','/','>'],'/',$path);
 		$path = str_replace('//','/',$path);
 		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;
-		return $protocol. '://' . $_SERVER['HTTP_HOST'] .$baseUrl.'app/'.$app.'/'.(( ! is_null($path) ) ? $path : '' );
+		return $protocol. '://' . $_SERVER['HTTP_HOST'] .$baseUrl.$baseDir.'/'.$app.'/'.(( ! is_null($path) ) ? $path : '' );
 	}
 
 	public static function getBaseAppLink($path = null , $app = null ){

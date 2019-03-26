@@ -16,10 +16,10 @@ use paymentCms\component\request;
  */
 class Mold {
 
-	private static $mold ;
-	private static $moldData ;
-	private static $moldFiles ;
-	public static $autoCompile = true ;
+	private  $mold ;
+	private $moldData ;
+	private $moldFiles ;
+	public $autoCompile = true ;
 
 	public function __construct() {
 		$this->init($this);
@@ -31,19 +31,19 @@ class Mold {
 	 * @return Mold
 	 * @example ->init();
 	 */
-	public static function init($mold = null) {
-		self::$moldData = new MoldData();
-		self::$moldFiles = new MoldFiles(self::$moldData);
+	public function init($mold = null) {
+		$this->moldData = new MoldData();
+		$this->moldFiles = new MoldFiles($this->moldData);
 		if ( is_null($mold) ) {
-			self::$mold = new Mold();
+			$this->mold = new Mold();
 		} else {
-			self::$mold = $mold;
+			$this->mold = $mold;
 		}
 		if ( Request::isGet('moldAssetsFileLoader') ){
-			self::$autoCompile = false ;
-			self::$moldFiles->renderAssets(Request::getOne('moldAssetsFileLoader'));
+			$this->autoCompile = false ;
+			$this->moldFiles->renderAssets(Request::getOne('moldAssetsFileLoader'));
 		}
-		return self::$mold;
+		return $this->mold;
 
 	}
 
@@ -59,9 +59,9 @@ class Mold {
 	 * @example : ->set( 'username' => $object ) );
 	 * @example : ->set( 'user' => array( 'username' => 'admin' , 'userAvatar' => 'avatar.png' ) ) );
 	 */
-	public static function set(){
-		call_user_func_array(array(self::$moldData , 'set') , func_get_args() );
-		return self::$mold ;
+	public function set(){
+		call_user_func_array(array($this->moldData , 'set') , func_get_args() );
+		return $this->mold ;
 	}
 
 	/**
@@ -71,9 +71,9 @@ class Mold {
 	 * @return Mold
 	 * @example ->setPageTitle('hello world!');
 	 */
-	public static function setPageTitle($pageTitle){
-		call_user_func_array(array(self::$moldData , 'set') , ['_title' , $pageTitle] );
-		return self::$mold ;
+	public function setPageTitle($pageTitle){
+		call_user_func_array(array($this->moldData , 'set') , ['_title' , $pageTitle] );
+		return $this->mold ;
 	}
 
 	/**
@@ -84,9 +84,9 @@ class Mold {
 	 * @example ->setPageTitle($user_object);
 	 * @example ->setPageTitle($user_array);
 	 */
-	public static function setUser($user){
-		call_user_func_array(array(self::$moldData , 'set') , ['_user' , $user] );
-		return self::$mold ;
+	public function setUser($user){
+		call_user_func_array(array($this->moldData , 'set') , ['_user' , $user] );
+		return $this->mold ;
 	}
 
 	/**
@@ -97,9 +97,9 @@ class Mold {
 	 * @example ->setConfig($config_object);
 	 * @example ->setConfig($config_array);
 	 */
-	public static function setConfig($config){
-		call_user_func_array(array(self::$moldData , 'set') , ['_config' , $config] );
-		return self::$mold ;
+	public function setConfig($config){
+		call_user_func_array(array($this->moldData , 'set') , ['_config' , $config] );
+		return $this->mold ;
 	}
 
 	/**
@@ -110,9 +110,9 @@ class Mold {
 	 * @example ->remove('variable');
 	 * @example ->remove('variable','other_variable');
 	 */
-	public static function remove(){
-		call_user_func_array(array(self::$moldData , 'remove') , func_get_args() );
-		return self::$mold ;
+	public function remove(){
+		call_user_func_array(array($this->moldData , 'remove') , func_get_args() );
+		return $this->mold ;
 	}
 
 	/**
@@ -124,8 +124,8 @@ class Mold {
 	 * @example ->get('variable','other_variable');
 	 * @example ->get();
 	 */
-	public static function get(){
-		return call_user_func_array(array(self::$moldData , 'get') , func_get_args() );
+	public function get(){
+		return call_user_func_array(array($this->moldData , 'get') , func_get_args() );
 	}
 
 	/**
@@ -135,9 +135,9 @@ class Mold {
 	 * @return Mold :
 	 * @example ->AutoCompile();
 	 */
-	public static function AutoCompile(){
-		self::$autoCompile = true ;
-		return self::$mold ;
+	public function AutoCompile(){
+		$this->autoCompile = true ;
+		return $this->mold ;
 	}
 
 
@@ -147,9 +147,9 @@ class Mold {
 	 * @return Mold :
 	 * @example ->offAutoCompile();
 	 */
-	public static function offAutoCompile(){
-		self::$autoCompile = false ;
-		return self::$mold ;
+	public function offAutoCompile(){
+		$this->autoCompile = false ;
+		return $this->mold ;
 	}
 
 	/**
@@ -162,9 +162,9 @@ class Mold {
 	 * @example ->path();
 	 * @example ->path('default' , 'com_pinoox_front' );
 	 */
-	public static function path($folder = null ,$app = null){
-		self::$moldFiles->setPath($folder , $app);
-		return self::$mold ;
+	public function path($folder = null ,$app = null){
+		$this->moldFiles->setPath($folder , $app);
+		return $this->mold ;
 	}
 
 	/**
@@ -179,11 +179,11 @@ class Mold {
 	 * @example ->view('sidebar.mold.html' , 'login.mold.html' );
 	 * @example ->view('panel\sidebar.mold.html' , 'person>login.mold.html' );
 	 */
-	public static function view(){
+	public function view(){
 		$files = func_get_args() ;
 		array_unshift( $files , 'body' )   ;
-		call_user_func_array(array(self::$moldFiles , 'appendView') , $files  );
-		return self::$mold ;
+		call_user_func_array(array($this->moldFiles , 'appendView') , $files  );
+		return $this->mold ;
 	}
 
 
@@ -199,11 +199,11 @@ class Mold {
 	 * @example ->header('header.mold.html' , 'sidebar.mold.html' );
 	 * @example ->header('panel\header.mold.html' , 'person>sidebar.mold.html' );
 	 */
-	public static function header(){
+	public function header(){
 		$files = func_get_args() ;
 		array_unshift( $files , 'header' )   ;
-		call_user_func_array(array(self::$moldFiles , 'appendView') , $files  );
-		return self::$mold ;
+		call_user_func_array(array($this->moldFiles , 'appendView') , $files  );
+		return $this->mold ;
 	}
 
 	/**
@@ -218,11 +218,11 @@ class Mold {
 	 * @example ->header('copyright.mold.html' , 'footer.mold.html' );
 	 * @example ->header('panel\copyright.mold.html' , 'person>footer.mold.html' );
 	 */
-	public static function footer(){
+	public function footer(){
 		$files = func_get_args() ;
 		array_unshift( $files , 'footer' )   ;
-		call_user_func_array(array(self::$moldFiles , 'appendView') , $files  );
-		return self::$mold ;
+		call_user_func_array(array($this->moldFiles , 'appendView') , $files  );
+		return $this->mold ;
 	}
 
 
@@ -239,13 +239,13 @@ class Mold {
 	 * @example ->after('person/body.mold.html' , 'copyright.mold.html' , 'footer.mold.html' );
 	 * @example ->after('body.mold.html' , 'panel\copyright.mold.html' , 'panel>footer.mold.html' );
 	 */
-	public static function after(){
+	public function after(){
 		if ( func_num_args() > 1  ){
-			call_user_func_array(array(self::$moldFiles , 'addViewAfter') , func_get_args()   );
-			return self::$mold ;
+			call_user_func_array(array($this->moldFiles , 'addViewAfter') , func_get_args()   );
+			return $this->mold ;
 		} else {
 			// TODO : add Exception
-			return self::$mold ;
+			return $this->mold ;
 		}
 	}
 
@@ -262,13 +262,13 @@ class Mold {
 	 * @example ->before('footer.mold.html' , 'person/body.mold.html' , 'copyright.mold.html' );
 	 * @example ->before('panel>footer.mold.html' , 'body.mold.html' , 'panel\copyright.mold.html' );
 	 */
-	public static function before(){
+	public function before(){
 		if ( func_num_args() > 1  ){
-			call_user_func_array(array(self::$moldFiles , 'addViewBefore') , func_get_args()   );
-			return self::$mold ;
+			call_user_func_array(array($this->moldFiles , 'addViewBefore') , func_get_args()   );
+			return $this->mold ;
 		} else {
 			// TODO : add Exception
-			return self::$mold ;
+			return $this->mold ;
 		}
 	}
 
@@ -280,9 +280,9 @@ class Mold {
 	 * @example ->unshow('copyright.mold.html');
 	 * @example ->unshow('copyright.mold.html','footer.mold.html');
 	 */
-	public static function unshow(){
-		call_user_func_array(array(self::$moldFiles , 'unshow') , func_get_args() );
-		return self::$mold ;
+	public function unshow(){
+		call_user_func_array(array($this->moldFiles , 'unshow') , func_get_args() );
+		return $this->mold ;
 	}
 
 	/**
@@ -291,8 +291,8 @@ class Mold {
 	 * @return array :
 	 * @example ->getViews();
 	 */
-	public static function getViews(){
-		return self::$moldFiles->listView();
+	public function getViews(){
+		return $this->moldFiles->listView();
 	}
 
 
@@ -302,8 +302,8 @@ class Mold {
 	 * @return string :
 	 * @example ->render();
 	 */
-	public static function render(){
-		return self::$moldFiles->render();
+	public function render(){
+		return $this->moldFiles->render();
 	}
 
 	/**
@@ -312,9 +312,9 @@ class Mold {
 	 * @return Mold
 	 * @example ->minifyCache();
 	 */
-	public static function minifyCache(){
-		self::$moldFiles->setMinifyHtml(true);
-		return self::$mold ;
+	public function minifyCache(){
+		$this->moldFiles->setMinifyHtml(true);
+		return $this->mold ;
 	}
 
 	/**
@@ -323,9 +323,9 @@ class Mold {
 	 * @return Mold
 	 * @example ->offMinifyCache();
 	 */
-	public static function offMinifyCache(){
-		self::$moldFiles->setMinifyHtml(false);
-		return self::$mold ;
+	public function offMinifyCache(){
+		$this->moldFiles->setMinifyHtml(false);
+		return $this->mold ;
 	}
 
 	/**
@@ -343,7 +343,7 @@ class Mold {
 	 * @example ->cache(false);
 	 * @example ->cache(3600);
 	 */
-	public static function cache($time = 432000){
+	public function cache($time = 432000){
 		if ( $time === false )
 			$time = false ;
 		elseif ( $time === null or empty($time))
@@ -352,13 +352,13 @@ class Mold {
 			$time = intval($time) ;
 		else
 			$time = 432000 ;
-		self::$moldFiles->setCacheLifeTime($time);
-		return self::$mold ;
+		$this->moldFiles->setCacheLifeTime($time);
+		return $this->mold ;
 	}
 
 
 	public function __destruct() {
-		if ( self::$autoCompile )
+		if ( $this->autoCompile )
 			echo self::render();
 	}
 }

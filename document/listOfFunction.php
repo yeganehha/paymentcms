@@ -48,4 +48,5 @@ return [
 	'array_reverse',
 	'array_unshift',
 	'array_unique',
+	'glob',
 ];
