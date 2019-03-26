@@ -27,6 +27,8 @@ spl_autoload_register(function ($class_name_call) {
 	$dire = array_shift($paths);
 	if ( $dire == 'paymentCms' )
 		$class_patch = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.strtolower(implode(DIRECTORY_SEPARATOR,$paths)).DIRECTORY_SEPARATOR.$class_name.'.php';
+	elseif ( $dire == 'plugin' )
+		$class_patch = payment_path.'plugins'.DIRECTORY_SEPARATOR.strtolower(implode(DIRECTORY_SEPARATOR,$paths)).DIRECTORY_SEPARATOR.$class_name.'.php';
 	else
 		$class_patch = payment_path.$dire.DIRECTORY_SEPARATOR.strtolower(implode(DIRECTORY_SEPARATOR,$paths)).DIRECTORY_SEPARATOR.$class_name.'.php';
 
