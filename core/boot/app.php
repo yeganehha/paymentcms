@@ -172,7 +172,19 @@ class App {
 			$app = self::$app ;
 		$path = str_replace(['\\','/','>'],'/',$path);
 		$path = str_replace('//','/',$path);
-		$path = ( substr($path,-1) == DIRECTORY_SEPARATOR or is_null($path) ) ? $path : $path.'/' ;
-		return $protocol. '://' . $_SERVER['HTTP_HOST'] .'/'.$baseUrl.'/app/'.$app.'/'.(( ! is_null($path) ) ? $path : '' );
+		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;
+		return $protocol. '://' . $_SERVER['HTTP_HOST'] .$baseUrl.'app/'.$app.'/'.(( ! is_null($path) ) ? $path : '' );
+	}
+
+	public static function getBaseAppLink($path = null , $app = null ){
+		$baseUrl = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
+		$protocol = 'http';
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") $protocol = 'https';
+		if ( $app == null)
+			$app = self::$app ;
+		$path = str_replace(['\\','/','>'],'/',$path);
+		$path = str_replace('//','/',$path);
+		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;
+		return $protocol. '://' . $_SERVER['HTTP_HOST'] .$baseUrl.$app.'/'.(( ! is_null($path) ) ? $path : '' );
 	}
 }

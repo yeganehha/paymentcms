@@ -31,39 +31,55 @@ class controller {
 		$mold->cache(10);
 		$mold->header('header.mold.html');
 		$mold->footer('footer.mold.html');
+		$mold->set('direction' , 'rtl');
+		$mold->set('text_align' , 'right');
+		$mold->set('float' , 'right');
 
 		$menu = new menu('sideBar') ;
 		$this->menu = $menu ;
-		$menu->add('dashboard' , rlang('dashboard' ) , 'home' , 'fa fa-home' );
-		$menu->add('payments' , rlang('payments' ) , 'home3' , 'fa fa-home' );
-		$menu->after('dashboard','service' , rlang('service' ) , 'home2' , 'fa fa-home' );
-		$menu->addChild('payments','best' , rlang('done' ) , 'home2' , 'fa fa-home' );
-		$menu->add('best2' , rlang('done' ) , 'best2' , 'fa fa-home' ,null,'payments');
-		$menu->add('best23' , rlang('done' ) , 'best23' , 'fa fa-home' ,null,'payments');
-		$menu->addChild('best2','best22' , rlang('service' ) , 'best222' , 'fa fa-home' , null );
-		$menu->add('best22222' , rlang('service' ) , 'best222' , 'fa fa-home' , null , 'best2');
+		$menu->add('dashboard' , rlang('dashboard' ) , app::getBaseAppLink() , 'fa fa-home' );
+		$menu->add('users' , rlang(['list','users'] ) , app::getBaseAppLink('users/lists') , 'fa fa-users' );
+		$menu->add('factors' , rlang('factors' ) , app::getBaseAppLink('factors/lists') , 'fa fa-file-text-o' );
+		$menu->addChild('factors' , 'allFactors' , rlang('factors' ) , app::getBaseAppLink('factors/lists')  );
+		$menu->add('successFactors' , rlang(['factorsOf','success'] ) , app::getBaseAppLink('factors/success') ,null,null,'factors' );
+		$menu->add('failFactors' , rlang(['factorsOf','fail'] ) , app::getBaseAppLink('factors/fail') ,null,null,'factors' );
+		$menu->add('pendingFactors' , rlang(['factorsOf','pending'] ) , app::getBaseAppLink('factors/pending') ,null,null,'factors' );
+		$menu->add('services' , rlang('services' ) , app::getBaseAppLink('service/lists') , 'fa fa-shopping-cart' );
+		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
+		$menu->add('plugins' , rlang('plugins' ) , app::getBaseAppLink('plugins/lists') , 'fa fa-puzzle-piece' );
+		$menu->add('configuration' , rlang('configuration' ) , app::getBaseAppLink('configuration') , 'fa fa-cogs' );
+		$menu->add('developer' , rlang('developer' ) , app::getBaseAppLink('developer') , 'fa fa-code' );
 
 
 	}
 
+	/**
+	 * @param null   $model
+	 * @param null   $searchVariable
+	 * @param string $searchWhereClaus
+	 *
+	 * @return \App\model\model
+	 */
 	protected function model($model = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
 		if ( $model == null )
 			$model = $this->model;
-		if (file_exists(payment_path.'app'.DIRECTORY_SEPARATOR.$this->app.DIRECTORY_SEPARATOR . 'model'.DIRECTORY_SEPARATOR. $model . '.php')) {
-			$model = 'App\\'.$this->app.'\model\\'.$model ;
-			if (class_exists($model)) {
-				return new $model($searchVariable,$searchWhereClaus) ;
-			} else {
-				App\core\controller\httpErrorHandler::E500($model);
-				exit;
-			}
+		$model = 'paymentCms\model\\'.$model ;
+		if (class_exists($model)) {
+			return new $model($searchVariable,$searchWhereClaus) ;
 		} else {
-			App\core\controller\httpErrorHandler::E500(payment_path.'app'.DIRECTORY_SEPARATOR.$this->app.DIRECTORY_SEPARATOR . 'model'.DIRECTORY_SEPARATOR. $model . '.php');
+			App\core\controller\httpErrorHandler::E500($model);
 			exit;
 		}
+
 	}
 
+	protected function pagination($total, $page, $number = 25 ){
+		$total = ceil($total / $number ) ;
+		$this->mold->set('pagination' , ['total' => $total ,'perEachPage' => $number , 'currentPage' => $page]);
+		return ['start' => ($page -1 ) * $number , 'limit' => $number];
+	}
 	public function __destruct() {
-		$this->mold->set('menu' , $this->menu );
+		if ( ! is_null($this->mold) and ! is_null($this->menu))
+			$this->mold->set('menu' , $this->menu );
 	}
 }

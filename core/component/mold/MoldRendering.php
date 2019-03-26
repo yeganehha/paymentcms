@@ -33,7 +33,9 @@ class MoldRendering {
 	const replaceWithEndFunctionName = '/' ;
 
 	public function __construct($string , $fileInfo , &$moldData ,$version , $runFromPhp = false ) {
-		$this->string = str_replace( ['<?php' , '<script' , '<style'] , ['<?<?php echo \'php\' ; ?>' , '<<?php echo \'script\' ; ?>', '<<?php echo \'style\' ; ?>'] ,$string );
+		$this->string = str_replace( '<?php' , '<?<?php echo \'php\' ; ?>'  ,$string );
+		$this->string = str_replace( '<script' , '<<?php echo \'script\' ; ?>' ,$string );
+		$this->string = str_replace( '<style' , '<<?php echo \'style\' ; ?>' ,$string );
 		$this->fileInfo = $fileInfo ;
 		$this->runFromPhp = $runFromPhp ;
 		$this->moldData = $moldData ;
@@ -271,6 +273,14 @@ class MoldRendering {
 		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
 	}
 
+	private function _l($data){
+		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+	}
+
+	private function __($data){
+		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+	}
+
 	private function _php($data){
 		$this->replace($data['find'],'<?php ' , false,false );
 	}
@@ -429,13 +439,15 @@ class MoldRendering {
 			case 'current':
 				$link = \app::getFullRequestUrl();
 				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
+				$this->replace($data['find'],' echo \app::getFullRequestUrl(); ' , false);
+				return ;
 				break;
 			case '':
-				$link = \app::getAppLink();
+				$link = \app::getBaseAppLink();
 				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
 			default :
-				$link = \app::getAppLink(null, $data['otherValues']);
+				$link = \app::getBaseAppLink(null, $data['otherValues']);
 				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
 		}

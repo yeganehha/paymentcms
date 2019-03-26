@@ -19,7 +19,16 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 interface model {
 
 	public function __construct($searchVariable,$searchWhereClaus);
-	public function search($searchVariable, $searchWhereClaus , $tableName  , $fields ) ;
+
+	/**
+	 * @param $searchVariable
+	 * @param $searchWhereClaus
+	 * @param $tableName
+	 * @param $fields
+	 *
+	 * @return mixed
+	 */
+	public function search($searchVariable, $searchWhereClaus , $tableName , $fields ) ;
 	public function insertToDataBase() ;
 	public function upDateDataBase() ;
 	public function deleteFromDataBase() ;

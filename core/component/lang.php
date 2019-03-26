@@ -15,10 +15,14 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 function lang($langs , $implode = ' ',$lang = 'fa' ){
-	echo implode($implode , (array) rlang($langs , $lang ));
+	echo implode($implode , (array) returnLang($langs , $lang ));
 }
 
-function rlang($langs,$lang = 'fa'){
+function rlang($langs , $implode = ' ',$lang = 'fa' ){
+	return implode($implode , (array) returnLang($langs , $lang ));
+}
+
+function returnLang($langs,$lang = 'fa'){
 	return Lang::init()->setLang($lang)->get($langs);
 }
 

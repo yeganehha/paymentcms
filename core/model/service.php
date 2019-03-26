@@ -45,8 +45,8 @@ class service implements model {
 	}
 
 	public function search( $searchVariable, $searchWhereClaus , $tableName = 'service'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
+		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields  );
+		return $results ;
 	}
 
 

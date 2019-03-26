@@ -18,98 +18,133 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class request {
 
-	public static function post( array $parameters){
-		return self::check($_POST,$parameters);
+	private static $data = [];
+	private static $json = [];
+
+	private static function getData()
+	{
+		if (empty(self::$data)) self::$data = file_get_contents('php://input');
+		return self::$data;
 	}
 
-	public static function get( array $parameters){
-		return self::check($_GET,$parameters , true);
+	private static function getJson()
+	{
+		if (empty(self::$json)) self::$json = strings::decodeJson(self::getData());
+		return self::$json;
 	}
 
-	public static function cookie( array $parameters){
-		return self::check($_COOKIE,$parameters);
-	}
+	public static function params($segments = null)
+	{
+		$args = Router::params();
+		if (empty($args)) return null;
+		if (is_null($segments)) return $args;
 
-	public static function server( array $parameters){
-		return self::check($_SERVER,$parameters);
-	}
-
-	public static function all( array $parameters){
-		return self::check($_REQUEST,$parameters);
-	}
-
-	public static function isGet($parameter){
-		if ( isset($_GET[$parameter]))
-			return true ;
-		return false ;
-	}
-	public static function isPost($parameter){
-		if ( isset($_COOKIE[$parameter]))
-			return true ;
-		return false ;
-	}
-	public static function isCookie($parameter){
-		if ( isset($_POST[$parameter]))
-			return true ;
-		return false ;
-	}
-	public static function is($parameter){
-		if ( isset($_REQUEST[$parameter]))
-			return true ;
-		return false ;
-	}
-
-	public static function getOne($parameter){
-		if ( isset($_GET[$parameter]))
-			return $_GET[$parameter] ;
-		return false ;
-	}
-
-	public static function postOne($parameter){
-		if ( isset($_POST[$parameter]))
-			return $_POST[$parameter] ;
-		return false ;
-	}
-
-	public static function cookieOne($parameter){
-		if ( isset($_COOKIE[$parameter]))
-			return $_COOKIE[$parameter] ;
-		return false ;
-	}
-
-	public static function one($parameter){
-		if ( isset($_REQUEST[$parameter]))
-			return $_REQUEST[$parameter] ;
-		return false ;
-	}
-
-	private static  function check($data , $parameters , $urlDecode = false ){
-		if ( is_array($parameters) ){
-			$return = array();
-			foreach ( $parameters as $key => $defaultValue ){
-				if ( is_int($key)) {
-					if (isset($data[$defaultValue])) {
-						if ($urlDecode)
-							$return[$defaultValue] = urldecode($data[$defaultValue]);
-						else
-							$return[$defaultValue] = $data[$defaultValue];
-					} else {
-						$return[$defaultValue] = null ;
-					}
-				} else {
-					if (isset($data[$key]))
-						if ( $urlDecode )
-							$return[$key] = urldecode($data[$key]);
-						else
-							$return[$key] = $data[$key];
-					else {
-						if (isset($defaultValue))
-							$return[$key] = $defaultValue ;
-					}
-				}
+		if (is_array($segments)) {
+			$params = array();
+			foreach ($segments as $s) {
+				$params[] = isset($args[$s]) ? $args[$s] : null;
 			}
-			return $return ;
-		} else
-			return array();
+			return $params;
+		}
+		return $data = isset($args[$segments]) ? $args[$segments] : null;
 	}
+
+	public static function headers($key = null)
+	{
+		$headers = apache_request_headers();
+		if (empty($key)) return $headers;
+
+		return isset($headers[$key]) ? $headers[$key] : null;
+	}
+
+	public static function json($keys, $defaults = null, $validation = null, $removeNull = false)
+	{
+		return arrays::parseParams(self::getJson(), $keys, $defaults, $validation, $removeNull);
+	}
+
+	public static function jsonOne($key, $default = null, $validation = null)
+	{
+		return arrays::parseParam(self::getJson(), $key, $default, $validation);
+	}
+
+	public static function post($keys, $defaults = null, $validation = null, $removeNull = false)
+	{
+		return arrays::parseParams($_POST, $keys, $defaults, $validation, $removeNull);
+	}
+
+	public static function postOne($key, $default = null, $validation = null)
+	{
+		return arrays::parseParam($_POST, $key, $default, $validation);
+	}
+
+	public static function get($keys, $defaults = null, $validation = null, $removeNull = false)
+	{
+		return arrays::parseParams($_GET, $keys, $defaults, $validation, $removeNull);
+	}
+
+	public static function getOne($key, $default = null, $validation = null)
+	{
+		return arrays::parseParam($_GET, $key, $default, $validation);
+	}
+
+	public static function all($keys, $defaults = null, $validation = null, $removeNull = false)
+	{
+		return arrays::parseParams($_REQUEST, $keys, $defaults, $validation, $removeNull);
+	}
+
+	public static function one($key, $default = null, $validation = null)
+	{
+		return arrays::parseParam($_REQUEST, $key, $default, $validation);
+	}
+
+	public static function isFile($file = '')
+	{
+		if (!empty($file)) {
+			if (isset($_FILES[$file]['name']) && !empty($_FILES[$file]['name'])) return true;
+		}
+		return false;
+	}
+
+	public static function file($key = null)
+	{
+		if (empty($key))
+			return $_FILES;
+		else
+			if (isset($_FILES[$key]))
+				return $_FILES[$key];
+		return null;
+	}
+
+	public static function isPost($param = '')
+	{
+		if (!empty($param)) {
+			if (isset($_POST[$param])) return true;
+			else return false;
+		}
+
+		if ($_SERVER['REQUEST_METHOD'] === 'POST')
+			return true;
+		return false;
+	}
+
+	public static function isGet($param = '')
+	{
+		if (!empty($param)) {
+			if (isset($_GET[$param])) return true;
+			else return false;
+		}
+
+		if ($_SERVER['REQUEST_METHOD'] === 'GET')
+			return true;
+		return false;
+	}
+
+	public static function isAjax()
+	{
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'))
+			return true;
+		return false;
+
+	}
+
 }

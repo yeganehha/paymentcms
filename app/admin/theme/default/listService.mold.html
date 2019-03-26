@@ -1,0 +1,136 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-rose card-header-icon pointer"  data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">
+                        <div class="card-icon" >
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "services"}</h4>
+                    </div>
+                    <div class="collapse" id="searchServices">
+                        <div class="card-body">
+                            {set loadDivID,"#listToGetFromServer"}
+                            {set loadDivIDInHtml,"listToGetFromServer"}
+                            <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
+                                <div class="row">
+                                   <div class="col-md-4">
+                                       <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                       <div class="col-md-9">
+                                           <div class="form-group has-default">
+                                               <input type="text" name="name" class="form-control">
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <div class="col-md-4">
+                                       <label class="col-md-3 col-form-label">{_ "description"}</label>
+                                       <div class="col-md-9">
+                                           <div class="form-group has-default">
+                                               <input type="text" name="description" class="form-control">
+                                           </div>
+                                       </div>
+                                   </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "price"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="price" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                   <div class="col-md-4">
+                                       <label class="col-md-3 col-form-label">{_ "link"}</label>
+                                       <div class="col-md-9">
+                                           <div class="form-group has-default">
+                                               <input type="text" name="link" class="form-control">
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <div class="col-md-4 text-center mt-3">
+                                       <div class="form-check">
+                                           <label class="form-check-label">
+                                               <input class="form-check-input" name="active" type="checkbox" value="active"> {_ "active"}
+                                               <span class="form-check-sign">
+                                                  <span class="check"></span>
+                                                </span>
+                                           </label>
+                                       </div>
+                                   </div>
+                                   <div class="col-md-4">
+                                       <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">{_ "close"}</button>
+                                       <button type="submit" class="btn btn-fill btn-rose">{_ "search"}</button>
+                                   </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-rose card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">shopping_cart</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "services"}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th>{_ "name"}</th>
+                                    <th>{_ "description"}</th>
+                                    <th>{_ "price"}</th>
+                                    <th>{_ "link"}</th>
+                                    <th>{_ "actions"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$services key=key value=service}
+                                <tr>
+                                    <td class="text-center">{$service.serviceId}</td>
+                                    <td>{$service.name}</td>
+                                    <td>{$service.description}</td>
+                                    <td>{$service.price}</td>
+                                    <td class="text-right">{$service.link}</td>
+                                    <td class="td-actions text-right">
+                                        <button type="button" rel="tooltip" class="btn btn-info btn-link">
+                                            <i class="material-icons">person</i>
+                                        </button>
+                                        <button type="button" rel="tooltip" class="btn btn-success btn-link">
+                                            <i class="material-icons">edit</i>
+                                        </button>
+                                        <button type="button" rel="tooltip" class="btn btn-danger btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                        {view "[url patch]pagination.mold.html"}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{map navBarButton}
+<a class="btn btn-info" href="{url}service/new">
+                      <span class="btn-label">
+                        <i class="material-icons">add_shopping_cart</i>
+                      </span>
+    {_ "add"} {_ "services"}
+    <div class="ripple-container"></div>
+</a>
+{/map}

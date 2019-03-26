@@ -16,314 +16,599 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 class validate {
-	private $data ;
-	private $error = array() ;
-	private $returnData ;
-	private $tempReturnData ;
-	private $isValid ;
-	private $methodExploder = '_';
+	
+	private static $obj;
+	private static $inputs;
+	private static $rules;
+	private static $customMessages;
+	private static $listMethodValidators;
+	private static $errors;
+	private static $isFail;
+	private static $data;
+	private static $field_title;
+	private static $currentKey;
+	private static $isNot = false;
+	private static $activeMethod;
+	private static $isErr = false;
+	private static $resultMethod = true;
+	private static $params = [];
+	private static $validators = [];
+	private static $field_titles = [];
+	private static $field_types = [];
 
 	/**
-	 * Validate constructor.
 	 *
-	 * validation  : required , notEmpty , email , number , numberFormat [ include { } / X 0123456789 + . - ] , maxLen [number] , minLen [number]
- 	 * @return boolean
-	 *
-	 * @param array $data
-	 * @param array $validations
+	 * @return validate
 	 */
-	public function __construct(array  $data, array $validations) {
-		$this->isValid = true ;
-		$this->returnData = array() ;
-		$this->tempReturnData = array() ;
-		try {
-			$this->data = $data;
-			$this->error = null ;
-			foreach ($validations as $paramsName => $validationsParameters) {
-				$validationsParametersEachOne = null ;
-				/*if ( !isset($data[$paramsName]))
-					break ;*/
+	public static function check($inputs, $rules, $messages = null)
+	{
+		self::$isErr = true;
+		self::$inputs = $inputs;
+		self::$rules = $rules;
+		self::$customMessages = $messages;
 
-				if ( strpos( $validationsParameters , '|' ) ){
-					$validationsParametersEachOne = explode('|',$validationsParameters);
-				}
-				else {
-					$validationsParametersEachOne[] = $validationsParameters ;
-				}
-				foreach ( $validationsParametersEachOne as $validateType ){
-					$validateTypeParameter = null ;
-					$strpose = strpos($validateType,':');
-					if ( $strpose !== false){
-						$validateTypeParameter = substr($validateType , $strpose+1 );
-						$validateType = substr($validateType,0,$strpose);
-					}
-					$validateType = $this->methodExploder.$validateType ;
-					if( method_exists($this,$validateType)){
-						if ( strpos($paramsName , '.' ) === false ){
-							if ( ! isset($data[$paramsName] ))
-								break ;
-							if ( ! $this->{$validateType}(array($paramsName) , $data[$paramsName] ,$validateTypeParameter ) )
-								$this->isValid = false ;
-						} else {
-							$explode = explode('.' , $paramsName);
-							$countExplode = count($explode)  ;
-							$tempData = $data;
-							$runFunctionFlag = true ;
-							for ( $i=0 ; $i < $countExplode ; $i++ ){
-								if ( $explode[$i] != '*' ) {
-									$tempData = $tempData[$explode[$i]];
-									$variableName[$i] = $explode[$i] ;
-								} else {
-									foreach ( $tempData as $tempDataIndex => $tempDataValue ) {
-										$variableName[$i] = $tempDataIndex ;
-										$tempData2 = $tempDataValue ;
-										for ($iTow = $i + 1; $iTow < $countExplode; $iTow++) {
-											if ( isset($tempData2[$explode[$iTow]]))
-												$tempData2 = $tempData2[$explode[$iTow]];
-											else
-												break ;
-											$variableName[$iTow] = $explode[$iTow] ;
-										}
-										if ( ! $this->{$validateType}($variableName , $tempData2 ,$validateTypeParameter ) )
-											$this->isValid = false ;
-										unset($variableName[$i][$tempDataIndex]);
-									}
-									$runFunctionFlag = false ;
-									$i = $countExplode ;
-								}
-							}
-							if ( $runFunctionFlag )
-								if ( ! $this->{$validateType}($variableName , $tempData ,$validateTypeParameter ) )
-									$this->isValid = false ;
-						}
-					} else
-						$this->isValid = false ;
-				}
-			}
-		} catch ( \Exception $e) {
-			$this->error = $e->getMessage() ;
-			$this->isValid = false ;
-			return false ;
-		}
-		return $this->isValid ;
+		self::init();
+		self::validateInputsByRules();
+
+		return self::$obj;
 	}
 
+	private static function init()
+	{
+		if (empty(self::$obj))
+			self::$obj = new validate();
+		self::getDefinedValidators();
+		self::setFail(false);
+	}
 
-	private function putData($name,$value){
-		if ( is_string($name) ){
-			$this->returnData[$name] = $value;
+	private static function getDefinedValidators()
+	{
+		if (!empty(self::$listMethodValidators)) return;
+
+		$class = new \ReflectionClass(self::class);
+		$methods = $class->getMethods(
+			\ReflectionMethod::IS_PUBLIC |
+			\ReflectionMethod::IS_PROTECTED |
+			\ReflectionMethod::IS_PRIVATE
+		);
+		foreach ($methods as $method) {
+			$mName = $method->name;
+			if (substr($mName, 0, 1) == '_') {
+				self::$listMethodValidators[] = $mName;
+			}
+		}
+	}
+
+	private static function setFail($status = true)
+	{
+		self::$isFail = $status;
+	}
+
+	private static function validateInputsByRules()
+	{
+		foreach (self::$rules as $key => $conditions) {
+			self::$currentKey = $key;
+			if (is_array($conditions)) {
+				$part_conds = $conditions[0];
+				self::$field_title = $conditions[1];
+			} else {
+				$part_conds = $conditions;
+			}
+
+			self::$field_titles[$key] = self::$field_title;
+
+			self::$data = arrays::searchArrayByPattern($key, self::$inputs);
+
+			$condParts = explode('|', $part_conds);
+			self::$field_types[$key] = $condParts;
+			foreach ($condParts as $cond) {
+				self::executeRuleMethod($cond);
+			}
+		}
+	}
+
+	private static function executeRuleMethod($ruleName)
+	{
+		$params = array();
+		$method = self::getMethodName($ruleName);
+
+		//check for exist parameters
+		if (strings::strhas($method, ':')) {
+			$parts = explode(':', $method);
+			$method = isset($parts[0]) ? $parts[0] : null;
+			$params = isset($parts[1]) ? $parts[1] : array();
+			//check for multi parameters
+			if (!empty($params)) {
+				$params = explode(',', $params);
+			}
+		}
+		if (empty($params)) $params = array();
+
+		self::$params = $params;
+
+		if (isset(self::$validators[$method])) {
+			$validator = self::$validators[$method];
+			self::executeRuleGenerate($validator['status'], $validator['err'], $validator['dataIntoMessage']);
+		} else if (self::isValidCountParams(self::class, $method, $params)) {
+			self::$activeMethod = $method;
+			self::callMethod(self::class, $method, $params);
 		} else {
-			$temp = $value ;
-			for ( $i = count($name) -1  ; $i >= 0  ; $i-- ){
-				$temp2 = $temp ;
-				unset($temp);
-				$temp[ $name[$i] ] = $temp2 ;
-			}
-			if ( ! in_array(json_encode($temp) , $this->tempReturnData ) ) {
-				$this->returnData = array_merge_recursive($this->returnData,$temp);
-				$this->tempReturnData[] = json_encode($temp) ;
-			}
+			//give an error...
 		}
-		return true ;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getError() {
-		return $this->error;
-	}
+	private static function getMethodName($ruleName)
+	{
+		self::$isNot = false;
+		$ruleName = trim($ruleName);
 
-	/**
-	 * @return array
-	 */
-	public function getReturnData() {
-		return $this->returnData;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isValid() {
-		return $this->isValid;
-	}
-
-	/**
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
-	 */
-	private function _minLen($paramsName , $paramsValue , $paramsValidateType ){
-		if ( strlen($paramsValue) < $paramsValidateType ) {
-			$this->error[] = array('name' => $paramsName , 'type' => 'minLen' , 'params' => $paramsValidateType );
-			return false ;
+		if (strings::strFirstHas($ruleName, '!')) {
+			$ruleName = strings::deleteWordFirstString($ruleName, '!');
+			self::$isNot = true;
 		}
-		$this->putData($paramsName , $paramsValue);
-		return true ;
+
+		$method = '_' . $ruleName;
+
+		return $method;
 	}
 
-	/**
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
-	 */
-	private function _maxLen($paramsName , $paramsValue , $paramsValidateType ){
-		if ( strlen($paramsValue) > $paramsValidateType ) {
-			$this->error[] = array('name' => $paramsName , 'type' => 'maxLen' , 'params' => $paramsValidateType );
-			return false ;
+	private static function executeRuleGenerate(\Closure $status, $err, \Closure $dataIntoMessage = null)
+	{
+		$info = [
+			'data' => self::getData(),
+			'first_data' => self::getFirstData(),
+			'title' => self::$field_title,
+			'titles' => self::$field_titles,
+			'inputs' => self::$inputs,
+		];
+		$options = self::$params;
+		$status = $status($info, $options);
+		if (!empty($dataIntoMessage))
+			$dataIntoMessage = $dataIntoMessage($info, $options);
+		if (is_array($err)) {
+			$message_err = $err[0];
+			$not_message_err = $err[1];
+			self::setMultiResult($status, $message_err, $not_message_err, $dataIntoMessage);
+		} else {
+			self::setError($err, $dataIntoMessage);
 		}
-		$this->putData($paramsName , $paramsValue);
-		return true ;
 	}
 
-	/**
-	 * $paramsValidateType include { } / X 0123456789 + . -
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
-	 */
-	private function _numberFormat($paramsName , $paramsValue , $paramsValidateType ){
-		$num_a=array('0','1','2','3','4','5','6','7','8','9');
-		$key_a=array('۰','۱','۲','۳','۴','۵','۶','۷','۸','۹');
-		$paramsValue = str_replace($key_a,$num_a,$paramsValue);
-		if ( $paramsValue == '' ) {
-			$this->putData($paramsName , $paramsValue);
-			return true;
+	private static function getData()
+	{
+		return self::$data['values'];
+	}
+
+	private static function getFirstData()
+	{
+		$data = self::getData();
+		return isset($data[0]) ? $data[0] : null;
+	}
+
+	private static function setMultiResult($status, $err, $notErr, $dataToStr = array())
+	{
+		if ($status && self::$isNot) {
+			self::setError($notErr, $dataToStr);
 		}
-		$explodeAccolade = preg_split("/{|}/", $paramsValidateType);
-		$correctGroupWords = array();
-		if ( count($explodeAccolade) >  0 ) {
-			foreach ($explodeAccolade as $indexWord => $valueOfWord) {
-				if (strpos($valueOfWord, '/') === false) {
-					if (count($correctGroupWords) > 0) {
-						foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
-							$correctGroupWords[$indexOfGroupWord] .= $valueOfWord;
-						}
-					} else {
-						$correctGroupWords[] = $valueOfWord;
-					}
-				} else {
-					$explodedWord = explode('/', $valueOfWord);
-					$newCorrectGroupWords = array();
-					foreach ($explodedWord as $numberOfExplodedWord => $oneOfThem) {
-						if (count($correctGroupWords) > 0) {
-							foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
-								$newCorrectGroupWords[] = $valueOfGroupWords . $oneOfThem;
-							}
-						} else {
-							$newCorrectGroupWords[] = $oneOfThem;
-						}
-					}
-					if (count($correctGroupWords) > 0) {
-						foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
-							unset($correctGroupWords[$indexOfGroupWord]);
-						}
-					}
-					$correctGroupWords = array_merge($correctGroupWords, $newCorrectGroupWords);
-				}
-			}
-		} else
-			$correctGroupWords[] = $paramsValidateType ;
-		usort($correctGroupWords, function($a, $b) {
-			return strlen($a) - strlen($b);
-		});
-		foreach ( $correctGroupWords as $indexOfWord => $correctWord ){
-			if ( strlen($paramsValue) == strlen($correctWord)) {
-				$return = true ;
-				for ($i = 0; $i < strlen($paramsValue); $i++) {
-					if ( substr($correctWord,$i,1) != 'X' ) {
-						if (substr($paramsValue, $i, 1) != substr($correctWord, $i, 1)) {
-							$return = false ;
-							break;
-						}
-					} else {
-						if ( ! ( ( intval(substr($paramsValue,2,1)) > 0 and intval(substr($paramsValue,2,1)) < 10 ) or substr($paramsValue,2,1) == '0' ) ){
-							$return = false ;
-							break;
-						}
-					}
-				}
-				if ( $return ) {
-					$this->putData($paramsName , $paramsValue);
-					return true;
-				}
+
+		if (!$status && !self::$isNot) {
+			self::setError($err, $dataToStr);
+		}
+	}
+
+	private static function setError($err = "No Message", $dataToStr = array())
+	{
+		if (self::$isErr) {
+			//use custom message if have been set
+			$message = self::customizeMessage();
+			if ($message === false || is_null($message))
+				$message = arrays::dataToStrArray($err, $dataToStr);
+
+			self::$errors[self::$currentKey][] = $message;
+			self::setFail(true);
+		}
+
+		self::$resultMethod = false;
+	}
+
+	private static function customizeMessage()
+	{
+		if (empty(self::$customMessages)) return false;
+
+		foreach (self::$customMessages as $ck => $cv) {
+			$parts = explode(':', $ck);
+			$key = isset($parts[0]) ? $parts[0] : null;
+			$rule = isset($parts[1]) ? $parts[1] : null;
+			$method = self::getMethodName($rule);
+
+			//if is set for specific rule a custom message
+			if (self::$currentKey == $key) {
+				if (empty($rule) || $method == self::$activeMethod)
+					return $cv;
 			}
 		}
-		$this->error[] = array('name' => $paramsName, 'type' => 'numberFormat', 'params' => $paramsValidateType);
+		return null;
+	}
+
+	// emails.*
+	// courses.*.seasons.*.lessons.*.title
+
+	private static function isValidCountParams($class, $method, $params)
+	{
+		$r = new \ReflectionMethod($class, $method);
+		$p = $r->getParameters();
+		$lengthP = 0;
+		$lengthParams = count($params);
+		if (count($p) > 0) {
+			foreach ($p as $key => $value) {
+				if (!$value->isDefaultValueAvailable())
+					$lengthP = $key + 1;
+			}
+		}
+
+		if ($lengthParams >= $lengthP) return true;
 		return false;
 	}
 
+	private static function callMethod($class, $method, $params)
+	{
+		if (self::ignore()) return;
+		call_user_func_array(array($class, $method), $params);
+	}
 
-	/**
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
-	 */
-	private function _email($paramsName , $paramsValue , $paramsValidateType ){
-		if ( ! filter_var($paramsValue, FILTER_VALIDATE_EMAIL) and $paramsValue != '' ) {
-			$this->error[] = array('name' => $paramsName , 'type' => 'email' , 'params' => '' );
-			return false ;
+	private static function ignore()
+	{
+		$types = isset(self::$field_types[self::$currentKey]) ? self::$field_types[self::$currentKey] : [];
+		$required = self::$data['required'];
+		if (!in_array('required', $types) && !$required) return true;
+		return false;
+	}
+
+	public static function checkOne($value, $rule, $patternArray = null)
+	{
+		self::$resultMethod = true;
+
+		if (!empty($patternArray)) {
+			self::$data = arrays::searchArrayByPattern($patternArray, $value);
+		} else {
+			self::$data['required'] = true;
+			self::$data['values'] = [$value];
 		}
-		$this->putData($paramsName , $paramsValue);
-		return true ;
+
+		$condParts = explode('|', $rule);
+		foreach ($condParts as $cond) {
+			self::executeRuleMethod($cond);
+		}
+
+		return self::$resultMethod;
+	}
+
+	public static function isFail()
+	{
+		return self::$isFail;
+	}
+
+	public static function getError()
+	{
+		$result = [];
+		foreach (self::$errors as $err) {
+			$result = array_merge($result, array_values($err));
+		}
+
+		return $result;
 	}
 
 	/**
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
+	 * get first error
 	 */
-	private function _required($paramsName , $paramsValue , $paramsValidateType ){
-		if ( $paramsValue == null ) {
-			$this->error[] = array('name' => $paramsName , 'type' => 'required' , 'params' => '' );
-			return false ;
+	public static function first($key = null)
+	{
+		$errors = self::getError();
+		if (!empty($errors)) {
+			if (is_array($errors)) {
+				$err = array_shift($errors);
+				if (is_array($err))
+					return isset($err[0]) ? $err[0] : null;
+				return $err;
+			} else {
+				return array_shift($errors);
+			}
 		}
-		$this->putData($paramsName , $paramsValue);
-		return true ;
+
+		return array();
 	}
 
 	/**
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
+	 * get errors
 	 */
-	private function _notEmpty($paramsName , $paramsValue , $paramsValidateType ){
-		if ( ( ( empty($paramsValue) and $paramsValue != '0' ) or $paramsValue == '' ) or $paramsValue == null  ) {
-			$this->error[] = array('name' => $paramsName , 'type' => 'notEmpty' , 'params' => '' );
-			return false ;
+	public static function get($key = null)
+	{
+		if (isset(self::$errors[$key]))
+			return self::$errors[$key];
+
+		return self::$errors;
+	}
+
+	public static function __callStatic($method, $arguments)
+	{
+		self::$resultMethod = true;
+		$method = '_' . $method;
+		if (count($arguments) < 1) return false;
+		$data = $arguments[0];
+		array_shift($arguments);
+		if (isset(self::$validators[$method])) {
+			self::$data['required'] = true;
+			self::$data['values'] = [$data];
+
+			$validator = self::$validators[$method];
+			self::executeRuleGenerate($validator['status'], $validator['err'], $validator['dataIntoMessage']);
+		} else if (method_exists(self::class, $method) && self::isValidCountParams(self::class, $method, $arguments)) {
+
+			self::$data['required'] = true;
+			self::$data['values'] = [$data];
+
+			self::callMethod(self::class, $method, $arguments);
+			self::$data = null;
+			return self::$resultMethod;
 		}
-		$this->putData($paramsName , $paramsValue);
-		return true ;
+	}
+
+	// check count params of a method in class
+
+	public static function generate($name, \Closure $status, $err, \Closure $dataIntoMessage = null)
+	{
+		self::$validators['_' . $name] = [
+			'status' => $status,
+			'err' => $err,
+			'dataIntoMessage' => $dataIntoMessage,
+		];
 	}
 
 	/**
-	 * @param $paramsName
-	 * @param $paramsValue
-	 * @param $paramsValidateType
-	 *
-	 * @return bool
+	 * @param $lengthParams : this params can mix with math operators
+	 * example: >=2
+	 * with getValueFromParams() can extract value : 2
+	 * with getOperatorFromParams() can extract operator : >=
 	 */
-	private function _number($paramsName , $paramsValue , $paramsValidateType ){
-		$intParamsValue = intval($paramsValue) + 1 ;
-		$intParamsValue = $intParamsValue - 1;
-		if ( $intParamsValue !=  $paramsValue ) {
-			$this->error[] = array('name' => $paramsName , 'type' => 'notEmpty' , 'params' => '' );
-			return false ;
+	private static function _length($lengthParams)
+	{
+		$data = self::getData();
+		$length = self::getValueFromParams($lengthParams);
+		$operator = self::getOperatorFromParams($lengthParams);
+
+		if (is_array($data)) {
+			foreach ($data as $d) {
+				if (is_array($d)) continue;
+
+				$dataLen = strlen($d);
+				self::compareLength($dataLen, $length, $d, $operator);
+			}
+		} else {
+			$dataLen = strlen($data);
+			self::compareLength($dataLen, $length, $data, $operator);
 		}
-		$this->putData($paramsName , $paramsValue);
-		return true ;
+
+	}
+
+	/**
+	 * this method extract only value without operators
+	 * example: input : >= 23
+	 *          output: 23
+	 */
+	private static function getValueFromParams($params)
+	{
+		return str_replace(self::getOperatorFromParams($params), '', $params);
+	}
+
+	/**
+	 * this method extract only operator without value
+	 * example: input : >= 23
+	 *          output: >=
+	 */
+	private static function getOperatorFromParams($params)
+	{
+		preg_match('/!=|==|<=|<|>=|>/', $params, $out);
+		return isset($out[0]) ? $out[0] : '';
+	}
+
+	private static function compareLength($dataLen, $length, $data, $operator)
+	{
+		switch ($operator) {
+			case '==': {
+				if ($dataLen != $length) self::setError(rlang('ERROR_VALID_LENGTH_EQUAL'), [self::$field_title, $length]);
+				break;
+			}
+			case '!=': {
+				if ($dataLen == $length) self::setError(rlang('ERROR_VALID_LENGTH_NOT_EQUAL'), [self::$field_title, $length]);
+				break;
+			}
+			case '>=': {
+				if ($dataLen < $length) self::setError(rlang('ERROR_VALID_LENGTH_GTE'), [self::$field_title, $length]);
+				break;
+			}
+			case '<=': {
+				if ($dataLen > $length) self::setError(rlang('ERROR_VALID_LENGTH_LTE'), [self::$field_title, $length]);
+				break;
+			}
+			case '>': {
+				if ($dataLen <= $length) self::setError(rlang('ERROR_VALID_LENGTH_GRATER'), [self::$field_title, $length]);
+				break;
+			}
+			case '<': {
+				if ($dataLen >= $length) self::setError(rlang('ERROR_VALID_LENGTH_LESSER'), [self::$field_title, $length]);
+				break;
+			}
+		}
+	}
+	/*========================================= Validators ==========================================
+	 * All Rules Come Here...
+	 * you can add your custom validators as a method and use it as a rule
+	 *
+	 * How to Define own validator ?
+	 * your method must define as static method and must be start with underline:
+	 *  -- example -->  public static function _myRule(){ //do staff }
+	 * also rule support arguments
+	 */
+
+	private static function _required()
+	{
+		if (!self::$data['required']) {
+			self::setError(rlang('ERROR_VALID_REQUIRED'), self::$field_title);
+			return;
+		}
+		self::$isNot = true;
+		self::_empty();
+	}
+
+	private static function _empty()
+	{
+		$value = self::getFirstData();
+		if (!is_array($value))
+			$value = trim($value);
+		$isEmpty = false;
+		if (!is_bool($value) && !is_numeric($value) && empty($value))
+			$isEmpty = true;
+
+		self::setMultiResult($isEmpty, rlang('ERROR_VALID_EMPTY'), rlang('ERROR_VALID_NOT_EMPTY'), self::$field_title);
+
+	}
+
+	private static function _number()
+	{
+		if (!is_numeric(self::getFirstData())) {
+			self::setError(rlang('ERROR_VALID_NUMBER'), self::$field_title);
+		}
+	}
+
+	private static function _username()
+	{
+		if (!preg_match('/^[a-zA-Z]+[_]{0,1}[a-zA-Z0-9]+$/m', self::getFirstData())) {
+			self::setError(rlang('ERROR_VALID_USERNAME'), self::$field_title);
+		}
+	}
+
+	private static function _extension()
+	{
+		if (!preg_match('/^[a-zA-Z0-9]+[_]{0,1}[a-zA-Z0-9]+$/m', self::getFirstData())) {
+			self::setError(rlang('ERROR_VALID_EXTENSION'), self::$field_title);
+		}
+	}
+
+	private static function _match($field, $fieldName2 = null)
+	{
+		$operator = self::getOperatorFromParams($field);
+		$key = str_replace($operator, '', $field);
+		$title2 = $key;
+		$checkField = $key;
+		if(strings::strFirstHas($key, '[') && strings::strLastHas($key, ']'))
+		{
+			$key = str_replace(['[', ']'], '', $key);
+			$values = arrays::searchArrayByPattern($key, self::$inputs);
+			$checkField = isset($values['values'][0]) ? $values['values'][0] : null;
+			$title2 = isset(self::$field_titles[$key]) ? self::$field_titles[$key] : $key;
+		}
+
+		$fieldName2 = (empty($fieldName2)) ? $title2 : $fieldName2;
+		self::compareValue($operator, self::getFirstData(), $checkField, $fieldName2);
+	}
+
+	private static function compareValue($operator, $value1, $value2, $fieldName2)
+	{
+		switch ($operator) {
+			case '==': {
+				if ($value1 != $value2) self::setError(rlang('ERROR_VALID_VALUE_EQUAL'), [self::$field_title, $fieldName2]);
+				break;
+			}
+			case '!=': {
+				if ($value1 == $value2) self::setError(rlang('ERROR_VALID_VALUE_NOT_EQUAL'), [self::$field_title, $fieldName2]);
+				break;
+			}
+			case '>=': {
+				if ($value1 < $value2) self::setError(rlang('ERROR_VALID_VALUE_GTE'), [self::$field_title, $fieldName2]);
+				break;
+			}
+			case '<=': {
+				if ($value1 > $value2) self::setError(rlang('ERROR_VALID_VALUE_LTE'), [self::$field_title, $fieldName2]);
+				break;
+			}
+			case '>': {
+				if ($value1 <= $value2) self::setError(rlang('ERROR_VALID_VALUE_GRATER'), [self::$field_title, $fieldName2]);
+				break;
+			}
+			case '<': {
+				if ($value1 >= $value2) self::setError(rlang('ERROR_VALID_VALUE_LESSER'), [self::$field_title, $fieldName2]);
+				break;
+			}
+		}
+	}
+
+	private static function _email()
+	{
+		if (filter_var(self::getFirstData(), FILTER_VALIDATE_EMAIL) === false)
+			self::setError(rlang('ERROR_VALID_EMAIL'));
+	}
+
+	private static function _url()
+	{
+		if (filter_var(self::getFirstData(), FILTER_VALIDATE_URL) === false)
+			self::setError(rlang('ERROR_VALID_URL'));
+	}
+
+	private static function _signs()
+	{
+		$isSigns = false;
+		if (preg_match('/[,.?\/*&^\\\$%#@()_!|"\~\'><=+}{; ]/', self::getFirstData()))
+			$isSigns = true;
+
+		self::setMultiResult($isSigns, rlang('ERROR_VALID_SINGS'), rlang('ERROR_VALID_NOT_SINGS'), self::$field_title);
+	}
+
+	private static function _name($type)
+	{
+		$regex = '';
+		switch ($type) {
+			case 'folder':
+				$regex = '/^(?!(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.[^.]*)?$)[^<>:"\\\\|?*\x00-\x1F]*[^<>:"\\\\|?*\x00-\x1F\ .]$/';
+				break;
+			case 'file':
+				$regex = '/^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\\\?*:\";|><\/]+$/';
+				break;
+		}
+
+		if (!preg_match($regex, self::getFirstData()))
+			self::setError(rlang('ERROR_VALID_NAME'), self::$field_title);
+
+	}
+
+	private static function _int()
+	{
+		if (filter_var(self::getFirstData(), FILTER_VALIDATE_INT) === false)
+			self::setError(rlang('ERROR_VALID_INT'), self::$field_title);
+	}
+
+	private static function _mobile()
+	{
+		$mobile = self::getFirstData();
+		if (strlen($mobile) != 11 || substr($mobile, 0, 2) != '09')
+			self::setError(rlang('ERROR_VALID_MOBILE'), self::$field_title);
+	}
+
+	private static function _float()
+	{
+		if (filter_var(self::getFirstData(), FILTER_VALIDATE_FLOAT) === false)
+			self::setError(rlang('ERROR_INVALID_REQUEST'), self::$field_title);
+	}
+
+
+	private static function _jdate()
+	{
+		$isResult = false;
+		$regex = '/\d{2,4}[-|\/]\d{1,2}[-|\/]\d{1,2}[#]/';
+		if (preg_match($regex, self::getFirstData() . '#'))
+			$isResult = true;
+
+		$fields = (is_array(self::$field_title)) ? self::$field_title : [self::$field_title, 'YY/MM/DD'];
+		self::setMultiResult($isResult, rlang('ERROR_VALID_DATE'), rlang('ERROR_VALID_NOT_DATE'), $fields);
 	}
 
 
