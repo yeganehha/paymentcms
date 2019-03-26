@@ -11,6 +11,8 @@
  */
 
 
+use paymentCms\component\file;
+
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
@@ -39,6 +41,10 @@ class Lang {
 	public static function init($langC = null){
 		$core_lang_path = payment_path.'core'.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.self::$langToShow.'.php' ;
 		self::loadLangFile($core_lang_path);
+		$files = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.self::$langToShow.'.php');
+		foreach ($files as $file) {
+			self::loadLangFile($file);
+		}
 		if ( is_null($langC) ) {
 			self::$langC = new Lang();
 		} else {

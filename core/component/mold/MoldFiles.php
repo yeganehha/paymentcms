@@ -35,6 +35,7 @@ class MoldFiles {
 	public function __construct(&$moldData) {
 		$this->moldData = $moldData;
 		$this->setPath('default');
+		MoldRendering::emptyMap();
 	}
 
 	public function setPath($folder,$app = null ){
@@ -240,7 +241,7 @@ class MoldFiles {
 
 
 	private function  loadFile($currentTemplate,$i){
-		$this->checkFileISMoldOrNOt($currentTemplate['path']);
+		$this->checkFileISMoldOrNOt($currentTemplate['path'],$currentTemplate['app']);
 		$return = ['eval' => null , 'function' => null ];
 		if ( ! is_file($currentTemplate['path']) ) {
 			// TODO: send exception and delete all cache of this file
@@ -356,10 +357,15 @@ class MoldFiles {
 		exit;
 	}
 
-	public function checkFileISMoldOrNOt($File){
+	public function checkFileISMoldOrNOt($File,$app){
 //		$fileName = array_pop(explode(DIRECTORY_SEPARATOR,$File) );
 		$fileExtOne = File::ext_file($File);
 		$fileExtTwo = File::ext_file(strings::deleteWordLastString($File,'.'.$fileExtOne) );
+		if ( strings::strLastHas($app,':plugin') ) {
+			$fileExtTree = File::ext_file(strings::deleteWordLastString($File, '.' . $fileExtTwo.'.'.$fileExtOne));
+			if ( $fileExtTree != strings::deleteWordLastString($app,':plugin') )
+				die('Just Can Load Mold File that name is ended with .'.strings::deleteWordLastString($app,':plugin').'.mold.'.$fileExtOne.' ! file path : ' . $File);
+		}
 		if ( $fileExtTwo == 'mold' )
 			return true ;
 		// TODO: send exception and delete all cache of this file

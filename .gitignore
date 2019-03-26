@@ -1,3 +1,4 @@
 .idea/*
 templates_c/*
 app/*/cache
+plugins/*/cache

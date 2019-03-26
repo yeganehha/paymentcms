@@ -35,7 +35,7 @@ class service extends \controller {
 		$variable = array( );
 		if ($valid->isFail()){
 			//TODO:: add error is not valid data
-			
+
 		} else {
 			if ( $get['name'] != null ) {
 				$value[] = '%'.$get['name'].'%' ;
