@@ -24,6 +24,7 @@ class controller {
 	protected $model ;
 	protected $mold ;
 	protected $menu ;
+	protected $alert ;
 
 	public function __construct() {
 		/* @var paymentCms\component\mold\Mold $mold */
@@ -63,12 +64,15 @@ class controller {
 	 *
 	 * @return \App\model\model
 	 */
-	protected function model($model = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
+	protected function model($model = null , $searchVariable = null , $searchWhereClaus = null) {
 		if ( $model == null )
 			$model = $this->model;
 		$model = 'paymentCms\model\\'.$model ;
 		if (class_exists($model)) {
-			return new $model($searchVariable,$searchWhereClaus) ;
+			if ( $searchWhereClaus == null )
+				return new $model($searchVariable) ;
+			else
+				return new $model($searchVariable,$searchWhereClaus) ;
 		} else {
 			App\core\controller\httpErrorHandler::E500($model);
 			exit;
@@ -96,8 +100,22 @@ class controller {
 		}
 		$this->mold->path('default');
 	}
+
+	protected function alert($type , $title , $description ,$icon = null , $close = true ){
+		if ( $icon != null )
+			$temp['icon'] = $icon ;
+		if ( $title != null )
+			$temp['title'] = $title ;
+		$temp['description'] = $description ;
+		$temp['type'] = $type ;
+		$temp['canClose'] = $close ;
+		$this->alert[] = $temp;
+	}
+
 	public function __destruct() {
 		if ( ! is_null($this->mold) and ! is_null($this->menu))
 			$this->mold->set('menu' , $this->menu );
+		if ( ! is_null($this->mold) and ! is_null($this->alert))
+			$this->mold->set('alert' , $this->alert );
 	}
 }

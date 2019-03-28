@@ -43,6 +43,15 @@ class database {
 			return (new database)->error('cant get config', 'connection to db with PDO');
 	}
 
+	public static function startTransaction(){
+		$query = 'START TRANSACTION;';
+		self::fullQuery($query);
+	}
+
+	public static function commit(){
+		$query = 'COMMIT;';
+		self::fullQuery($query);
+	}
 
 	/**
 	 * @param      $TabelName
