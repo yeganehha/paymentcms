@@ -319,6 +319,15 @@ class validate {
 	}
 
 	/**
+	 * get first error
+	 */
+	public static function errorsIn()
+	{
+		$errors = self::getError();
+		return implode('<br>',$errors);
+	}
+
+	/**
 	 * get errors
 	 */
 	public static function get($key = null)

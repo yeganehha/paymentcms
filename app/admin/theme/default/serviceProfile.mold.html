@@ -1,0 +1,406 @@
+<div class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12 ml-auto mr-auto">
+                <div class="page-categories">
+                    {if !isset($newService)}<ul class="nav nav-pills nav-pills-warning nav-pills-icons justify-content-center" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#link6" role="tablist">
+                                <i class="material-icons">dashboard</i> {_ "info"}
+                            </a>
+                        </li><li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#link7" role="tablist">
+                                <i class="material-icons">account_balance_wallet</i> {_ "payments"}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#link8" role="tablist">
+                                <i class="material-icons">edit</i> {_ "edit"}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#link9" role="tablist">
+                                <i class="material-icons">info</i> {_ "info"} {_ "more"}
+                            </a>
+                        </li>
+                        {call servicesProfileMorePage}
+                    </ul>{/if}
+                    <div class="tab-content tab-space tab-subcategories">
+                        {if !isset($newService)}<div class="tab-pane active" id="link6">
+
+                        </div>
+                        <div class="tab-pane " id="link7">
+
+                        </div>{/if}
+                        <div class="tab-pane {if isset($newService)}active{/if}" id="link8">
+                            <div class="row">
+                                <div class="col-md-7 col-sm-12">
+                                    <div class="card">
+                                        <div class="card-header card-header-rose card-header-icon" >
+                                            <div class="card-icon" >
+                                                <i class="material-icons">add_shopping_cart</i>
+                                            </div>
+                                            <h4 class="card-title float-{$float} m-3">{_ "add"} {_ "services"}</h4>
+                                        </div>
+                                        <form class="form-horizontal" method="post">
+                                            <div class="card-body">
+                                                {call addServiceFormUpDescription}
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="nameInput" value="{if isset($post.name)}{$post.name}{else}{/if}" name="name" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "description"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="descriptionInput" value="{if isset($post.description)}{$post.description}{else}{/if}" name="description" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "price"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="priceInput" value="{if isset($post.price)}{$post.price}{else}{/if}" name="price" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "link"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="linkInput" value="{if isset($post.link)}{$post.link}{else}{/if}" name="link" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center mt-2">
+                                                        <div class="form-check">
+                                                            <label class="form-check-label">
+                                                                <input class="form-check-input" id="activeInput" name="active" type="checkbox"  {if isset($post.active)}{if $post.active == 'active' }checked{/if}{else}checked{/if} value="active"> {_ "active"}
+                                                                <span class="form-check-sign">
+                                                  <span class="check"></span>
+                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {call addServiceFormField}
+                                            </div>
+                                            <div class="card-footer">
+                                                <button class="btn btn-link" type="reset">{_ "refresh"}</button>
+                                                <button type="submit" class="btn btn-fill btn-rose">
+                                 <span class="btn-label">
+                                    <i class="material-icons">add_shopping_cart</i>
+                                  </span>
+                                                    {_ "add"} {_ "services"}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-sm col-md-5">
+                                    <div class="card">
+                                        <div class="card-header card-header-info card-header-icon " >
+                                            <div class="card-icon" >
+                                                <i class="material-icons">info</i>
+                                            </div>
+                                            <h4 class="card-title float-{$float} m-3">{_ "help"} {_ "services"}</h4>
+                                        </div>
+                                        <div class="card-body text-{$text_align} text-secondary">
+                                            <strong class="text-info">{_ "name"} :</strong> {_ "service_add_helper_name"}<br>
+                                            {call addServiceFormHelp}
+                                        </div>
+                                        <div class="card-footer">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {if !isset($newService)}<div class="tab-pane" id="link9">
+                            <div class="card bg-light">
+                                <div class="card-header card-header-rose card-header-icon" >
+                                    <div class="card-icon" >
+                                        <i class="fa fa-wpforms fa-2x"></i>
+                                    </div>
+                                    <h4 class="card-title float-{$float} m-3">{_ "management"} {_ "field"}</h4>
+                                </div>
+                                <form class="form-horizontal" method="post">
+                                    <div class="card-body text-{$text_align}">
+                                        <span class="text-dark">
+                                            {_ "filedOfServiceDescription"}
+                                        </span>
+                                        <div class="row border mt-5 rounded">
+                                            <div class="col-md-4">
+                                                <label class="col-md-2 col-form-label mt-2">{_ "firstName"}</label>
+                                                <div class="col-md-10">
+                                                    <div class="form-group bmd-form-group">
+                                                        <select class="selectpicker" name="firstNameStatus" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'firstName'}">
+                                                            <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
+                                                            <option value="visible">{_ "visible"}</option>
+                                                            <option value="invisible">{_ "invisible"}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="col-md-2 col-form-label mt-2">{_ "lastName"}</label>
+                                                <div class="col-md-10">
+                                                    <div class="form-group bmd-form-group">
+                                                        <select class="selectpicker" name="lastNameStatus" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'lastName'}">
+                                                            <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
+                                                            <option value="visible">{_ "visible"}</option>
+                                                            <option value="invisible">{_ "invisible"}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="col-md-2 col-form-label mt-2">{_ "email"}</label>
+                                                <div class="col-md-10">
+                                                    <div class="form-group bmd-form-group">
+                                                        <select class="selectpicker" name="emailNameStatus" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'email'}">
+                                                            <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
+                                                            <option value="visible">{_ "visible"}</option>
+                                                            <option value="invisible">{_ "invisible"}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="col-md-2 col-form-label mt-2">{_ "phone"} {_ "number"}</label>
+                                                <div class="col-md-10">
+                                                    <div class="form-group bmd-form-group">
+                                                        <select class="selectpicker" name="phoneNameStatus" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'phone'} {_ 'number'}">
+                                                            <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
+                                                            <option value="visible">{_ "visible"}</option>
+                                                            <option value="invisible">{_ "invisible"}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="moreFields" >
+                                            <div class="card moreFieldsItem0">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-10">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-2 col-form-label">{_ "name"} {_ "field"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "nameFieldHelp"}</span>");'>help</i> </span></label>
+                                                                    <div class="col-md-10">
+                                                                        <input type="text" value="" class="form-control" >
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-2 col-form-label mt-2">{_ "type"} {_ "field"}</label>
+                                                                    <div class="col-md-10">
+                                                                        <select class="selectpicker" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'type'} {_ 'field'}">
+                                                                            <option value="text">{_ "textField"}</option>
+                                                                            <option value="url">{_ "urlField"}</option>
+                                                                            <option value="password">{_ "passwordField"}</option>
+                                                                            <option value="email">{_ "emailField"}</option>
+                                                                            <option value="select">{_ "selectField"}</option>
+                                                                            <option value="radio">{_ "radioField"}</option>
+                                                                            <option value="checkbox">{_ "checkBoxField"}</option>
+                                                                            <option value="textarea">{_ "textareaField"}</option>
+                                                                            <option value="date">{_ "dateField"}</option>
+                                                                            <option value="number">{_ "numberField"}</option>
+                                                                            <option value="file">{_ "fileField"}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-2 col-form-label">{_ "description"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "descriptionFieldHelp"}</span>");'>help</i> </span></label>
+                                                                    <div class="col-md-10">
+                                                                        <input type="text" value="" class="form-control" >
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-2 col-form-label mt-2"> {_ "status"}</label>
+                                                                    <div class="col-md-10">
+                                                                        <div class="form-group bmd-form-group">
+                                                                            <select class="selectpicker" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'field'}">
+                                                                                <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
+                                                                                <option value="visible">{_ "visible"}</option>
+                                                                                <option value="invisible">{_ "invisible"}</option>
+                                                                                <option value="admin">{_ "adminField"}</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row moreFieldsItemMoreConfig0 border rounded pb-2 mt-2" style="display: none;">
+                                                                <hr>
+                                                                <div class="col-md-8">
+                                                                    <label class="col-md-2 col-form-label">{_ "valueOfField"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "valueOfFieldHelp"}</span>");'>help</i> </span></label>
+                                                                    <div class="col-md-10 border-bottom ">
+                                                                        <input type="text"  value="" class="form-control tagsinput" data-role="tagsinput" data-color="info"  placeholder="{_ "valueOfField"}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="col-md-6 col-form-label"> {_ "orderToShow"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "orderToShowFieldHelp"}</span>");'>help</i> </span></label>
+                                                                    <div class="col-md-6">
+                                                                        <input type="number" value="" class="form-control" >
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <label class="col-md-4 col-form-label"> {_ "regixField"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "regixFieldHelp"}</span>");'>help</i> </span></label>
+                                                                    <div class="col-md-8 border-bottom  text-left">
+                                                                        <input type="text" value="" class="form-control tagsinput " dir="ltr" data-role="tagsinput" data-color="info" placeholder="{_ "regixField"}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="btn btn-outline-danger rounded" onclick="$('.moreFieldsItem0').remove()">
+                                                                 <span class="btn-label">
+                                                                    <i class="material-icons">delete</i>
+                                                                 </span>
+                                                                {_ "delete"}
+                                                            </div>
+                                                            <div class="btn btn-outline-info rounded pointer" onclick="$('.moreFieldsItemMoreConfig0').toggle();">
+                                                                 <span class="btn-label">
+                                                                    <i class="material-icons">unfold_more</i>
+                                                                 </span>
+                                                                {_ "more"} {_ "configuration"}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="btn btn-success border pointer float-left" onclick="add();">
+                                             <span class="btn-label">
+                                                <i class="material-icons">add</i>
+                                             </span>
+                                                {_ "add"} {_ "field"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button class="btn btn-link" type="reset">{_ "refresh"}</button>
+                                        <button type="submit" class="btn btn-fill btn-rose">
+                                             <span class="btn-label">
+                                                <i class="material-icons">save</i>
+                                             </span>
+                                            {_ "save"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            {call serviceMoreInfoCard}serviceMoreInfoCard
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="typeOfAddItem" style="display: none;">
+    <div class="card moreFieldsItem__IIDD__">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="col-md-2 col-form-label">{_ "name"} {_ "field"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "nameFieldHelp"}</span>");'>help</i> </span></label>
+                            <div class="col-md-10">
+                                <input type="text" value="" class="form-control" >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-2 col-form-label mt-2">{_ "type"} {_ "field"}</label>
+                            <div class="col-md-10">
+                                <select class="selectpicker" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'type'} {_ 'field'}">
+                                    <option value="text">{_ "textField"}</option>
+                                    <option value="url">{_ "urlField"}</option>
+                                    <option value="password">{_ "passwordField"}</option>
+                                    <option value="email">{_ "emailField"}</option>
+                                    <option value="select">{_ "selectField"}</option>
+                                    <option value="radio">{_ "radioField"}</option>
+                                    <option value="checkbox">{_ "checkBoxField"}</option>
+                                    <option value="textarea">{_ "textareaField"}</option>
+                                    <option value="date">{_ "dateField"}</option>
+                                    <option value="number">{_ "numberField"}</option>
+                                    <option value="file">{_ "fileField"}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-2 col-form-label">{_ "description"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "descriptionFieldHelp"}</span>");'>help</i> </span></label>
+                            <div class="col-md-10">
+                                <input type="text" value="" class="form-control" >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-2 col-form-label mt-2"> {_ "status"}</label>
+                            <div class="col-md-10">
+                                <div class="form-group bmd-form-group">
+                                    <select class="selectpicker" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'field'}">
+                                        <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
+                                        <option value="visible">{_ "visible"}</option>
+                                        <option value="invisible">{_ "invisible"}</option>
+                                        <option value="admin">{_ "adminField"}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row moreFieldsItemMoreConfig__IIDD__ border rounded pb-2 mt-2" style="display: none;">
+                        <hr>
+                        <div class="col-md-8">
+                            <label class="col-md-2 col-form-label">{_ "valueOfField"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "valueOfFieldHelp"}</span>");'>help</i> </span></label>
+                            <div class="col-md-10 border-bottom ">
+                                <input type="text"  value="" class="form-control tagsinput" data-role="tagsinput" data-color="info"  placeholder="{_ "valueOfField"}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="col-md-6 col-form-label"> {_ "orderToShow"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "orderToShowFieldHelp"}</span>");'>help</i> </span></label>
+                            <div class="col-md-6">
+                                <input type="number" value="" class="form-control" >
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="col-md-4 col-form-label"> {_ "regixField"} <span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{_ "regixFieldHelp"}</span>");'>help</i> </span></label>
+                            <div class="col-md-8 border-bottom  text-left">
+                                <input type="text" value="" class="form-control tagsinput " dir="ltr" data-role="tagsinput" data-color="info" placeholder="{_ "regixField"}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn btn-outline-danger rounded" onclick="$('.moreFieldsItem__IIDD__').remove()">
+                                                                 <span class="btn-label">
+                                                                    <i class="material-icons">delete</i>
+                                                                 </span>
+                        {_ "delete"}
+                    </div>
+                    <div class="btn btn-outline-info rounded pointer" onclick="$('.moreFieldsItemMoreConfig__IIDD__').toggle();">
+                                                                 <span class="btn-label">
+                                                                    <i class="material-icons">unfold_more</i>
+                                                                 </span>
+                        {_ "more"} {_ "configuration"}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var numberOfElement = 0 ;
+</script>
+{map navbarPageExtraTitle}{if !isset($newService)}{_ "more"}{/if}{/map}
+{map footerjs}<script src="{url theme}/assets/js/page/serviceProfile.js"></script>{/map}

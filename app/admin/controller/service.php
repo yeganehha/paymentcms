@@ -5,7 +5,9 @@ namespace App\admin\controller;
 
 
 use paymentCms\component\request;
+use paymentCms\component\Response;
 use paymentCms\component\validate;
+use paymentCms\model\api;
 
 /**
  * Created by Yeganehha .
@@ -23,7 +25,6 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 class service extends \controller {
-
 	public function lists() {
 		$get = request::post('page=1,perEachPage=25,name,description,price,link,active' ,null);
 		$rules = [
@@ -68,4 +69,89 @@ class service extends \controller {
 		$this->mold->set('services' , $search);
 	}
 
+
+	public function new(){
+		if ( request::isPost() ){
+			$this->checkBaseData();
+		}
+		$this->mold->set('newService',true);
+		$this->mold->view('serviceProfile.mold.html');
+		$this->mold->setPageTitle(rlang(['add','services']));
+	}
+
+	private function checkBaseData(){
+		$form = request::post('id=0,name,description,price,link,active');
+		$rules = [
+			'id' => ['int|match:>=0'	, rlang('id')],
+			'name' => ['required'	, rlang('name')],
+			'description' => ['required'	, rlang('description')],
+			'price' => ['required|int|match:>=0', rlang('price')],
+			'link' => ['required'	, rlang('link')],
+		];
+		$valid = validate::check($form, $rules);
+		if ($valid->isFail()){
+			$this->alert('warning' , null,$valid->errorsIn(),'error');
+			$this->mold->set('post',$form);
+		} else {
+			/* @var \paymentCms\model\service $model */
+			if ( $form['id'] > 0 )
+				$model = $this->model('service' , $form['id']) ;
+			else
+				$model = $this->model('service') ;
+			$model->setPrice($form['price']);
+			$model->setDescription($form['description']);
+			$model->setLink($form['link']);
+			$model->setName($form['name']);
+			if( $form['active'] == 'active')
+				$model->setStatus(1);
+			else
+				$model->setStatus(0);
+			$status = false ;
+			if ( $form['id'] == 0 ) {
+				$action = 'insert';
+				$id = $model->insertToDataBase();
+				if ( $id > 0 )
+					$status = true ;
+			} else {
+				$status = $model->upDateDataBase();
+				$action = 'update';
+			}
+			if ($status ) {
+				Response::redirect(\app::getBaseAppLink('service/profile/' . $model->getServiceId() . '/'.$action.'ActionDone'));
+			} else {
+				$this->alert('warning' , null, rlang('pleaseTryAGain'),'error');
+				$this->mold->set('post',$form);
+			}
+		}
+	}
+
+	private function checkFieldData(){
+		$form = request::post('id,firstNameStatus=visible,lastNameStatus=visible,emailNameStatus=visible,phoneNameStatus=required');
+		$rules = [
+			'id' => ['int|match:>0'	, rlang('id')],
+			'firstNameStatus' => ['format:{visible/invisible/required}'	, rlang(['status','firstName'])],
+			'lastNameStatus' => ['format:{visible/invisible/required}'	, rlang(['status','lastName'])],
+			'emailStatus' => ['format:{visible/invisible/required}'	, rlang(['status','email'])],
+			'phoneStatus' => ['format:{visible/invisible/required}'	, rlang(['status','phone'])],
+		];
+		$valid = validate::check($form, $rules);
+		if ($valid->isFail()){
+			$this->alert('warning' , null,$valid->errorsIn(),'error');
+			$this->mold->set('post',$form);
+		} else {
+			/* @var \paymentCms\model\service $model */
+			$model = $this->model('service' , $form['id']) ;
+			$model->setFirstNameStatus($form['firstNameStatus']);
+			$model->setLastNameStatus($form['lastNameStatus']);
+			$model->setEmailStatus($form['emailStatus']);
+			$model->setPhoneStatus($form['phoneStatus']);
+			$status = $model->upDateDataBase();
+			if ($status ) {
+				Response::redirect(\app::getBaseAppLink('service/profile/' . $model->getServiceId() . '/moreConfigurationActionDone'));
+			} else {
+				$this->alert('warning' , null, rlang('pleaseTryAGain'),'error');
+				$this->mold->set('post',$form);
+			}
+		}
+	}
 }

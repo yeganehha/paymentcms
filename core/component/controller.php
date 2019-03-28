@@ -24,6 +24,7 @@ class controller {
 	protected $model ;
 	protected $mold ;
 	protected $menu ;
+	protected $alert ;
 
 	public function __construct() {
 		/* @var paymentCms\component\mold\Mold $mold */
@@ -96,8 +97,22 @@ class controller {
 		}
 		$this->mold->path('default');
 	}
+
+	protected function alert($type , $title , $description ,$icon = null , $close = true ){
+		if ( $icon != null )
+			$temp['icon'] = $icon ;
+		if ( $title != null )
+			$temp['title'] = $title ;
+		$temp['description'] = $description ;
+		$temp['type'] = $type ;
+		$temp['canClose'] = $close ;
+		$this->alert[] = $temp;
+	}
+
 	public function __destruct() {
 		if ( ! is_null($this->mold) and ! is_null($this->menu))
 			$this->mold->set('menu' , $this->menu );
+		if ( ! is_null($this->mold) and ! is_null($this->alert))
+			$this->mold->set('alert' , $this->alert );
 	}
 }
