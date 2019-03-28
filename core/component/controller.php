@@ -64,12 +64,15 @@ class controller {
 	 *
 	 * @return \App\model\model
 	 */
-	protected function model($model = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
+	protected function model($model = null , $searchVariable = null , $searchWhereClaus = null) {
 		if ( $model == null )
 			$model = $this->model;
 		$model = 'paymentCms\model\\'.$model ;
 		if (class_exists($model)) {
-			return new $model($searchVariable,$searchWhereClaus) ;
+			if ( $searchWhereClaus == null )
+				return new $model($searchVariable) ;
+			else
+				return new $model($searchVariable,$searchWhereClaus) ;
 		} else {
 			App\core\controller\httpErrorHandler::E500($model);
 			exit;

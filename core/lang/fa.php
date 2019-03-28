@@ -68,6 +68,9 @@ return [
 	'type' => 'نوع',
 	'delete' => 'حذف',
 	'pleaseTryAGain' => 'لطفا مجددا تلاش کنید!',
+	'profile' => 'پروفایل',
+	'successfully' => 'موفقیت آمیز',
+	'was' => 'بود.',
 	'numberOfRecordsShowPerEachPage' => 'تعداد رکورد ها نمایش داده شده : ',
 
 	/*

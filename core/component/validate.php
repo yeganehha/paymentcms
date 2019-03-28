@@ -621,4 +621,79 @@ class validate {
 	}
 
 
+	/**
+	 * $paramsValidateType include { } / X 0123456789 + . -
+	 * @param $paramsValidateType
+	 *
+	 * @return bool
+	 */
+	private static function _format( $paramsValidateType ){
+		$paramsName = self::$field_title ;
+		$paramsValue = self::getFirstData() ;
+		$num_a=array('0','1','2','3','4','5','6','7','8','9');
+		$key_a=array('۰','۱','۲','۳','۴','۵','۶','۷','۸','۹');
+		$paramsValue = str_replace($key_a,$num_a,$paramsValue);
+		$explodeAccolade = preg_split("/{|}/", $paramsValidateType);
+		$correctGroupWords = array();
+		if ( count($explodeAccolade) >  0 ) {
+			foreach ($explodeAccolade as $indexWord => $valueOfWord) {
+				if (strpos($valueOfWord, '/') === false) {
+					if (count($correctGroupWords) > 0) {
+						foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
+							$correctGroupWords[$indexOfGroupWord] .= $valueOfWord;
+						}
+					} else {
+						$correctGroupWords[] = $valueOfWord;
+					}
+				} else {
+					$explodedWord = explode('/', $valueOfWord);
+					$newCorrectGroupWords = array();
+					foreach ($explodedWord as $numberOfExplodedWord => $oneOfThem) {
+						if (count($correctGroupWords) > 0) {
+							foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
+								$newCorrectGroupWords[] = $valueOfGroupWords . $oneOfThem;
+							}
+						} else {
+							$newCorrectGroupWords[] = $oneOfThem;
+						}
+					}
+					if (count($correctGroupWords) > 0) {
+						foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
+							unset($correctGroupWords[$indexOfGroupWord]);
+						}
+					}
+					$correctGroupWords = array_merge($correctGroupWords, $newCorrectGroupWords);
+				}
+			}
+		} else
+			$correctGroupWords[] = $paramsValidateType ;
+		usort($correctGroupWords, function($a, $b) {
+			return strlen($a) - strlen($b);
+		});
+		foreach ( $correctGroupWords as $indexOfWord => $correctWord ){
+			if ( strlen($paramsValue) == strlen($correctWord)) {
+				$return = true ;
+				for ($i = 0; $i < strlen($paramsValue); $i++) {
+					if ( substr($correctWord,$i,1) != 'X' ) {
+						if (substr($paramsValue, $i, 1) != substr($correctWord, $i, 1)) {
+							$return = false ;
+							break;
+						}
+					} else {
+						if ( ! ( ( intval(substr($paramsValue,2,1)) > 0 and intval(substr($paramsValue,2,1)) < 10 ) or substr($paramsValue,2,1) == '0' ) ){
+							$return = false ;
+							break;
+						}
+					}
+				}
+				if ( $return )
+					return true;
+			}
+		}
+		self::setError(rlang('ERROR_INVALID_FORMAT'), self::$field_title);
+		return false;
+	}
+
+
+
 }

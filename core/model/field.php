@@ -26,32 +26,28 @@ class field implements model {
 
 
 	private $fieldId ;
-	private $lang ;
-	private $name ;
+	private $type ;
 	private $title ;
 	private $description ;
-	private $editable ;
-	private $showFront ;
-	private $required ;
 	private $values ;
 	private $regex ;
 	private $serviceId ;
+	private $status ;
+	private $orderNumber ;
 
 	public function __construct(  $searchVariable = null , $searchWhereClaus = 'fieldId = ? ' ){
 		if ( $searchVariable != null ) {
 			$result = \database::searche('field' ,  $searchWhereClaus  , array($searchVariable) ); 
 			if ( $result != null ) {
 				$this->fieldId = $result['fieldId'] ;
-				$this->lang = $result['lang'] ;
-				$this->name = $result['name'] ;
+				$this->type = $result['type'] ;
 				$this->title = $result['title'] ;
 				$this->description = $result['description'] ;
-				$this->editable = $result['editable'] ;
-				$this->showFront = $result['showFront'] ;
-				$this->required = $result['required'] ;
 				$this->values = $result['values'] ;
 				$this->regex = $result['regex'] ;
 				$this->serviceId = $result['serviceId'] ;
+				$this->status = $result['status'] ;
+				$this->orderNumber = $result['orderNumber'] ;
 			} else 
 				return $this->returning(null,false,'field4');
 		}
@@ -69,13 +65,8 @@ class field implements model {
 	}
 
 
-	public function setLang( $lang = null ) {
-		$this->lang = $lang ;
-	}
-
-
-	public function setName( $name = null ) {
-		$this->name = $name ;
+	public function setType( $type = null ) {
+		$this->type = $type ;
 	}
 
 
@@ -86,21 +77,6 @@ class field implements model {
 
 	public function setDescription( $description = null ) {
 		$this->description = $description ;
-	}
-
-
-	public function setEditable( $editable = null ) {
-		$this->editable = $editable ;
-	}
-
-
-	public function setShowFront( $showFront = null ) {
-		$this->showFront = $showFront ;
-	}
-
-
-	public function setRequired( $required = null ) {
-		$this->required = $required ;
 	}
 
 
@@ -119,18 +95,23 @@ class field implements model {
 	}
 
 
+	public function setStatus( $status = null ) {
+		$this->status = $status ;
+	}
+
+
+	public function setOrder( $orderNumber = null ) {
+		$this->orderNumber = $orderNumber ;
+	}
+
+
 	public function getFieldId() {
 		return $this->fieldId ;
 	}
 
 
-	public function getLang() {
-		return $this->lang ;
-	}
-
-
-	public function getName() {
-		return $this->name ;
+	public function getType() {
+		return $this->type ;
 	}
 
 
@@ -141,21 +122,6 @@ class field implements model {
 
 	public function getDescription() {
 		return $this->description ;
-	}
-
-
-	public function getEditable() {
-		return $this->editable ;
-	}
-
-
-	public function getShowFront() {
-		return $this->showFront ;
-	}
-
-
-	public function getRequired() {
-		return $this->required ;
 	}
 
 
@@ -174,17 +140,25 @@ class field implements model {
 	}
 
 
+	public function getStatus() {
+		return $this->status ;
+	}
+
+
+	public function getOrder() {
+		return $this->orderNumber ;
+	}
+
+
 	public function insertToDataBase( ) {
-		$array['lang'] = $this->lang ;
-		$array['name'] = $this->name ;
+		$array['type'] = $this->type ;
 		$array['title'] = $this->title ;
 		$array['description'] = $this->description ;
-		$array['editable'] = $this->editable ;
-		$array['showFront'] = $this->showFront ;
-		$array['required'] = $this->required ;
 		$array['values'] = $this->values ;
 		$array['regex'] = $this->regex ;
 		$array['serviceId'] = $this->serviceId ;
+		$array['status'] = $this->status ;
+		$array['orderNumber'] = $this->orderNumber ;
 		$id = \database::insert('field' , $array  ); 
 		if ( $id ) {
 			$this->fieldId = $id ; 
@@ -195,16 +169,14 @@ class field implements model {
 
 
 	public function upDateDataBase( ) {
-		$array['lang'] = $this->lang ;
-		$array['name'] = $this->name ;
+		$array['type'] = $this->type ;
 		$array['title'] = $this->title ;
 		$array['description'] = $this->description ;
-		$array['editable'] = $this->editable ;
-		$array['showFront'] = $this->showFront ;
-		$array['required'] = $this->required ;
 		$array['values'] = $this->values ;
 		$array['regex'] = $this->regex ;
 		$array['serviceId'] = $this->serviceId ;
+		$array['status'] = $this->status ;
+		$array['orderNumber'] = $this->orderNumber ;
 		if ( \database::update('field' , $array , array('query' => 'fieldId = ?', 'param' => array($this->fieldId)) ) ) 
 			return $this->returning() ;
 		return $this->returning(null,false,'field2') ;
@@ -220,16 +192,14 @@ class field implements model {
 
 	public function returnAsArray( ) {
 		$array['fieldId'] = $this->fieldId ;
-		$array['lang'] = $this->lang ;
-		$array['name'] = $this->name ;
+		$array['type'] = $this->type ;
 		$array['title'] = $this->title ;
 		$array['description'] = $this->description ;
-		$array['editable'] = $this->editable ;
-		$array['showFront'] = $this->showFront ;
-		$array['required'] = $this->required ;
 		$array['values'] = $this->values ;
 		$array['regex'] = $this->regex ;
 		$array['serviceId'] = $this->serviceId ;
+		$array['status'] = $this->status ;
+		$array['orderNumber'] = $this->orderNumber ;
 		return $array ;
 	}
 
