@@ -71,6 +71,9 @@ return [
 	'profile' => 'پروفایل',
 	'successfully' => 'موفقیت آمیز',
 	'was' => 'بود.',
+	'please' => 'خواهشا',
+	'selecting' => 'انتخاب کنید!',
+	'pay' => 'پرداخت',
 	'numberOfRecordsShowPerEachPage' => 'تعداد رکورد ها نمایش داده شده : ',
 
 	/*
