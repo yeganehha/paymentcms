@@ -39,7 +39,7 @@ $(window).resize(function(){
 });
 window.onscroll = function() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        $('.position-fixed-grid').css('margin-top', document.documentElement.scrollTop+'px');
+        $('.position-fixed-grid').css('margin-top', ( document.documentElement.scrollTop - 80)+'px');
     } else {
         $('.position-fixed-grid').css('margin-top', '0px');
     }
