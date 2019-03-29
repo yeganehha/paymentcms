@@ -1,0 +1,14 @@
+                    <ul class="nav">
+                        {foreach from=$tempMenu key=key value=eachMenu}
+                        <li class="nav-item {if $activeMenu == $eachMenu->getKey()}active{/if}">
+                            <a class="nav-link" data-menu-key="{$eachMenu->getKey()}" {if $eachMenu->getChild() != null } data-toggle="collapse" href="#menuCollapse_{$key}_{$eachMenu->getKey()}" {else}href="{$eachMenu->getLink()}" {if $eachMenu->getTarget() != null }target="{$eachMenu->getTarget()}"{/if}{/if}>{if $eachMenu->getIcon() != null}<i class="{$eachMenu->getIcon()}"></i>{/if}
+                                <p>{$eachMenu->getTitle()}{if $eachMenu->getChild() != null }<b class="caret"></b>{/if}</p></a>
+                            {if $eachMenu->getChild() != null }
+                            <div class="collapse" style="margin-right: 20px;" id="menuCollapse_{$key}_{$eachMenu->getKey()}">
+                                {set value=$menu->getMenu($eachMenu->getChild()) name="tempMenu"}
+                                {view "[url patch]menuChild.mold.html"}
+                            </div>
+                            {/if}
+                        </li>
+                        {/foreach}
+                    </ul>

@@ -21,12 +21,29 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class home extends \controller {
 
-	public function __construct() {
 
-	}
+	public function index($serviceId){
+		/* @var \paymentCms\model\service $model */
+		$model = $this->model('service',$serviceId);
+		if ( is_null($model->getServiceId()) ){
+			$this->mold->offAutoCompile();
+			\App\core\controller\httpErrorHandler::E404();
+			return ;
+		}
+		/* @var \paymentCms\model\field $fieldModel */
+		$fieldModel = $this->model('field') ;
+		$fields = $fieldModel->search([$serviceId,'admin' , 'invisible' ],'serviceId = ? and status != ? and status != ? order by orderNumber desc');
+		if ( $fields === true)
+			$fields = [] ;
 
-	public function index(){
-		lang(['test','testIng']);
+		foreach ($fields as $key => $field){
+			if ( $field['type'] == 'checkbox' or $field['type'] == 'radio' or $field['type'] == 'select' )
+				$fields[$key]['values'] = explode(',', $field['values']);
+		}
+
+		$this->mold->set('service',$model);
+		$this->mold->set('fields',$fields);
+		$this->mold->view('home.mold.html');
 	}
 	public function sd(){
 		show(func_get_args());

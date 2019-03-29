@@ -25,6 +25,9 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 class service extends \controller {
+	public function index(){
+		Response::redirect(\app::getBaseAppLink('service/lists'));
+	}
 	public function lists() {
 		$get = request::post('page=1,perEachPage=25,name,description,price,link,active' ,null);
 		$rules = [
@@ -135,8 +138,7 @@ class service extends \controller {
 			'phoneStatus' => ['format:{visible/invisible/required}'	, rlang(['status','phone'])],
 			'moreField.*.status' => ['format:{visible/invisible/required,admin}'	, rlang('status')],
 			'moreField.*.type' => ['format:{text/url/password/email/select/radio/checkbox/textarea/date/number/file}'	, rlang('type')],
-			'moreField.*.name' => ['empty'	, rlang('name')],
-			'moreField.*.description' => ['empty'	, rlang('description')],
+			'moreField.*.name' => ['notEmpty'	, rlang('name')],
 			'moreField.*.order' => ['number'	, rlang('orderToShow')],
 		];
 		$valid = validate::check($form, $rules);

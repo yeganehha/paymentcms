@@ -482,9 +482,23 @@ class validate {
 
 	}
 
+	private static function _notEmpty()
+	{
+		$value = self::getFirstData();
+		if (!is_array($value))
+			$value = trim($value);
+		$isNotEmpty = false;
+		if (!is_bool($value) && !is_numeric($value) &&  !empty($value))
+			$isNotEmpty = true;
+
+		self::setMultiResult($isNotEmpty, rlang('ERROR_VALID_NOT_EMPTY'), rlang('ERROR_VALID_EMPTY'), self::$field_title);
+
+	}
+
 	private static function _number()
 	{
-		if (!is_numeric(self::getFirstData())) {
+		$value = self::getFirstData() ;
+		if (! ( is_numeric($value) or $value ==  "" ) ) {
 			self::setError(rlang('ERROR_VALID_NUMBER'), self::$field_title);
 		}
 	}

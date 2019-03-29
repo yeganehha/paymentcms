@@ -1,0 +1,136 @@
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5 mb-5">
+        <div class="row mt-5">
+            <div class="col-md-8 ml-auto mr-auto">
+                <form id="LoginValidation" action="#" method="">
+                    <div class="card img-fluid">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="material-icons">account_balance_wallet</i>
+                            </div>
+                        </div>
+                        <div class="card-body rtl text-right">
+                            <div class="col-md-4 text-large text-bold text-center" >
+                                <div class="position-fixed-grid">
+                                    <img class="hidden-sm mb-3" src="./undraw_mobile_payments_edgf.png" style="max-width: 100%">
+                                    <span class="text-center title">وبسایت شخصی عرفان ابراهیمی</span>
+                                    {if count($fields) > 0 }
+                                    <div class="col-md-12 form-group mt-5">
+                                        <span class="text-center title">{$service->getDescription()}</span>
+                                    </div>
+                                    <div class="col-md-12 form-group mt-5">
+                                        <span class="text-center title text-danger">{$service->getPrice()} {_ "toman"}</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-info col-md-12 hidden-sm ">{_ "pay"}</button>
+                                    {/if}
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-sm-12">
+                                {if $service->getFirstNameStatus() != 'invisible' or $service->getFirstNameStatus() != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="firstName" class="bmd-label-floating">{_ "firstName"} {if $service->getFirstNameStatus() == 'required'}*{/if}</label>
+                                    <input type="text" class="form-control" id="firstName" {if $service->getFirstNameStatus() == 'required'}required{/if} name="firstName">
+                                </div>
+                                {/if}
+                                {if $service->getLastNameStatus() != 'invisible' or $service->getLastNameStatus() != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="lastName" class="bmd-label-floating">{_ "lastName"} {if $service->getLastNameStatus() == 'required'}*{/if}</label>
+                                    <input type="text" class="form-control" id="lastName" {if $service->getLastNameStatus() == 'required'}required{/if} name="lastName">
+                                </div>
+                                {/if}
+                                {if $service->getEmailStatus() != 'invisible' or $service->getEmailStatus() != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="email" class="bmd-label-floating">{_ "email"} {if $service->getEmailStatus() == 'required'}*{/if}</label>
+                                    <input type="email" class="form-control" id="email" {if $service->getEmailStatus() == 'required'}required{/if} name="email">
+                                </div>
+                                {/if}
+                                {if $service->getPhoneStatus() != 'invisible' or $service->getPhoneStatus() != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="phone" class="bmd-label-floating">{_ "phone"} {if $service->getPhoneStatus() == 'required'}*{/if}</label>
+                                    <input type="text" class="form-control" id="phone" {if $service->getPhoneStatus() == 'required'}required{/if} name="phone">
+                                </div>
+                                {/if}
+                                {if count($fields) == 0 }
+                                <div class="col-md-12 form-group mt-5">
+                                    <span class="text-center title">{$service->getDescription()}</span>
+                                </div>
+                                <div class="col-md-12 form-group mt-5">
+                                    <label for="price" class="bmd-label-floating">{_ "price"}</label>
+                                    <input type="text"  range="[0,9999999]" class="form-control text-center text-large text-bold" id="price" required name="price">
+                                </div>
+                                <button type="submit" class="btn btn-info col-md-12">Login</button>
+                                {/if}
+                                {if is_array($fields)}
+                                    {foreach from=$fields key=key value=field}
+                                        {if $field.type == 'textarea'}
+                                            <div class="col-md-12">
+                                                <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}*{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                                <div class="col-md-10">
+                                                    <div class="form-check">
+                                                        <textarea rows="4" cols="50"  class="form-control" id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" >{$field.values}</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {elseif $field.type == 'checkbox'}
+                                            <div class="col-md-12">
+                                                <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}*{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                                <div class="col-md-10">
+                                                    {foreach from=$field.values key=keyValue value=value}
+                                                    <div class="form-check">
+                                                        <label class="form-check-label">
+                                                            <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}]" > {$value}
+                                                            <span class="form-check-sign"><span class="check"></span></span>
+                                                        </label>
+                                                    </div>
+                                                    {/foreach}
+                                                </div>
+                                            </div>
+                                        {elseif $field.type == 'radio'}
+                                            <div class="col-md-12">
+                                                <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}*{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                                <div class="col-md-10">
+                                                    {foreach from=$field.values key=keyValue value=value}
+                                                    <div class="form-check">
+                                                        <label class="form-check-label">
+                                                            <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" > {$value}
+                                                            <span class="circle"><span class="check"></span></span>
+                                                        </label>
+                                                    </div>
+                                                    {/foreach}
+                                                </div>
+                                            </div>
+                                        {elseif $field.type == 'select'}
+                                            <div class="col-md-12">
+                                                <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}*{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                                <div class="col-md-10">
+                                                    <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" {if $field.status  == 'required'}required{/if} data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
+                                                    {foreach from=$field.values key=keyValue value=value}
+                                                        <option value="{$value}"  >{$value}</option>
+                                                    {/foreach}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        {else}
+                                            <div class="col-md-12">
+                                                <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}*{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                                <div class="col-md-10">
+                                                    <input type="{$field.type}"  id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" value="{$field.values}" class="form-control">
+                                                </div>
+                                            </div>
+                                        {/if}
+                                    {/foreach}
+                                {/if}
+                                <div class="category form-category">* Required fields</div>
+                                {if count($fields) > 0 }
+                                <button type="submit" class="btn btn-info col-md-12 hidden-un-sm ">{_ "pay"}</button>
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="card-footer ml-auto mr-auto">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
