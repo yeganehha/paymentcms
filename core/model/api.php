@@ -28,7 +28,7 @@ class api implements model {
 	private $apiId ;
 	private $name ;
 	private $active ;
-	private $hosted ;
+	private $domain ;
 	private $allowIp ;
 
 	public function __construct(  $searchVariable = null , $searchWhereClaus = 'apiId = ? ' ){
@@ -38,7 +38,7 @@ class api implements model {
 				$this->apiId = $result['apiId'] ;
 				$this->name = $result['name'] ;
 				$this->active = $result['active'] ;
-				$this->hosted = $result['hosted'] ;
+				$this->domain = $result['domain'] ;
 				$this->allowIp = $result['allowIp'] ;
 			} else 
 				return $this->returning(null,false,'api4');
@@ -67,8 +67,8 @@ class api implements model {
 	}
 
 
-	public function setHosted( $hosted = null ) {
-		$this->hosted = $hosted ;
+	public function setDomain( $domain = null ) {
+		$this->domain = $domain ;
 	}
 
 
@@ -92,8 +92,8 @@ class api implements model {
 	}
 
 
-	public function getHosted() {
-		return $this->hosted ;
+	public function getDomain() {
+		return $this->domain ;
 	}
 
 
@@ -105,7 +105,7 @@ class api implements model {
 	public function insertToDataBase( ) {
 		$array['name'] = $this->name ;
 		$array['active'] = $this->active ;
-		$array['hosted'] = $this->hosted ;
+		$array['domain'] = $this->domain ;
 		$array['allowIp'] = $this->allowIp ;
 		$id = \database::insert('api' , $array  ); 
 		if ( $id ) {
@@ -119,7 +119,7 @@ class api implements model {
 	public function upDateDataBase( ) {
 		$array['name'] = $this->name ;
 		$array['active'] = $this->active ;
-		$array['hosted'] = $this->hosted ;
+		$array['domain'] = $this->domain ;
 		$array['allowIp'] = $this->allowIp ;
 		if ( \database::update('api' , $array , array('query' => 'apiId = ?', 'param' => array($this->apiId)) ) ) 
 			return $this->returning() ;
@@ -138,7 +138,7 @@ class api implements model {
 		$array['apiId'] = $this->apiId ;
 		$array['name'] = $this->name ;
 		$array['active'] = $this->active ;
-		$array['hosted'] = $this->hosted ;
+		$array['domain'] = $this->domain ;
 		$array['allowIp'] = $this->allowIp ;
 		return $array ;
 	}

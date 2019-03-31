@@ -26,7 +26,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class innerController extends \controller {
 
-	private static $jsonResponse = true ;
+	protected static $jsonResponse = true ;
 
 	public function __construct() {
 		$this->callHooks('adminHeaderNavbar',[1,2]);
@@ -45,18 +45,15 @@ class innerController extends \controller {
 		}
 	}
 
-	public static function __callStatic($x,$y) {
-		self::$jsonResponse = false;
-	}
 
 	protected function jsonError($massage = null , $statusCode = 400){
-		if ( isset($this) )
+		if ( isset($this) and self::$jsonResponse )
 			Response::jsonError($massage,$statusCode);
 		return false ;
 	}
 
 	protected function json($result){
-		if ( isset($this) )
+		if ( isset($this) and self::$jsonResponse  )
 			Response::json($result);
 		return $result ;
 	}

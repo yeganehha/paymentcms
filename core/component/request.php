@@ -72,6 +72,11 @@ class request {
 		return arrays::parseParams($_POST, $keys, $defaults, $validation, $removeNull);
 	}
 
+	public static function getFromArray($values , $keys, $defaults = null, $validation = null, $removeNull = false)
+	{
+		return arrays::parseParams($values, $keys, $defaults, $validation, $removeNull);
+	}
+
 	public static function postOne($key, $default = null, $validation = null)
 	{
 		return arrays::parseParam($_POST, $key, $default, $validation);

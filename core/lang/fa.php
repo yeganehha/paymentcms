@@ -74,6 +74,11 @@ return [
 	'please' => 'خواهشا',
 	'selecting' => 'انتخاب کنید!',
 	'pay' => 'پرداخت',
+	'webservice' => 'dd',
+	'ip' => 'آی پی',
+	'ips' => 'آی پی های',
+	'allow' => 'مجاز',
+	'deActive' => 'غیر فعال',
 	'numberOfRecordsShowPerEachPage' => 'تعداد رکورد ها نمایش داده شده : ',
 
 	/*

@@ -66,7 +66,7 @@ class service extends \controller {
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? " 1 " : implode('or' , $variable) , 'service', 'COUNT(serviceId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? " 1 " : implode('or' , $variable) ) . 'order by serviceId DESC limit '.$pagination['start'].','.$pagination['limit'] , 'service', '*' );
-		$this->mold->view('listService.mold.html');
+		$this->mold->view('serviceList.mold.html');
 		$this->mold->setPageTitle(rlang('services'));
 		$this->mold->set('activeMenu' , 'services');
 		$this->mold->set('services' , $search);
