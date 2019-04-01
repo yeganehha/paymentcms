@@ -15,5 +15,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 return [
-	'test' => 'test LAng ',
+	'canNotInsertFieldValue' => 'در وارد سازی اطلاعات درخواستی صورتحساب مشکلی پیش آمده!',
+	'canNotInsertItems' => 'در درج آیتم های صورتحساب مشکلی پیش آمده!',
+	'canNotInsertFactor' => 'در ثبت صورتحساب مشکلی پیش آمده!',
 ];

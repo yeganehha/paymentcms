@@ -5,6 +5,8 @@ namespace App\api\controller;
 
 
 use paymentCms\component\file;
+use paymentCms\component\mold\Mold;
+use paymentCms\component\request;
 use paymentCms\component\Response;
 use paymentCms\component\strings;
 
@@ -24,12 +26,56 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 
-class innerController extends \controller {
+class innerController {
 
-	protected static $jsonResponse = true ;
+	protected static $jsonResponse = null ;
+	protected static $api ;
+	private static $mold;
 
 	public function __construct() {
-		$this->callHooks('adminHeaderNavbar',[1,2]);
+		if ( self::$jsonResponse == null ) {
+			self::$mold = new Mold();
+			self::$mold->offAutoCompile();
+			/* @var \paymentCms\model\api $api */
+			if (strings::strFirstHas(\app::getFullRequestUrl(), \app::getBaseAppLink(null, 'api'))) {
+				$requestedIp = request::serverOne('REMOTE_ADDR');
+				self::$jsonResponse = true;
+			} else {
+				$requestedIp = 'local';
+				self::$jsonResponse = false;
+			}
+			$api = $this->model('api', "%" . $requestedIp . "%", ' ( allowIp Like ? or allowIp Like \'%*%\' ) and active = 1 limit 1');
+			if ($api->getApiId() == null) {
+				self::jsonError('Access Denied !', 403);
+				Response::redirect(\App::getBaseAppLink('httpErrorHandler/403', 'core'));
+				return false;
+			}
+			self::$api = $api;
+			$this->callHooks('adminHeaderNavbar', [1, 2]);
+		}
+		return true ;
+	}
+
+
+	/**
+	 * @param null   $model
+	 * @param null   $searchVariable
+	 * @param string $searchWhereClaus
+	 *
+	 * @return \App\model\model
+	 */
+	protected static function model($model  , $searchVariable = null , $searchWhereClaus = null) {
+		$model = 'paymentCms\model\\'.$model ;
+		if (class_exists($model)) {
+			if ( $searchWhereClaus == null )
+				return new $model($searchVariable) ;
+			else
+				return new $model($searchVariable,$searchWhereClaus) ;
+		} else {
+			\App\core\controller\httpErrorHandler::E500($model);
+			exit;
+		}
+
 	}
 
 	protected function callHooks($hookName,$variable){
@@ -39,22 +85,35 @@ class innerController extends \controller {
 			$class = 'plugin\\'.end($temp).'\hook';
 			$method = '_'.$hookName;
 			if ( method_exists($class,$method) ){
-				$Object = new $class($this->mold);
+				$Object = new $class(self::$mold);
 				call_user_func_array([$Object,$method],$variable);
 			}
 		}
 	}
 
 
-	protected function jsonError($massage = null , $statusCode = 400){
-		if ( isset($this) and self::$jsonResponse )
+	protected static function jsonError($massage = null , $statusCode = 400){
+		if ( self::$jsonResponse )
 			Response::jsonError($massage,$statusCode);
-		return false ;
+		return ['status'=> false , 'massage' => $massage ] ;
 	}
 
-	protected function json($result){
-		if ( isset($this) and self::$jsonResponse  )
+	protected static function json($result){
+		if ( self::$jsonResponse  )
 			Response::json($result);
-		return $result ;
+		return ['status'=> true , 'result' => $result ] ;
+	}
+
+	protected function getRealIp(){
+		if(!empty(request::serverOne('HTTP_CLIENT_IP'))){
+			//ip from share internet
+			$ip = request::serverOne('HTTP_CLIENT_IP');
+		}elseif(!empty( request::serverOne('HTTP_X_FORWARDED_FOR') )){
+			//ip pass from proxy
+			$ip = request::serverOne('HTTP_X_FORWARDED_FOR');
+		}else{
+			$ip = request::serverOne('REMOTE_ADDR');
+		}
+		return $ip;
 	}
 }

@@ -92,6 +92,16 @@ class request {
 		return arrays::parseParam($_GET, $key, $default, $validation);
 	}
 
+	public static function server($keys, $defaults = null, $validation = null, $removeNull = false)
+	{
+		return arrays::parseParams($_SERVER, $keys, $defaults, $validation, $removeNull);
+	}
+
+	public static function serverOne($key, $default = null, $validation = null)
+	{
+		return arrays::parseParam($_SERVER, $key, $default, $validation);
+	}
+
 	public static function all($keys, $defaults = null, $validation = null, $removeNull = false)
 	{
 		return arrays::parseParams($_REQUEST, $keys, $defaults, $validation, $removeNull);

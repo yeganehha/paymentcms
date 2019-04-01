@@ -36,4 +36,9 @@ class httpErrorHandler extends \controller {
 		exit;
 		parent::view('httpErrorHandler' , array('errorType' => '500'));
 	}
+
+	public static function E403() {
+		echo '403<br>';
+		exit;
+	}
 }

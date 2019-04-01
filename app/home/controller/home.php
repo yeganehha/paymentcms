@@ -26,13 +26,13 @@ class home extends \controller {
 
 	public function index($serviceId){
 		$service = service::info($serviceId);
-		if ( $service == null){
+		if ( ! $service['status'] ){
 			$this->mold->offAutoCompile();
 			\App\core\controller\httpErrorHandler::E404();
 			return ;
 		}
-		$this->mold->set('service',$service['service']);
-		$this->mold->set('fields',$service['fields']);
+		$this->mold->set('service',$service['result']['service']);
+		$this->mold->set('fields',$service['result']['fields']);
 		$this->mold->view('home.mold.html');
 
 	}
