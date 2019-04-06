@@ -33,6 +33,11 @@ class innerController {
 	private static $mold;
 
 	public function __construct() {
+		$this->init();
+	}
+
+
+	protected static function init(){
 		if ( self::$jsonResponse == null ) {
 			self::$mold = new Mold();
 			self::$mold->offAutoCompile();
@@ -44,19 +49,17 @@ class innerController {
 				$requestedIp = 'local';
 				self::$jsonResponse = false;
 			}
-			$api = $this->model('api', "%" . $requestedIp . "%", ' ( allowIp Like ? or allowIp Like \'%*%\' ) and active = 1 limit 1');
+			$api = self::model('api', "%" . $requestedIp . "%", ' ( allowIp Like ? or allowIp Like \'%*%\' ) and active = 1 limit 1');
 			if ($api->getApiId() == null) {
 				self::jsonError('Access Denied !', 403);
 				Response::redirect(\App::getBaseAppLink('httpErrorHandler/403', 'core'));
 				return false;
 			}
 			self::$api = $api;
-			$this->callHooks('adminHeaderNavbar', [1, 2]);
+			self::callHooks('adminHeaderNavbar', [1, 2]);
 		}
 		return true ;
 	}
-
-
 	/**
 	 * @param null   $model
 	 * @param null   $searchVariable
@@ -78,7 +81,7 @@ class innerController {
 
 	}
 
-	protected function callHooks($hookName,$variable){
+	protected static function callHooks($hookName,$variable){
 		$files = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
 		foreach ($files as $file) {
 			$temp = explode(DIRECTORY_SEPARATOR, strings::deleteWordLastString($file,DIRECTORY_SEPARATOR.'hook.php')) ;

@@ -27,6 +27,8 @@ class service extends innerController {
 	}
 
 	public static function info($serviceId){
+		if ( self::$api == null )
+			self::init();
 		/* @var \paymentCms\model\service $model */
 		$model = self::model('service',$serviceId);
 		if ( is_null($model->getServiceId()) ){

@@ -25,6 +25,8 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class factor extends innerController {
 
 	public static function generate($serviceId,$baseData = null) {
+		if ( self::$api == null )
+			self::init();
 		if (is_null($baseData) or !is_array($baseData)) $baseData = $_POST;
 		$data = request::getFromArray($baseData, 'firstName,lastName,email,phone,price,description,customField');
 		unset($baseData);
