@@ -25,6 +25,7 @@ class MoldRendering {
 	private $fileInfo = [] ;
 	private $runFromPhp = false ;
 	private $moldShouldReplaceInTheEnd  = [] ;
+	private $moldForeachElse  = [] ;
 	private $engineStatus = true ;
 	private $lastEngineStatusFalse = 0 ;
 	const startVariable = '$' ;
@@ -245,6 +246,7 @@ class MoldRendering {
 			preg_match_all($re, $data['otherValues'], $matches, PREG_SET_ORDER, 0);
 			if (count($matches) != 1) die('error in foreach function');
 			$value = end($matches[0]);
+			$this->moldForeachElse[] = $from ;
 			$this->replace($data['find'], 'foreach ('.$from.' as $'.trim($key).' => $'.trim($value).' ) { $moldData->set("' . trim($key) . '" , $'.trim($key).' ); $moldData->set("' . trim($value) . '" , $'.trim($value).' );');
 		} else {
 			$extraData = explode(self::parameterSeparator,$data['otherValues']);
@@ -256,11 +258,21 @@ class MoldRendering {
 			}
 			if ( ! isset($extraDataSet[0]) or  ! isset($extraDataSet[1])  or  ! isset($extraDataSet[2]) )
 				die('error in foreach function');
+			$this->moldForeachElse[] = $extraDataSet[0] ;
 			$this->replace($data['find'], 'foreach ('.$extraDataSet[0].' as $'.trim($extraDataSet[1]).' => $'.trim($extraDataSet[2]).' ) { $moldData->set("' . trim($extraDataSet[1]) . '" , $'.trim($extraDataSet[1]).' ); $moldData->set("' . trim($extraDataSet[2]) . '" , $'.trim($extraDataSet[2]).' );');
 		}
 	}
 	private function _endforeach($data){
+		$endedForeach = array_pop($this->moldForeachElse);
 		$this->replace($data['find'], ' } ');
+	}
+
+	private function _foreachelse($data){
+		$endedForeach = end($this->moldForeachElse);
+		if ( $endedForeach != null )
+			$this->replace($data['find'], ' } if ( '.$endedForeach.' == null ) { ');
+		else
+			$this->replace($data['find'], ' } if ( 1 == 0 ) { ');
 	}
 
 	private function _stop($data){

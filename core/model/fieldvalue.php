@@ -29,14 +29,14 @@ class fieldvalue implements model {
 	private $factorId ;
 	private $value ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'id = ? ' ){
+	public function __construct(  $searchVariable = null , $searchWhereClaus = 'fieldId = ? and factorId = ?' ){
 		if ( $searchVariable != null ) {
-			$result = \database::searche('fieldvalue' ,  $searchWhereClaus  , array($searchVariable) ); 
+			$result = \database::searche('fieldvalue' ,  $searchWhereClaus  , $searchVariable );
 			if ( $result != null ) {
 				$this->fieldId = $result['fieldId'] ;
 				$this->factorId = $result['factorId'] ;
 				$this->value = $result['value'] ;
-			} else 
+			} else
 				return $this->returning(null,false,'fieldvalue4');
 		}
 		return $this->returning();
@@ -82,27 +82,24 @@ class fieldvalue implements model {
 		$array['fieldId'] = $this->fieldId ;
 		$array['factorId'] = $this->factorId ;
 		$array['value'] = $this->value ;
-		$id = \database::insert('fieldvalue' , $array  ); 
-		if ( $id ) {
-			$this->id = $id ; 
-			return $this->returning($id) ;
+		$status = \database::insert('fieldvalue' , $array  );
+		if ( $status ) {
+			return $this->returning() ;
 		}
 		return $this->returning(null,false,'fieldvalue3') ;
 	}
 
 
 	public function upDateDataBase( ) {
-		$array['fieldId'] = $this->fieldId ;
-		$array['factorId'] = $this->factorId ;
 		$array['value'] = $this->value ;
-		if ( \database::update('fieldvalue' , $array , array('query' => 'id = ?', 'param' => array($this->id)) ) ) 
+		if ( \database::update('fieldvalue' , $array , array('query' => 'fieldId = ? and factorId = ?', 'param' => array($this->fieldId, $this->factorId)) ) )
 			return $this->returning() ;
 		return $this->returning(null,false,'fieldvalue2') ;
 	}
 
 
 	public function deleteFromDataBase( ) {
-		if ( \database::delete('fieldvalue', array('query' => 'id = ?', 'param' => array($this->id)) ) ) 
+		if ( \database::delete('fieldvalue', array('query' => 'fieldId = ? and factorId = ?', 'param' => array($this->fieldId, $this->factorId)) ) )
 			return $this->returning() ;
 		return  $this->returning(null,false,'fieldvalue1') ;
 	}

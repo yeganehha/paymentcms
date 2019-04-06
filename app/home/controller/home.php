@@ -4,6 +4,8 @@
 namespace App\home\controller;
 
 
+use App\api\controller\service;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
@@ -23,27 +25,16 @@ class home extends \controller {
 
 
 	public function index($serviceId){
-		/* @var \paymentCms\model\service $model */
-		$model = $this->model('service',$serviceId);
-		if ( is_null($model->getServiceId()) ){
+		$service = service::info($serviceId);
+		if ( ! $service['status'] ){
 			$this->mold->offAutoCompile();
 			\App\core\controller\httpErrorHandler::E404();
 			return ;
 		}
-		/* @var \paymentCms\model\field $fieldModel */
-		$fieldModel = $this->model('field') ;
-		$fields = $fieldModel->search([$serviceId,'admin' , 'invisible' ],'serviceId = ? and status != ? and status != ? order by orderNumber desc');
-		if ( $fields === true)
-			$fields = [] ;
-
-		foreach ($fields as $key => $field){
-			if ( $field['type'] == 'checkbox' or $field['type'] == 'radio' or $field['type'] == 'select' )
-				$fields[$key]['values'] = explode(',', $field['values']);
-		}
-
-		$this->mold->set('service',$model);
-		$this->mold->set('fields',$fields);
+		$this->mold->set('service',$service['result']['service']);
+		$this->mold->set('fields',$service['result']['fields']);
 		$this->mold->view('home.mold.html');
+
 	}
 	public function sd(){
 		show(func_get_args());
