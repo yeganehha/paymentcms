@@ -30,6 +30,7 @@ function returnLang($langs,$lang = 'fa'){
 
 class Lang {
 	private static $langC ;
+	private static $fileInclude ;
 	private static $lang = [];
 	private static $langToShow = 'fa';
 	private static $loadedFile = [];
@@ -78,9 +79,14 @@ class Lang {
 		return null;
 	}
 
-	public static function get(){
-		$app_lang_path = \app::getAppPath('lang/').self::$langToShow.'.php' ;
+	public static function addToLangfile($app){
+		$app_lang_path = \app::getAppPath('lang/' , $app).self::$langToShow.'.php' ;
 		self::loadLangFile($app_lang_path);
+	}
+
+	public static function get(){
+//		$app_lang_path = \app::getAppPath('lang/').self::$langToShow.'.php' ;
+//		self::loadLangFile($app_lang_path);
 		$Want = func_get_args() ;
 		$return = [] ;
 		if ( func_num_args() > 1 ) {
