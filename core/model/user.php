@@ -19,37 +19,27 @@
 
 namespace paymentCms\model;
 
+use paymentCms\component\model;
+use paymentCms\model\modelInterFace ;
 
-use paymentCms\model\model ;
+class user extends model implements modelInterFace {
 
-class user implements model {
-
-
+	private $primaryKey = 'userId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'userId';
 	private $userId ;
 	private $fname ;
 	private $lname ;
 	private $email ;
 	private $phone ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'userId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('user' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->userId = $result['userId'] ;
-				$this->fname = $result['fname'] ;
-				$this->lname = $result['lname'] ;
-				$this->email = $result['email'] ;
-				$this->phone = $result['phone'] ;
-			} else 
-				return $this->returning(null,false,'user4');
-		}
-		return $this->returning();
+	public function setFromArray($result) {
+		$this->userId = $result['userId'] ;
+		$this->fname = $result['fname'] ;
+		$this->lname = $result['lname'] ;
+		$this->email = $result['email'] ;
+		$this->phone = $result['phone'] ;
 	}
 
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'user'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
-	}
 
 
 	public function setUserId( $userId = null ) {
@@ -102,37 +92,6 @@ class user implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['fname'] = $this->fname ;
-		$array['lname'] = $this->lname ;
-		$array['email'] = $this->email ;
-		$array['phone'] = $this->phone ;
-		$id = \database::insert('user' , $array  ); 
-		if ( $id ) {
-			$this->userId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'user3') ;
-	}
-
-
-	public function upDateDataBase( ) {
-		$array['fname'] = $this->fname ;
-		$array['lname'] = $this->lname ;
-		$array['email'] = $this->email ;
-		$array['phone'] = $this->phone ;
-		if ( \database::update('user' , $array , array('query' => 'userId = ?', 'param' => array($this->userId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'user2') ;
-	}
-
-
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('user', array('query' => 'userId = ?', 'param' => array($this->userId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'user1') ;
-	}
-
 
 	public function returnAsArray( ) {
 		$array['userId'] = $this->userId ;
@@ -143,16 +102,19 @@ class user implements model {
 		return $array ;
 	}
 
-
-
-	private function returning($return = null , $status = true , $errorNumber = "user0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 
 }

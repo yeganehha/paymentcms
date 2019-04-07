@@ -36,6 +36,8 @@ spl_autoload_register(function ($class_name_call) {
 	}
 	if ( file_exists($class_patch)) {
 		require_once $class_patch;
+		if ( method_exists($class_name_call,'__init'))
+			call_user_func([$class_name_call,'__init']);
 	} else {
 		App\core\controller\httpErrorHandler::E500($class_patch);
 		exit;
@@ -53,7 +55,5 @@ function show($pram = null , $exit = true ){
 require_once __DIR__ .DIRECTORY_SEPARATOR. 'app.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'controller.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'pluginController.php';
-$configDataBase = require_once __DIR__.DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR. 'config.php';
 require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'databaseConection.php';
 require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'lang.php';
-database::conection($configDataBase);

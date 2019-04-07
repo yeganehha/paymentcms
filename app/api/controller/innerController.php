@@ -5,6 +5,7 @@ namespace App\api\controller;
 
 
 use paymentCms\component\file;
+use paymentCms\component\model;
 use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -32,12 +33,8 @@ class innerController {
 	protected static $api ;
 	private static $mold;
 
-	public function __construct() {
-		$this->init();
-	}
 
-
-	protected static function init(){
+	public static function __init(){
 		if ( self::$jsonResponse == null ) {
 			self::$mold = new Mold();
 			self::$mold->offAutoCompile();
@@ -49,7 +46,7 @@ class innerController {
 				$requestedIp = 'local';
 				self::$jsonResponse = false;
 			}
-			$api = self::model('api', "%" . $requestedIp . "%", ' ( allowIp Like ? or allowIp Like \'%*%\' ) and active = 1 limit 1');
+			$api = self::model('api', ["%" . $requestedIp . "%"], ' ( allowIp Like ? or allowIp Like \'%*%\' ) and active = 1');
 			if ($api->getApiId() == null) {
 				self::jsonError('Access Denied !', 403);
 				Response::redirect(\App::getBaseAppLink('httpErrorHandler/403', 'core'));

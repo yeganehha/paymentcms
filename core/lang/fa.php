@@ -74,7 +74,7 @@ return [
 	'please' => 'خواهشا',
 	'selecting' => 'انتخاب کنید!',
 	'pay' => 'پرداخت',
-	'webservice' => 'dd',
+	'webservice' => 'درگاه های ارتباطی',
 	'ip' => 'آی پی',
 	'ips' => 'آی پی های',
 	'allow' => 'مجاز',

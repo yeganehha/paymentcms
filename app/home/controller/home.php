@@ -27,7 +27,6 @@ class home extends \controller {
 
 
 	public function index($serviceId){
-		$this->mold->offAutoCompile();
 		if ( request::isPost() ){
 			return $this->checkData($serviceId);
 		}
@@ -40,7 +39,6 @@ class home extends \controller {
 		$this->mold->set('service',$service['result']['service']);
 		$this->mold->set('fields',$service['result']['fields']);
 		$this->mold->view('home.mold.html');
-
 	}
 
 	public function checkData($serviceId){
