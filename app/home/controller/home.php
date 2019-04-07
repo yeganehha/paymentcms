@@ -4,7 +4,9 @@
 namespace App\home\controller;
 
 
+use App\api\controller\factor;
 use App\api\controller\service;
+use paymentCms\component\request;
 
 /**
  * Created by Yeganehha .
@@ -25,6 +27,10 @@ class home extends \controller {
 
 
 	public function index($serviceId){
+		$this->mold->offAutoCompile();
+		if ( request::isPost() ){
+			return $this->checkData($serviceId);
+		}
 		$service = service::info($serviceId);
 		if ( ! $service['status'] ){
 			$this->mold->offAutoCompile();
@@ -35,6 +41,12 @@ class home extends \controller {
 		$this->mold->set('fields',$service['result']['fields']);
 		$this->mold->view('home.mold.html');
 
+	}
+
+	public function checkData($serviceId){
+		$this->mold->offAutoCompile();
+		$result = factor::generate($serviceId,$_POST);
+		show($result);
 	}
 	public function sd(){
 		show(func_get_args());
