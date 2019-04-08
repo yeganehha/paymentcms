@@ -20,11 +20,13 @@
 namespace paymentCms\model;
 
 
-use paymentCms\model\model ;
+use paymentCms\component\model ;
 
-class field implements model {
+class field extends model implements modelInterFace  {
 
 
+	private $primaryKey = 'fieldId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'fieldId';
 	private $fieldId ;
 	private $type ;
 	private $title ;
@@ -35,28 +37,16 @@ class field implements model {
 	private $status ;
 	private $orderNumber ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'fieldId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('field' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->fieldId = $result['fieldId'] ;
-				$this->type = $result['type'] ;
-				$this->title = $result['title'] ;
-				$this->description = $result['description'] ;
-				$this->values = $result['values'] ;
-				$this->regex = $result['regex'] ;
-				$this->serviceId = $result['serviceId'] ;
-				$this->status = $result['status'] ;
-				$this->orderNumber = $result['orderNumber'] ;
-			} else 
-				return $this->returning(null,false,'field4');
-		}
-		return $this->returning();
-	}
-
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'field'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
+	public function setFromArray($result) {
+		$this->fieldId = $result['fieldId'] ;
+		$this->type = $result['type'] ;
+		$this->title = $result['title'] ;
+		$this->description = $result['description'] ;
+		$this->values = $result['values'] ;
+		$this->regex = $result['regex'] ;
+		$this->serviceId = $result['serviceId'] ;
+		$this->status = $result['status'] ;
+		$this->orderNumber = $result['orderNumber'] ;
 	}
 
 
@@ -150,46 +140,6 @@ class field implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['type'] = $this->type ;
-		$array['title'] = $this->title ;
-		$array['description'] = $this->description ;
-		$array['values'] = $this->values ;
-		$array['regex'] = $this->regex ;
-		$array['serviceId'] = $this->serviceId ;
-		$array['status'] = $this->status ;
-		$array['orderNumber'] = $this->orderNumber ;
-		$id = \database::insert('field' , $array  ); 
-		if ( $id ) {
-			$this->fieldId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'field3') ;
-	}
-
-
-	public function upDateDataBase( ) {
-		$array['type'] = $this->type ;
-		$array['title'] = $this->title ;
-		$array['description'] = $this->description ;
-		$array['values'] = $this->values ;
-		$array['regex'] = $this->regex ;
-		$array['serviceId'] = $this->serviceId ;
-		$array['status'] = $this->status ;
-		$array['orderNumber'] = $this->orderNumber ;
-		if ( \database::update('field' , $array , array('query' => 'fieldId = ?', 'param' => array($this->fieldId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'field2') ;
-	}
-
-
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('field', array('query' => 'fieldId = ?', 'param' => array($this->fieldId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'field1') ;
-	}
-
-
 	public function returnAsArray( ) {
 		$array['fieldId'] = $this->fieldId ;
 		$array['type'] = $this->type ;
@@ -204,15 +154,19 @@ class field implements model {
 	}
 
 
-
-	private function returning($return = null , $status = true , $errorNumber = "field0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 
 }

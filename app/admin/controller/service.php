@@ -4,6 +4,7 @@
 namespace App\admin\controller;
 
 
+use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
 use paymentCms\component\validate;
@@ -63,15 +64,14 @@ class service extends \controller {
 			}
 		}
 		$model = parent::model('service');
-		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? " 1 " : implode('or' , $variable) , 'service', 'COUNT(serviceId) as co' )) [0]['co'];
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode('or' , $variable) , 'service', 'COUNT(serviceId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? " 1 " : implode('or' , $variable) ) . 'order by serviceId DESC limit '.$pagination['start'].','.$pagination['limit'] , 'service', '*' );
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode('or' , $variable) )  , 'service', '*'  , ['column' => 'serviceId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
 		$this->mold->view('serviceList.mold.html');
 		$this->mold->setPageTitle(rlang('services'));
 		$this->mold->set('activeMenu' , 'services');
 		$this->mold->set('services' , $search);
 	}
-
 
 	public function new(){
 		if ( request::isPost() ){
@@ -146,7 +146,7 @@ class service extends \controller {
 			$this->alert('warning' , null,$valid->errorsIn(),'error');
 			$this->mold->set('post',$form);
 		} else {
-			\database::startTransaction();
+			model::transaction();
 			/* @var \paymentCms\model\service $model */
 			/* @var \paymentCms\model\field $modelField */
 			$model = $this->model('service' , $form['id']) ;
@@ -175,15 +175,15 @@ class service extends \controller {
 					else
 						$modelField->insertToDataBase();
 				}
-				if ( is_array($form['deleteField']) and count($form['deleteField']) > 0 )
-					foreach ($form['moreField'] as $key => $field ){
-						$in  = str_repeat('?,', count($form['deleteField']) - 1) . '?';
-						$form['deleteField'][] = $model->getServiceId() ;
-						\database::delete('field', array('query' => 'fieldId in ('.$in.') and serviceId = ?', 'param' => $form['deleteField'] ) );
-					}
-				\database::commit();
+				if ( is_array($form['deleteField']) and count($form['deleteField']) > 0 ){
+					$modelField->db()->where('fieldId' , $form['deleteField'] , 'IN');
+					$modelField->db()->where('serviceId' , $model->getServiceId() );
+					$modelField->db()->delete('field' );
+				}
+				model::commit();
 				Response::redirect(\app::getBaseAppLink('service/profile/' . $model->getServiceId() . '/moreConfigurationActionDone'));
 			} else {
+				model::rollback();
 				$this->alert('warning' , null, rlang('pleaseTryAGain'),'error');
 				$this->mold->set('post',$form);
 			}
@@ -216,7 +216,7 @@ class service extends \controller {
 
 		/* @var \paymentCms\model\field $fieldModel */
 		$fieldModel = $this->model('field') ;
-		$fields = $fieldModel->search([$serviceId],'serviceId = ? order by orderNumber desc');
+		$fields = $fieldModel->search($serviceId,'serviceId = ? ' ,null,'*',['column'=>'orderNumber' , 'type' => 'desc' ]  );
 		if ( $fields === true)
 			$fields = [] ;
 		$this->mold->set('service',$model);
@@ -245,7 +245,7 @@ class service extends \controller {
 		$this->mold->set('activeTab','moreInfo');
 		/* @var \paymentCms\model\field $fieldModel */
 		$fieldModel = $this->model('field') ;
-		$fields = $fieldModel->search([$serviceId],'serviceId = ? order by orderNumber desc');
+		$fields = $fieldModel->search($serviceId , 'serviceId = ?' , null ,'*',['column' => 'orderNumber' , 'type' => 'desc']);
 		if ( $fields === true)
 			$fields = [] ;
 		$this->mold->set('service',$model);

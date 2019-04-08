@@ -20,11 +20,12 @@
 namespace paymentCms\model;
 
 
-use paymentCms\model\model ;
+use paymentCms\component\model ;
 
-class service implements model {
+class service extends model implements modelInterFace  {
 
-
+	private $primaryKey = 'serviceId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'serviceId';
 	private $serviceId ;
 	private $link ;
 	private $price ;
@@ -36,29 +37,18 @@ class service implements model {
 	private $emailStatus ;
 	private $phoneStatus ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'serviceId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('service' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->serviceId = $result['serviceId'] ;
-				$this->link = $result['link'] ;
-				$this->price = $result['price'] ;
-				$this->description = $result['description'] ;
-				$this->name = $result['name'] ;
-				$this->status = $result['status'] ;
-				$this->lastNameStatus = $result['lastNameStatus'] ;
-				$this->firstNameStatus = $result['firstNameStatus'] ;
-				$this->emailStatus = $result['emailStatus'] ;
-				$this->phoneStatus = $result['phoneStatus'] ;
-			} else 
-				return $this->returning(null,false,'service4');
-		}
-		return $this->returning();
-	}
 
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'service'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
+	public function setFromArray($array){
+		$this->serviceId = $array['serviceId'] ;
+		$this->link = $array['link'] ;
+		$this->price = $array['price'] ;
+		$this->description = $array['description'] ;
+		$this->name = $array['name'] ;
+		$this->status = $array['status'] ;
+		$this->lastNameStatus = $array['lastNameStatus'] ;
+		$this->firstNameStatus = $array['firstNameStatus'] ;
+		$this->emailStatus = $array['emailStatus'] ;
+		$this->phoneStatus = $array['phoneStatus'] ;
 	}
 
 
@@ -162,47 +152,6 @@ class service implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['link'] = $this->link ;
-		$array['price'] = $this->price ;
-		$array['description'] = $this->description ;
-		$array['name'] = $this->name ;
-		$array['status'] = $this->status ;
-		$array['lastNameStatus'] = $this->lastNameStatus ;
-		$array['firstNameStatus'] = $this->firstNameStatus ;
-		$array['emailStatus'] = $this->emailStatus ;
-		$array['phoneStatus'] = $this->phoneStatus ;
-		$id = \database::insert('service' , $array  ); 
-		if ( $id ) {
-			$this->serviceId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'service3') ;
-	}
-
-
-	public function upDateDataBase( ) {
-		$array['link'] = $this->link ;
-		$array['price'] = $this->price ;
-		$array['description'] = $this->description ;
-		$array['name'] = $this->name ;
-		$array['status'] = $this->status ;
-		$array['lastNameStatus'] = $this->lastNameStatus ;
-		$array['firstNameStatus'] = $this->firstNameStatus ;
-		$array['emailStatus'] = $this->emailStatus ;
-		$array['phoneStatus'] = $this->phoneStatus ;
-		if ( \database::update('service' , $array , array('query' => 'serviceId = ?', 'param' => array($this->serviceId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'service2') ;
-	}
-
-
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('service', array('query' => 'serviceId = ?', 'param' => array($this->serviceId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'service1') ;
-	}
-
 
 	public function returnAsArray( ) {
 		$array['serviceId'] = $this->serviceId ;
@@ -218,16 +167,19 @@ class service implements model {
 		return $array ;
 	}
 
-
-
-	private function returning($return = null , $status = true , $errorNumber = "service0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 
 }

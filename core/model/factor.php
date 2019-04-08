@@ -20,11 +20,14 @@
 namespace paymentCms\model;
 
 
-use paymentCms\model\model ;
+use paymentCms\component\model;
+use paymentCms\model\modelInterFace ;
 
-class factor implements model {
+class factor extends model implements modelInterFace {
 
 
+	private $primaryKey = 'factorId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'factorId';
 	private $factorId ;
 	private $userId ;
 	private $createdDate ;
@@ -38,33 +41,21 @@ class factor implements model {
 	private $createdIp ;
 	private $apiId ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'factorId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('factor' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->factorId = $result['factorId'] ;
-				$this->userId = $result['userId'] ;
-				$this->createdDate = $result['createdDate'] ;
-				$this->dueDate = $result['dueDate'] ;
-				$this->paidDate = $result['paidDate'] ;
-				$this->status = $result['status'] ;
-				$this->module = $result['module'] ;
-				$this->price = $result['price'] ;
-				$this->requestAction = $result['requestAction'] ;
-				$this->backUri = $result['backUri'] ;
-				$this->createdIp = $result['createdIp'] ;
-				$this->apiId = $result['apiId'] ;
-			} else 
-				return $this->returning(null,false,'factor4');
-		}
-		return $this->returning();
-	}
 
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'factor'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
+	public function setFromArray($result) {
+		$this->factorId = $result['factorId'] ;
+		$this->userId = $result['userId'] ;
+		$this->createdDate = $result['createdDate'] ;
+		$this->dueDate = $result['dueDate'] ;
+		$this->paidDate = $result['paidDate'] ;
+		$this->status = $result['status'] ;
+		$this->module = $result['module'] ;
+		$this->price = $result['price'] ;
+		$this->requestAction = $result['requestAction'] ;
+		$this->backUri = $result['backUri'] ;
+		$this->createdIp = $result['createdIp'] ;
+		$this->apiId = $result['apiId'] ;
 	}
-
 
 	public function setFactorId( $factorId = null ) {
 		$this->factorId = $factorId ;
@@ -186,52 +177,6 @@ class factor implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['userId'] = $this->userId ;
-		$array['createdDate'] = $this->createdDate ;
-		$array['dueDate'] = $this->dueDate ;
-		$array['paidDate'] = $this->paidDate ;
-		$array['status'] = $this->status ;
-		$array['module'] = $this->module ;
-		$array['price'] = $this->price ;
-		$array['requestAction'] = $this->requestAction ;
-		$array['backUri'] = $this->backUri ;
-		$array['createdIp'] = $this->createdIp ;
-		$array['apiId'] = $this->apiId ;
-		$id = \database::insert('factor' , $array  ); 
-		if ( $id ) {
-			$this->factorId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'factor3') ;
-	}
-
-
-	public function upDateDataBase( ) {
-		$array['userId'] = $this->userId ;
-		$array['createdDate'] = $this->createdDate ;
-		$array['dueDate'] = $this->dueDate ;
-		$array['paidDate'] = $this->paidDate ;
-		$array['status'] = $this->status ;
-		$array['module'] = $this->module ;
-		$array['price'] = $this->price ;
-		$array['requestAction'] = $this->requestAction ;
-		$array['backUri'] = $this->backUri ;
-		$array['createdIp'] = $this->createdIp ;
-		$array['apiId'] = $this->apiId ;
-		if ( \database::update('factor' , $array , array('query' => 'factorId = ?', 'param' => array($this->factorId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'factor2') ;
-	}
-
-
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('factor', array('query' => 'factorId = ?', 'param' => array($this->factorId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'factor1') ;
-	}
-
-
 	public function returnAsArray( ) {
 		$array['factorId'] = $this->factorId ;
 		$array['userId'] = $this->userId ;
@@ -249,15 +194,19 @@ class factor implements model {
 	}
 
 
-
-	private function returning($return = null , $status = true , $errorNumber = "factor0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 
 }

@@ -37,7 +37,7 @@ class service extends innerController {
 		}
 		/* @var \paymentCms\model\field $fieldModel */
 		$fieldModel = self::model('field') ;
-		$fields = $fieldModel->search([$serviceId,'admin' , 'invisible' ],'serviceId = ? and status != ? and status != ? order by orderNumber desc');
+		$fields = $fieldModel->search([$serviceId,'admin' , 'invisible' ],'serviceId = ? and status != ? and status != ?',null,'*',['column'=>'orderNumber' , 'type' => 'desc' ]);
 		if ( $fields === true)
 			$fields = [] ;
 

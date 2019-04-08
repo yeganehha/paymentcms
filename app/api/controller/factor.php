@@ -4,6 +4,7 @@
 namespace App\api\controller;
 
 
+use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\validate;
 
@@ -73,12 +74,11 @@ class factor extends innerController {
 			$userSystem = [ 'value' => $data['email']  , 'variable' => 'email' ];
 		if ( isset($userSystem) ){
 			/* @var \paymentCms\model\user $userModel */
-			$userModel = self::model('user',$userSystem['value'] , $userSystem['variable'] .' = ? order by userId limit 1') ;
+			$userModel = self::model('user',$userSystem['value'] , $userSystem['variable'] .' = ? ' ) ;
 		}
 		/* end getting user information */
 
-
-		\database::startTransaction();
+		model::transaction();
 		$error = false ;
 		/* @var \paymentCms\model\factor $factorModel */
 		$factorModel = self::model('factor') ;
@@ -133,9 +133,10 @@ class factor extends innerController {
 			$error = rlang('canNotInsertFactor');
 		}
 		if ( $error === false ){
-			\database::commit();
+			model::commit();
 			return self::json($factorModel->getFactorId());
 		} else {
+			model::rollback();
 			return self::jsonError($error,500);
 		}
 	}

@@ -20,37 +20,26 @@
 namespace paymentCms\model;
 
 
-use paymentCms\model\model ;
+use paymentCms\component\model ;
 
-class api implements model {
+class api extends model implements modelInterFace  {
 
-
+	private $primaryKey = 'apiId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'apiId';
 	private $apiId ;
 	private $name ;
 	private $active ;
 	private $domain ;
 	private $allowIp ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'apiId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('api' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->apiId = $result['apiId'] ;
-				$this->name = $result['name'] ;
-				$this->active = $result['active'] ;
-				$this->domain = $result['domain'] ;
-				$this->allowIp = $result['allowIp'] ;
-			} else 
-				return $this->returning(null,false,'api4');
-		}
-		return $this->returning();
-	}
 
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'api'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
+	public function setFromArray($result) {
+		$this->apiId = $result['apiId'] ;
+		$this->name = $result['name'] ;
+		$this->active = $result['active'] ;
+		$this->domain = $result['domain'] ;
+		$this->allowIp = $result['allowIp'] ;
 	}
-
 
 	public function setApiId( $apiId = null ) {
 		$this->apiId = $apiId ;
@@ -102,37 +91,6 @@ class api implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['name'] = $this->name ;
-		$array['active'] = $this->active ;
-		$array['domain'] = $this->domain ;
-		$array['allowIp'] = $this->allowIp ;
-		$id = \database::insert('api' , $array  ); 
-		if ( $id ) {
-			$this->apiId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'api3') ;
-	}
-
-
-	public function upDateDataBase( ) {
-		$array['name'] = $this->name ;
-		$array['active'] = $this->active ;
-		$array['domain'] = $this->domain ;
-		$array['allowIp'] = $this->allowIp ;
-		if ( \database::update('api' , $array , array('query' => 'apiId = ?', 'param' => array($this->apiId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'api2') ;
-	}
-
-
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('api', array('query' => 'apiId = ?', 'param' => array($this->apiId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'api1') ;
-	}
-
 
 	public function returnAsArray( ) {
 		$array['apiId'] = $this->apiId ;
@@ -144,15 +102,19 @@ class api implements model {
 	}
 
 
-
-	private function returning($return = null , $status = true , $errorNumber = "api0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 
 }

@@ -32,7 +32,7 @@ class webservice extends \controller {
 	public function lists( $action = null ) {
 		/* @var \paymentCms\model\api $model */
 		$model = parent::model('api');
-		$apis = $model->search(array(), ' 1 order by apiId desc' );
+		$apis = $model->search(null,null,null,'*',['column'=>'apiId','type'=>'desc']);
 		if ( $apis === true )
 			$apis = null ;
 

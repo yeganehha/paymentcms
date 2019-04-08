@@ -25,15 +25,19 @@ spl_autoload_register(function ($class_name_call) {
 	$paths = explode('\\' , $class_name_call) ;
 	$class_name = array_pop($paths);
 	$dire = array_shift($paths);
-	if ( $dire == 'paymentCms' )
-		$class_patch = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.strtolower(implode(DIRECTORY_SEPARATOR,$paths)).DIRECTORY_SEPARATOR.$class_name.'.php';
-	elseif ( $dire == 'plugin' )
-		$class_patch = payment_path.'plugins'.DIRECTORY_SEPARATOR.strtolower(implode(DIRECTORY_SEPARATOR,$paths)).DIRECTORY_SEPARATOR.$class_name.'.php';
-	else
-		$class_patch = payment_path.$dire.DIRECTORY_SEPARATOR.strtolower(implode(DIRECTORY_SEPARATOR,$paths)).DIRECTORY_SEPARATOR.$class_name.'.php';
-
+	if ( $dire == 'paymentCms' ) {
+		$class_patch = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
+	}elseif ( $dire == 'plugin' ) {
+		Lang::addToLangfile($paths[0]);
+		$class_patch = payment_path . 'plugins' . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
+	}else {
+		Lang::addToLangfile($paths[0]);
+		$class_patch = payment_path . $dire . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
+	}
 	if ( file_exists($class_patch)) {
 		require_once $class_patch;
+		if ( method_exists($class_name_call,'__init'))
+			call_user_func([$class_name_call,'__init']);
 	} else {
 		App\core\controller\httpErrorHandler::E500($class_patch);
 		exit;
@@ -51,7 +55,5 @@ function show($pram = null , $exit = true ){
 require_once __DIR__ .DIRECTORY_SEPARATOR. 'app.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'controller.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'pluginController.php';
-$configDataBase = require_once __DIR__.DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR. 'config.php';
 require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'databaseConection.php';
 require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'lang.php';
-database::conection($configDataBase);
