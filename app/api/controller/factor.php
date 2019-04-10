@@ -23,7 +23,7 @@ use paymentCms\component\validate;
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
-class factor extends innerController {
+class invoice extends innerController {
 
 	public static function generate($serviceId,$baseData = null) {
 		if (is_null($baseData) or !is_array($baseData)) $baseData = $_POST;
@@ -80,34 +80,34 @@ class factor extends innerController {
 
 		model::transaction();
 		$error = false ;
-		/* @var \paymentCms\model\factor $factorModel */
-		$factorModel = self::model('factor') ;
-		$factorModel->setStatus('pending');
-		$factorModel->setPrice($service['price']);
-		$factorModel->setApiId(self::$api->getApiId());
-		$factorModel->setBackUri('back uri ....');
-		$factorModel->setCreatedIp('ip ...');
-		$factorModel->setDueDate(date('Y-m-d H:i:s' , time()+4*24*60*60));
-		$factorModel->setCreatedDate(date('Y-m-d H:i:s'));
+		/* @var \paymentCms\model\invoice $invoiceModel */
+		$invoiceModel = self::model('invoice') ;
+		$invoiceModel->setStatus('pending');
+		$invoiceModel->setPrice($service['price']);
+		$invoiceModel->setApiId(self::$api->getApiId());
+		$invoiceModel->setBackUri('back uri ....');
+		$invoiceModel->setCreatedIp('ip ...');
+		$invoiceModel->setDueDate(date('Y-m-d H:i:s' , time()+4*24*60*60));
+		$invoiceModel->setCreatedDate(date('Y-m-d H:i:s'));
 		if ( isset($userModel) ) {
 			if ( $userModel->getUserId() != null )
-				$factorModel->setUserId($userModel->getUserId());
+				$invoiceModel->setUserId($userModel->getUserId());
 			else {
 				$s = 0 ;
 				// TODO : add user with api
 			}
 		}
-		$factorModel->setModule('module ...');
-		$factorModel->setRequestAction('action ...');
-		$factorId = $factorModel->insertToDataBase();
-		if ( $factorId !== false ){
+		$invoiceModel->setModule('module ...');
+		$invoiceModel->setRequestAction('action ...');
+		$invoiceId = $invoiceModel->insertToDataBase();
+		if ( $invoiceId !== false ){
 			/* @var \paymentCms\model\items $itemsModel */
 			$itemsModel = self::model('items') ;
 			$itemsModel->setPrice($service['price']);
 			$itemsModel->setServiceId($service['serviceId']);
 			$itemsModel->setDescription($service['description']);
 			$itemsModel->setTime(date('Y-m-d H:i:s'));
-			$itemsModel->setFactorId($factorModel->getFactorId());
+			$itemsModel->setInvoiceId($invoiceModel->getInvoiceId());
 			$itemId = $itemsModel->insertToDataBase();
 			if ( $itemId !== false ){
 				if ( is_array($data['customField']) and ! empty($data['customField']) ){
@@ -116,7 +116,7 @@ class factor extends innerController {
 							continue ;
 						/* @var \paymentCms\model\fieldvalue $fieldValueModel */
 						$fieldValueModel = self::model('fieldvalue') ;
-						$fieldValueModel->setFactorId($factorModel->getFactorId());
+						$fieldValueModel->setInvoiceId($invoiceModel->getInvoiceId());
 						$fieldValueModel->setFieldId($fieldId);
 						$fieldValueModel->setValue($fieldValue);
 						$fieldValueStatus = $fieldValueModel->insertToDataBase();
@@ -130,11 +130,11 @@ class factor extends innerController {
 				$error = rlang('canNotInsertItems');
 			}
 		} else {
-			$error = rlang('canNotInsertFactor');
+			$error = rlang('canNotInsertInvoice');
 		}
 		if ( $error === false ){
 			model::commit();
-			return self::json($factorModel->getFactorId());
+			return self::json($invoiceModel->getInvoiceId());
 		} else {
 			model::rollback();
 			return self::jsonError($error,500);

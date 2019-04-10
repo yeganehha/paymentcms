@@ -26,7 +26,7 @@ class items extends model implements modelInterFace {
 	private $primaryKey = 'itemId';
 	private $primaryKeyShouldNotInsertOrUpdate = 'itemId';
 	private $itemId ;
-	private $factorId ;
+	private $invoiceId ;
 	private $price ;
 	private $description ;
 	private $time ;
@@ -34,7 +34,7 @@ class items extends model implements modelInterFace {
 
 	public function setFromArray($result) {
 		$this->itemId = $result['itemId'] ;
-		$this->factorId = $result['factorId'] ;
+		$this->invoiceId = $result['invoiceId'] ;
 		$this->price = $result['price'] ;
 		$this->description = $result['description'] ;
 		$this->time = $result['time'] ;
@@ -48,8 +48,8 @@ class items extends model implements modelInterFace {
 	}
 
 
-	public function setFactorId( $factorId = null ) {
-		$this->factorId = $factorId ;
+	public function setInvoiceId( $invoiceId = null ) {
+		$this->invoiceId = $invoiceId ;
 	}
 
 
@@ -78,8 +78,8 @@ class items extends model implements modelInterFace {
 	}
 
 
-	public function getFactorId() {
-		return $this->factorId ;
+	public function getInvoiceId() {
+		return $this->invoiceId ;
 	}
 
 
@@ -104,7 +104,7 @@ class items extends model implements modelInterFace {
 
 	public function returnAsArray( ) {
 		$array['itemId'] = $this->itemId ;
-		$array['factorId'] = $this->factorId ;
+		$array['invoiceId'] = $this->invoiceId ;
 		$array['price'] = $this->price ;
 		$array['description'] = $this->description ;
 		$array['time'] = $this->time ;

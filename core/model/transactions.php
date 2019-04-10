@@ -28,7 +28,7 @@ class transactions extends model implements modelInterFace {
 	private $primaryKey = 'transactionId';
 	private $primaryKeyShouldNotInsertOrUpdate = 'transactionId';
 	private $transactionId ;
-	private $factorId ;
+	private $invoiceId ;
 	private $price ;
 	private $time ;
 	private $ip ;
@@ -40,7 +40,7 @@ class transactions extends model implements modelInterFace {
 
 	public function setFromArray($result) {
 		$this->transactionId = $result['transactionId'];
-		$this->factorId = $result['factorId'];
+		$this->invoiceId = $result['invoiceId'];
 		$this->price = $result['price'];
 		$this->time = $result['time'];
 		$this->ip = $result['ip'];
@@ -57,8 +57,8 @@ class transactions extends model implements modelInterFace {
 	}
 
 
-	public function setFactorId( $factorId = null ) {
-		$this->factorId = $factorId ;
+	public function setInvoiceId( $invoiceId = null ) {
+		$this->invoiceId = $invoiceId ;
 	}
 
 
@@ -107,8 +107,8 @@ class transactions extends model implements modelInterFace {
 	}
 
 
-	public function getFactorId() {
-		return $this->factorId ;
+	public function getInvoiceId() {
+		return $this->invoiceId ;
 	}
 
 
@@ -154,7 +154,7 @@ class transactions extends model implements modelInterFace {
 
 	public function returnAsArray( ) {
 		$array['transactionId'] = $this->transactionId ;
-		$array['factorId'] = $this->factorId ;
+		$array['invoiceId'] = $this->invoiceId ;
 		$array['price'] = $this->price ;
 		$array['time'] = $this->time ;
 		$array['ip'] = $this->ip ;

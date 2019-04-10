@@ -18,8 +18,9 @@ return [
 	'dashboard' => 'داشبورد',
 	'services' => 'سرویس ها - خدمات',
 	'list' => 'لیست',
-	'factors' => 'صورتحساب ها',
-	'factorsOf' => 'صورتحساب های',
+	'invoices' => 'صورتحساب ها',
+	'invoice' => 'صورتحساب',
+	'invoiceOf' => 'صورتحساب های',
 	'users' => 'کاربران',
 	'payments' => 'پرداخت ها',
 	'done' => 'انجام شده',
@@ -79,6 +80,11 @@ return [
 	'ips' => 'آی پی های',
 	'allow' => 'مجاز',
 	'deActive' => 'غیر فعال',
+	'client' => 'کاربر',
+	'date' => 'تاریخ',
+	'due' => 'سر رسید',
+	'total' => 'مجموع',
+	'method' => 'روش',
 	'numberOfRecordsShowPerEachPage' => 'تعداد رکورد ها نمایش داده شده : ',
 
 	/*

@@ -4,7 +4,7 @@
 namespace App\home\controller;
 
 
-use App\api\controller\factor;
+use App\api\controller\invoice;
 use App\api\controller\service;
 use paymentCms\component\request;
 
@@ -43,7 +43,7 @@ class home extends \controller {
 
 	public function checkData($serviceId){
 		$this->mold->offAutoCompile();
-		$result = factor::generate($serviceId,$_POST);
+		$result = invoice::generate($serviceId,$_POST);
 		show($result);
 	}
 	public function sd(){
