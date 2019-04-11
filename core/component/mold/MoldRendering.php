@@ -157,6 +157,8 @@ class MoldRendering {
 	}
 
 	private function _echo($data){
+		if ( !$this->engineStatus )
+			return ;
 		if ( $this->runFromPhp ){
 			$this->replace($data['find'] , $data['otherValues'] );
 		} else {
@@ -165,21 +167,29 @@ class MoldRendering {
 	}
 
 	private function _if($data){
+		if ( !$this->engineStatus )
+			return ;
 		if ( $this->runFromPhp ){
 			$this->replace($data['find'] , ' ( ( '. $data['otherValues'] .' ) ? ' );
 		} else
 		$this->replace($data['find'] , 'if ( '.$data['otherValues'] .' ) { ');
 	}
 	private function _elseif($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'] , '} elseif ( '.$data['otherValues'] .' ) { ');
 	}
 	private function _else($data){
+		if ( !$this->engineStatus )
+			return ;
 		if ( $this->runFromPhp ){
 			$this->replace($data['find'] , ' : ' );
 		} else
 		$this->replace($data['find'] , '} else { ');
 	}
 	private function _endif($data){
+		if ( !$this->engineStatus )
+			return ;
 		if ( $this->runFromPhp ){
 			$this->replace($data['find'] ,  ' ) ');
 		} else
@@ -203,6 +213,45 @@ class MoldRendering {
 			$matches = explode(self::parameterSeparator , $data['otherValues'] );
 			if (count($matches) != 2) die('error in set function');
 			$this->replace($data['find'], '$moldData->set(' . trim($matches[0]) . ' , ' . trim($matches[1]) . ');');
+		}
+	}
+
+	private function _math($data){
+		if ( !$this->engineStatus )
+			return ;
+		if (preg_match('/(format)( *)=/', $data['otherValues']) ) {
+
+			$re = '/(format)\s*=\s*(["\'])(?:(?=(\\\\?))\3.)*?\2/';
+			preg_match_all($re, $data['otherValues'], $matches, PREG_SET_ORDER, 0);
+			if ( count($matches) != 1 )
+				die('error in math function!(format is required and unique)');
+			$format = explode($matches[0][2] , $matches[0][0])[1];
+			$data['otherValues'] = str_replace($matches[0][0] ,'', $data['otherValues']);
+
+			$re = '/([\S]+)\s*=\s*([\S]+)/';
+			preg_match_all($re, $data['otherValues'], $matches, PREG_SET_ORDER, 0);
+			for( $i = 0 ; $i < count($matches ) ; $i++ ){
+				$dataOfFormat[ trim(strtolower(str_replace(["\"","'"],"" , $matches[$i][1]))) ] = $matches[$i][2];
+			}
+			if ( isset($dataOfFormat['set']) ){
+				$set = $dataOfFormat['set'];
+				unset($dataOfFormat['set']);
+			}
+			if ( ! empty($dataOfFormat) ){
+				foreach ( $dataOfFormat as $variable => $value ){
+					$format = preg_replace('(\b('.$variable.')\b)' , $value , $format);
+				}
+			}
+			if ( isset($set) ){
+				$this->replace($data['find'], '$moldData->set(' . trim($set) . ' , (' . trim($format) . ') );');
+			} else {
+				if ( $this->runFromPhp ) {
+					$this->replace($data['find'], ' (' . trim($format) . ') ');
+				}else
+					$this->replace($data['find'], 'echo (' . trim($format) . ') ; ');
+			}
+		} else {
+			die('error in math function!(format is required)');
 		}
 	}
 
@@ -244,6 +293,8 @@ class MoldRendering {
 		}
 	}
 	private function _endfor($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'], ' } ');
 	}
 	private function _foreach($data){
@@ -279,11 +330,20 @@ class MoldRendering {
 		}
 	}
 	private function _endforeach($data){
+		if ( !$this->engineStatus )
+			return ;
 		$endedForeach = array_pop($this->moldForeachElse);
 		$this->replace($data['find'], ' } ');
 	}
 
+	private function _continue($data){
+		if ( !$this->engineStatus )
+			return ;
+		$this->replace($data['find'] , ' continue ;');
+	}
 	private function _foreachelse($data){
+		if ( !$this->engineStatus )
+			return ;
 		$endedForeach = end($this->moldForeachElse);
 		if ( $endedForeach != null )
 			$this->replace($data['find'], ' } if ( '.$endedForeach.' == null ) { ');
@@ -301,26 +361,38 @@ class MoldRendering {
 		$this->replace($data['find'],'' );
 	}
 	private function _lang($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
 	}
 
 	private function _l($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
 	}
 
 	private function __($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
 	}
 
 	private function _php($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'],'<?php ' , false,false );
 	}
 
 	private function _endphp($data){
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'],' ?>' , false,false );
 	}
 
 	private function _currentApp($data){
+		if ( !$this->engineStatus )
+			return ;
 		if ( $this->runFromPhp ){
 			$this->replace($data['find'] ,  \app::getApp());
 		} else
@@ -456,6 +528,8 @@ class MoldRendering {
 	}
 
 	private function _url($data){
+		if ( !$this->engineStatus )
+			return ;
 		switch (trim(strtolower($data['otherValues']))) {
 			case 'theme':
 				$link = \app::getAppLink('theme/' . $this->fileInfo['folder'], $this->fileInfo['app']);
@@ -489,40 +563,58 @@ class MoldRendering {
 	}
 
 	private function _endmap($data) {
+		if ( !$this->engineStatus )
+			return ;
 		$this->replace($data['find'],' ' , false,false);
 	}
 
 	private function _call ( $data ){
+		if ( !$this->engineStatus )
+			return ;
 		$data['otherValues'] = trim($data['otherValues']);
 		$this->replace($data['find'],' $i = 0 ; while ( function_exists(\'moldBlock_'.$data['otherValues'].'_\'.$i )) { call_user_func_array(\'moldBlock_'.$data['otherValues'].'_\'.$i ,[&$moldData] ); $i++ ; } ');
 	}
 
 
 	private function ___count($value){
+		if ( !$this->engineStatus )
+			return ;
 		return '((is_array('.$value.') ) ? count('.$value.') : 0 )' ;
 	}
 
 	private function ___nl2br($value){
+		if ( !$this->engineStatus )
+			return ;
 		return ' nl2br('.$value.') ' ;
 	}
 
 	private function ___truncate($value,$number = 40 , $more = '"..."'){
+		if ( !$this->engineStatus )
+			return ;
 		return '((strlen('.$value.') > '.$number.' ) ? substr('.$value.' , 0 , '.$number.').'.$more.' : '.$value.' )' ;
 	}
 
 	private function ___number_format($value,$decimals = 0 ,$dec_point ='.',$thousands_sep = ','){
+		if ( !$this->engineStatus )
+			return ;
 		return 'number_format('.$value.','.$decimals.',"'.$dec_point.'","'.$thousands_sep.'")' ;
 	}
 
 	private function ___str_replace($value, $search , $replace ){
+		if ( !$this->engineStatus )
+			return ;
 		return 'str_replace('.$search.' ,'.$replace.','.$value.' )' ;
 	}
 
 	private function ___date_format($value,$format){
+		if ( !$this->engineStatus )
+			return ;
 		return '( ( ctype_digit('.$value.') && strtotime(date(\'Y-m-d H:i:s\','.$value.')) === (int)'.$value.' ) ? date('.$format.','.$value.') : date('.$format.',strtotime(str_replace(\'/\', \'-\','.$value.'))) ) ' ;
 	}
 
 	private function ___jDate($value,$format,$time_Zone = '"Asia/Tehran"' , $tr_num = '"en"'){
+		if ( !$this->engineStatus )
+			return ;
 		return '( ( ctype_digit('.$value.') && strtotime(date(\'Y-m-d H:i:s\','.$value.')) === (int)'.$value.' ) ? \paymentCms\component\JDate::jdate('.$format.','.$value.',"",'.$time_Zone.','.$tr_num.') : \paymentCms\component\JDate::jdate('.$format.',strtotime(str_replace(\'/\', \'-\','.$value.')),"",'.$time_Zone.','.$tr_num.') ) ' ;
 	}
 }
