@@ -1,0 +1,546 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-rose card-header-icon">
+                        <div class="card-icon">
+                            <i class="fa fa-file-text-o"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "invoice"}</h4>
+                        <div class="card-title float-{if $float == 'right'}left{else}right{/if}  m-3 btn-group btn-group-sm">
+                            <button class="btn btn-outline">
+                                <i class="fa fa-download"></i> {_ "download"}
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fa fa-print"></i> {_ "print"}
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fa fa-clipboard"></i> {_ "viewAsClient"}
+                            </button>
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <div class=" border rounded p-3 ">
+                            <ul class="nav nav-pills nav-pills-info" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#link1" role="tablist">
+                                        {_ "info"}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#link2" role="tablist">
+                                        {_ "info"} {_ "more"}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#link3" role="tablist">
+                                        {_ "configuration"}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#link4" role="tablist">
+                                        {_ "note"}
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content tab-space">
+                                <div class="tab-pane active" id="link1">
+                                    <div class="row">
+                                        <div class="col-md-6 float-left text-center">
+                                            <div class="text-center text-success">$invoice.status</div>
+                                            <div class="text-center">$invoice.payDate</div>
+                                            <div class="text-center">{_ "method"} {_ "pay"} : $invoice.method</div>
+                                            <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "paid"}</button>
+                                            <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "cancel"}</button>
+                                        </div>
+                                        <div class="col-md-6 float-left">
+                                            <div class="table-responsive table-striped rounded border p-1">
+                                                <table class="table text-{$text_align}">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "name"} {_ "client"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "due"} {_ "date"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "total"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "price"} {_ "paid"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="link2">
+                                    <div class="table-responsive table-striped">
+                                        <table class="table text-{$text_align}">
+                                            <tbody>
+                                            <tr>
+                                                <td>
+                                                    {_ "status"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                                <td>
+                                                    {_ "method"} {_ "pay"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {_ "name"} {_ "client"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                                <td>
+                                                    {_ "due"} {_ "date"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {_ "total"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                                <td>
+                                                    {_ "price"} {_ "paid"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {_ "invoice"} {_ "date"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                                <td>
+                                                    {_ "pay"} {_ "date"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {_ "webservice"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                                <td>
+                                                    {_ "ip"} {_ "creator"} {_ "invoice"} :
+                                                </td>
+                                                <td>
+                                                    $client->getName()
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="card-header float-{$float}">
+                                                <h4 class="card-title">$service->getName()</h4>
+                                            </div>
+                                            <div class="table-responsive table-striped">
+                                                <table class="table text-{$text_align}">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "name"} {_ "client"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "due"} {_ "date"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "total"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "price"} {_ "paid"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card-header float-{$float}">
+                                                <h4 class="card-title">$service->getName()</h4>
+                                            </div>
+                                            <div class="table-responsive table-striped">
+                                                <table class="table text-{$text_align}">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "name"} {_ "client"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "due"} {_ "date"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "total"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "price"} {_ "paid"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card-header float-{$float}">
+                                                <h4 class="card-title">$service->getName()</h4>
+                                            </div>
+                                            <div class="table-responsive table-striped">
+                                                <table class="table text-{$text_align}">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "name"} {_ "client"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "due"} {_ "date"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "total"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "price"} {_ "paid"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card-header float-{$float}">
+                                                <h4 class="card-title">$service->getName()</h4>
+                                            </div>
+                                            <div class="table-responsive table-striped">
+                                                <table class="table text-{$text_align}">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "name"} {_ "client"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "due"} {_ "date"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "total"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {_ "price"} {_ "paid"} :
+                                                        </td>
+                                                        <td>
+                                                            $client->getName()
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="link3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="col-md-4 col-form-label">{_ "date"} {_ "creat"} {_ "invoice"}</label>
+                                            <div class="col-md-8">
+                                                <div class="form-group has-default">
+                                                    <input type="text" id="createdDate" value="{if isset($post.name)}{$post.name}{else}{if isset($service)}$service->getName(){/if}{/if}" name="createdDate" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="col-md-4 col-form-label">{_ "due"} {_ "date"}</label>
+                                            <div class="col-md-8">
+                                                <div class="form-group has-default">
+                                                    <input type="text" id="dueDate" value="{if isset($post.description)}{$post.description}{else}{if isset($service)}{$service->getDescription()}{/if}{/if}" name="dueDate" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="col-md-4 col-form-label">{_ "method"} {_ "pay"}</label>
+                                            <div class="col-md-8">
+                                                <div class="form-group has-default">
+                                                    <input type="text" id="module" value="{if isset($post.description)}{$post.description}{else}{if isset($service)}{$service->getDescription()}{/if}{/if}" name="module" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="col-md-4 col-form-label">{_ "status"}</label>
+                                            <div class="col-md-8">
+                                                <select class="form-control"  name="moreField[__IIDD__][type]" data-size="7" data-style="btn btn-outline-info btn-round float-{$float}" title="{_ 'type'} {_ 'field'}">
+                                                    <option value="pending" selected>{_ "pending"}</option>
+                                                    <option value="canceled">{_ "canceled"}</option>
+                                                    <option value="refused">{_ "refused"}</option>
+                                                    <option value="failed">{_ "failed"}</option>
+                                                    <option value="paid">{_ "paid"}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="link4">
+                                    <textarea rows="5" class="form-control border pt-2 pl-2 pr-2" placeholder="{_ 'note'}..."></textarea>
+                                    <input type="submit" value="{_ 'save'}" class="btn btn-info">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-header mt-5 float-{$float}">
+                            <h4 class="card-title">{_ "invoiceItems"}</h4>
+                        </div>
+                        <div class="table-responsive table-hover">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "description"}</th>
+                                    <th class="text-center bg-info text-white border-white border rounded" style="width: 200px">{_ "price"}</th>
+                                    <th class="bg-info text-white border-white border rounded  text-center" style="width: 50px">{_ "actions"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$invoices key=key value=invoice}
+                                <tr>
+                                    <td class="text-center">{$invoice.invoiceId|ssssss:"df":"dsf":"dfs":$invoice.invoiceId}</td>
+                                    <td>{$invoice.name}</td>
+                                    <td>{$invoice.createdDate|date_format:"jS F, Y"}</td>
+                                    <td>{$invoice.dueDate|jDate:"jS F, Y"}</td>
+                                    <td>{$invoice.paidDate|jDate:"jS F, Y"}</td>
+                                    <td>{$invoice.price|number_format}</td>
+                                    <td>{$invoice.module}</td>
+                                    <td class="text-right">{$invoice.status}</td>
+                                    <td class="td-actions text-right">
+                                        <a class="btn btn-info btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                            <i class="material-icons">remove_red_eye</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {foreachelse}
+                                <tr class="border-bottom border-top">
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        <textarea class="form-control border bg-white rounded p-1">50 GB - haminbook.ir (2019/03/19 - 2019/04/18)</textarea>
+                                    </td>
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        <input class="form-control text-center bg-white rounded" value="50000" >
+                                    </td>
+                                    <td class="td-actions text-center rounded">
+                                        <a class="btn btn-danger btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="border-bottom border-top">
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        <textarea class="form-control border bg-white rounded p-1">50 GB - haminbook.ir (2019/03/19 - 2019/04/18)</textarea>
+                                    </td>
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        <input class="form-control text-center bg-white rounded" value="50000" >
+                                    </td>
+                                    <td class="td-actions text-center rounded">
+                                        <a class="btn btn-danger btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="border-bottom border-top">
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        <textarea class="form-control border bg-white rounded p-1">50 GB - haminbook.ir (2019/03/19 - 2019/04/18)</textarea>
+                                    </td>
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        <input class="form-control text-center bg-white rounded" value="50000" >
+                                    </td>
+                                    <td class="td-actions text-center rounded  text-center">
+                                        <a class="btn btn-danger btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                                <tr class="border-top" >
+                                    <td class="border-left border-bottom border-right border-white rounded bg-dark text-bold text-large text-left pl-5 text-white " >
+                                       {_ "total"} :
+                                    </td>
+                                    <td class="border-left border-bottom border-right border-white rounded bg-dark text-bold text-large  text-center text-white" >
+                                        5000000
+                                    </td>
+                                    <td class="border-left border-bottom border-right border-white rounded bg-dark text-bold text-large " >
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="text-center">
+                                <div class="btn-group text-center">
+                                    <button class="btn btn-outline-success btn-success">{_ "save"}</button>
+                                    <button class="btn btn-outline-secondary btn-secondary">{_ "refresh"}</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header mt-5 float-{$float}">
+                            <h4 class="card-title">{_ "transactions"}</h4>
+                        </div>
+                        <div class="table-responsive table-striped">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "date"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "method"} {_ "pay"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "transactionId"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "price"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "note"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center" style="width: 80px;">{_ "actions"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$invoices key=key value=invoice}
+                                <tr class="border-bottom border-top">
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        2019/03/19
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                    <td class="td-actions text-center rounded">
+                                        <a class="btn btn-danger btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                        <a class="btn btn-info btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                            <i class="material-icons">remove_red_eye</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {foreachelse}
+                                <tr class="border-bottom border-top">
+                                    <td class="rounded p-1 text-center" colspan="6">{_ "hasNotTransactionYet"}</td>
+                                </tr>
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

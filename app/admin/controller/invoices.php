@@ -26,8 +26,9 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 class invoices extends \controller {
-	public function index(){
-		Response::redirect(\app::getBaseAppLink('service/lists'));
+	public function index($invoiceId){
+		$this->mold->view('invoice.mold.html');
+		$this->mold->setPageTitle(rlang('invoice'));
 	}
 	public function lists() {
 		$get = request::post('page=1,perEachPage=25,name,description,price,link,active' ,null);

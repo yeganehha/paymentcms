@@ -74,7 +74,7 @@ class Lang {
 			self::$loadedFile[] = $file;
 			$newLang = require_once  $file  ;
 			self::$lang = array_merge(self::$lang,$newLang);
-			self::$lang = array_unique(self::$lang);
+//			self::$lang = array_unique(self::$lang);
 		}
 		return null;
 	}
