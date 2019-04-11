@@ -33,7 +33,9 @@ class MoldFiles {
 	const version = '0.0.0.1' ;
 
 	public function __construct(&$moldData) {
+		/* @var MoldData $moldData */
 		$this->moldData = $moldData;
+		$this->moldData->setMoldData(self::version);
 		$this->setPath('default');
 		MoldRendering::emptyMap();
 	}

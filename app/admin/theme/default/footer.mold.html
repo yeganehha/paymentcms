@@ -3,6 +3,11 @@
         <nav class="float-right text-secondary">
             <ul>
                 <li class="ltr">
+                    <a href="https://www.moldEngine.ir/" target="_blank" class="form-inline">
+                        (Mold V: {$Mold.version})
+                    </a>
+                </li>
+                <li class="ltr">
                     <a href="https://creative-tim.com/" target="_blank" >
                         &copy; Admin Template By  Creative Tim
                     </a>
@@ -25,10 +30,7 @@
             </ul>
         </nav>
         <div class="copyright float-left ltr text-secondary">
-            &copy;
-            <script>
-                document.write(new Date().getFullYear())
-            </script>, made with <i class="material-icons text-danger">favorite</i> by
+            &copy; {$Mold.now|date_format:"Y"}, made with <i class="material-icons text-danger">favorite</i> by
             <a href="https://www.paymentcms.ir/" target="_blank" class="text-secondary text-bold">payment Cms</a>.
         </div>
     </div>

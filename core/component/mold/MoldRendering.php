@@ -113,6 +113,22 @@ class MoldRendering {
 				$replaceWith = implode('[', $allVariable);
 				for ($i = 1; $i < count($allVariable); $i++) $replaceWith .= ']';
 				$string = str_replace($pattern[0], $replaceWith, $string);
+
+				if ( strings::strhas($string , '|' ) ){
+					$dataOfFunctions = explode('|', $string);
+					$value = array_shift($dataOfFunctions);
+					foreach ( $dataOfFunctions as $dataOfFunction ) {
+						$funcValue = explode(':', $dataOfFunction);
+						$funcName = array_shift($funcValue);
+						array_unshift($funcValue, $value);
+						if (method_exists($this, '___' . $funcName))
+							$string = call_user_func_array([$this, '___' . $funcName], $funcValue);
+						else
+							$string = $value;
+						$value = $string ;
+					}
+				}
+
 			}
 		}
 		if ( !empty($this->moldShouldReplaceInTheEnd))
@@ -479,5 +495,34 @@ class MoldRendering {
 	private function _call ( $data ){
 		$data['otherValues'] = trim($data['otherValues']);
 		$this->replace($data['find'],' $i = 0 ; while ( function_exists(\'moldBlock_'.$data['otherValues'].'_\'.$i )) { call_user_func_array(\'moldBlock_'.$data['otherValues'].'_\'.$i ,[&$moldData] ); $i++ ; } ');
+	}
+
+
+	private function ___count($value){
+		return '((is_array('.$value.') ) ? count('.$value.') : 0 )' ;
+	}
+
+	private function ___nl2br($value){
+		return ' nl2br('.$value.') ' ;
+	}
+
+	private function ___truncate($value,$number = 40 , $more = '"..."'){
+		return '((strlen('.$value.') > '.$number.' ) ? substr('.$value.' , 0 , '.$number.').'.$more.' : '.$value.' )' ;
+	}
+
+	private function ___number_format($value,$decimals = 0 ,$dec_point ='.',$thousands_sep = ','){
+		return 'number_format('.$value.','.$decimals.',"'.$dec_point.'","'.$thousands_sep.'")' ;
+	}
+
+	private function ___str_replace($value, $search , $replace ){
+		return 'str_replace('.$search.' ,'.$replace.','.$value.' )' ;
+	}
+
+	private function ___date_format($value,$format){
+		return '( ( ctype_digit('.$value.') && strtotime(date(\'Y-m-d H:i:s\','.$value.')) === (int)'.$value.' ) ? date('.$format.','.$value.') : date('.$format.',strtotime(str_replace(\'/\', \'-\','.$value.'))) ) ' ;
+	}
+
+	private function ___jDate($value,$format,$time_Zone = '"Asia/Tehran"' , $tr_num = '"en"'){
+		return '( ( ctype_digit('.$value.') && strtotime(date(\'Y-m-d H:i:s\','.$value.')) === (int)'.$value.' ) ? \paymentCms\component\JDate::jdate('.$format.','.$value.',"",'.$time_Zone.','.$tr_num.') : \paymentCms\component\JDate::jdate('.$format.',strtotime(str_replace(\'/\', \'-\','.$value.')),"",'.$time_Zone.','.$tr_num.') ) ' ;
 	}
 }

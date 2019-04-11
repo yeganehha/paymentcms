@@ -100,7 +100,7 @@
                                     <td class="text-center">{$service.serviceId}</td>
                                     <td>{$service.name}</td>
                                     <td>{$service.description}</td>
-                                    <td>{$service.price}</td>
+                                    <td>{$service.price|number_format}</td>
                                     <td class="text-right">{$service.link}</td>
                                     <td class="td-actions text-right">
                                         <a class="btn btn-info btn-link" href="{url}service/profile/{$service.serviceId}">

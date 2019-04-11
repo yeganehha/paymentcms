@@ -38,7 +38,7 @@ $(window).resize(function(){
 
 });
 window.onscroll = function() {
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
         $('.position-fixed-grid').css('margin-top', ( document.documentElement.scrollTop - 80)+'px');
     } else {
         $('.position-fixed-grid').css('margin-top', '0px');

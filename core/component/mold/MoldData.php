@@ -20,6 +20,20 @@ class MoldData {
 
 	}
 
+	public function setMoldData($moldVersion){
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
+		$this->set('Mold' , [
+			'now' => time() ,
+			'get' => $_GET ,
+			'post' => $_POST ,
+			'cookies' => $_COOKIE ,
+			'server' => $_SERVER ,
+			'session' => $_SESSION ,
+			'version' => $moldVersion ,
+		]);
+	}
 	private function validateName($name){
 		return  str_replace(['\\','/','~','.','-','>','<','$',' ','*','+','!','@','#','%','^','&','(',')','{',',','}','[',']',';','\'','"'] , '_' , $name );
 	}

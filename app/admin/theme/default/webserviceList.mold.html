@@ -12,7 +12,7 @@
                     </div>
                     <div class="card-body">
                         <a href="{$api.domain}" target="_blank">{$api.domain}</a><br>
-                        <span class="ltr text-left">{$api.allowIp}</span>
+                        <span class="ltr text-left badge badge-info m-1">{$api.allowIp|str_replace:",":'</span><span class="ltr text-left badge badge-info m-1">'}</span>
                     </div>
                     <div class="card-footer">
                         <a href="{url}webservice/edit/{$api.apiId}" title="{_ 'edit'}"><i class="material-icons pointer text-warning">edit</i></a>
