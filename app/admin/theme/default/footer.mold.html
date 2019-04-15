@@ -1,40 +1,41 @@
 <footer class="footer">
     <div class="container-fluid">
-        <nav class="float-left">
+        <nav class="float-right text-secondary">
             <ul>
-                <li>
-                    <a href="https://www.creative-tim.com/">
-                        Creative Tim
+                <li class="ltr">
+                    <a href="https://www.moldEngine.ir/" target="_blank" class="form-inline">
+                        (Mold V: {$Mold.version})
+                    </a>
+                </li>
+                <li class="ltr">
+                    <a href="https://creative-tim.com/" target="_blank" >
+                        &copy; Admin Template By  Creative Tim
                     </a>
                 </li>
                 <li>
-                    <a href="https://creative-tim.com/presentation">
-                        About Us
+                    <a href="https://www.paymentcms.ir/themes" target="_blank" >
+                        Themes
                     </a>
                 </li>
                 <li>
-                    <a href="http://blog.creative-tim.com/">
-                        Blog
+                    <a href="https://www.paymentcms.ir/plugins" target="_blank" >
+                        Plugins
                     </a>
                 </li>
                 <li>
-                    <a href="https://www.creative-tim.com/license">
+                    <a href="https://www.paymentcms.ir/license" target="_blank" >
                         Licenses
                     </a>
                 </li>
             </ul>
         </nav>
-        <div class="copyright float-right">
-            &copy;
-            <script>
-                document.write(new Date().getFullYear())
-            </script>, made with <i class="material-icons">favorite</i> by
-            <a href="https://www.creative-tim.com/" target="_blank">Creative Tim</a> for a better web.
+        <div class="copyright float-left ltr text-secondary">
+            &copy; {$Mold.now|date_format:"Y"}, made with <i class="material-icons text-danger">favorite</i> by
+            <a href="https://www.paymentcms.ir/" target="_blank" class="text-secondary text-bold">payment Cms</a>.
         </div>
     </div>
 </footer>
-</div>
-</div>
+
 <!--   Core JS Files   -->
 <script src="{url theme}/assets/js/core/jquery.min.js"></script>
 <script src="{url theme}/assets/js/core/popper.min.js"></script>
@@ -68,8 +69,6 @@
 <script src="{url theme}/assets/ajax/libs/core-js/2.4.1/core.js"></script>
 <!-- Library for adding dinamically elements -->
 <script src="{url theme}/assets/js/plugins/arrive.min.js"></script>
-<!--  Google Maps Plugin    -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2Yno10-YTnLjjn_Vtk0V8cdcY5lC4plU"></script>
 <!-- Place this tag in your head or just before your close body tag. -->
 <script async defer src="{url theme}/assets/js/buttons.js"></script>
 <!-- Chartist JS -->

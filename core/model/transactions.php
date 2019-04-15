@@ -20,13 +20,15 @@
 namespace paymentCms\model;
 
 
-use paymentCms\model\model ;
+use paymentCms\component\model;
+use paymentCms\model\modelInterFace ;
 
-class transactions implements model {
+class transactions extends model implements modelInterFace {
 
-
+	private $primaryKey = 'transactionId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'transactionId';
 	private $transactionId ;
-	private $factorId ;
+	private $invoiceId ;
 	private $price ;
 	private $time ;
 	private $ip ;
@@ -36,29 +38,17 @@ class transactions implements model {
 	private $transactionCodeTwo ;
 	private $description ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'transactionId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('transactions' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->transactionId = $result['transactionId'] ;
-				$this->factorId = $result['factorId'] ;
-				$this->price = $result['price'] ;
-				$this->time = $result['time'] ;
-				$this->ip = $result['ip'] ;
-				$this->module = $result['module'] ;
-				$this->status = $result['status'] ;
-				$this->transactionCodeOne = $result['transactionCodeOne'] ;
-				$this->transactionCodeTwo = $result['transactionCodeTwo'] ;
-				$this->description = $result['description'] ;
-			} else 
-				return $this->returning(null,false,'transactions4');
-		}
-		return $this->returning();
-	}
-
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'transactions'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields );
-		return $this->returning($results) ;
+	public function setFromArray($result) {
+		$this->transactionId = $result['transactionId'];
+		$this->invoiceId = $result['invoiceId'];
+		$this->price = $result['price'];
+		$this->time = $result['time'];
+		$this->ip = $result['ip'];
+		$this->module = $result['module'];
+		$this->status = $result['status'];
+		$this->transactionCodeOne = $result['transactionCodeOne'];
+		$this->transactionCodeTwo = $result['transactionCodeTwo'];
+		$this->description = $result['description'];
 	}
 
 
@@ -67,8 +57,8 @@ class transactions implements model {
 	}
 
 
-	public function setFactorId( $factorId = null ) {
-		$this->factorId = $factorId ;
+	public function setInvoiceId( $invoiceId = null ) {
+		$this->invoiceId = $invoiceId ;
 	}
 
 
@@ -117,8 +107,8 @@ class transactions implements model {
 	}
 
 
-	public function getFactorId() {
-		return $this->factorId ;
+	public function getInvoiceId() {
+		return $this->invoiceId ;
 	}
 
 
@@ -162,51 +152,9 @@ class transactions implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['factorId'] = $this->factorId ;
-		$array['price'] = $this->price ;
-		$array['time'] = $this->time ;
-		$array['ip'] = $this->ip ;
-		$array['module'] = $this->module ;
-		$array['status'] = $this->status ;
-		$array['transactionCodeOne'] = $this->transactionCodeOne ;
-		$array['transactionCodeTwo'] = $this->transactionCodeTwo ;
-		$array['description'] = $this->description ;
-		$id = \database::insert('transactions' , $array  ); 
-		if ( $id ) {
-			$this->transactionId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'transactions3') ;
-	}
-
-
-	public function upDateDataBase( ) {
-		$array['factorId'] = $this->factorId ;
-		$array['price'] = $this->price ;
-		$array['time'] = $this->time ;
-		$array['ip'] = $this->ip ;
-		$array['module'] = $this->module ;
-		$array['status'] = $this->status ;
-		$array['transactionCodeOne'] = $this->transactionCodeOne ;
-		$array['transactionCodeTwo'] = $this->transactionCodeTwo ;
-		$array['description'] = $this->description ;
-		if ( \database::update('transactions' , $array , array('query' => 'transactionId = ?', 'param' => array($this->transactionId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'transactions2') ;
-	}
-
-
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('transactions', array('query' => 'transactionId = ?', 'param' => array($this->transactionId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'transactions1') ;
-	}
-
-
 	public function returnAsArray( ) {
 		$array['transactionId'] = $this->transactionId ;
-		$array['factorId'] = $this->factorId ;
+		$array['invoiceId'] = $this->invoiceId ;
 		$array['price'] = $this->price ;
 		$array['time'] = $this->time ;
 		$array['ip'] = $this->ip ;
@@ -219,15 +167,18 @@ class transactions implements model {
 	}
 
 
-
-	private function returning($return = null , $status = true , $errorNumber = "transactions0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 }

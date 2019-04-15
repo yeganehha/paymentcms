@@ -24,6 +24,7 @@ class controller {
 	protected $model ;
 	protected $mold ;
 	protected $menu ;
+	protected $alert ;
 
 	public function __construct() {
 		/* @var paymentCms\component\mold\Mold $mold */
@@ -42,15 +43,16 @@ class controller {
 		$this->menu = $menu ;
 		$menu->add('dashboard' , rlang('dashboard' ) , app::getBaseAppLink() , 'fa fa-home' );
 		$menu->add('users' , rlang(['list','users'] ) , app::getBaseAppLink('users/lists') , 'fa fa-users' );
-		$menu->add('factors' , rlang('factors' ) , app::getBaseAppLink('factors/lists') , 'fa fa-file-text-o' );
-		$menu->addChild('factors' , 'allFactors' , rlang('factors' ) , app::getBaseAppLink('factors/lists')  );
-		$menu->add('successFactors' , rlang(['factorsOf','success'] ) , app::getBaseAppLink('factors/success') ,null,null,'factors' );
-		$menu->add('failFactors' , rlang(['factorsOf','fail'] ) , app::getBaseAppLink('factors/fail') ,null,null,'factors' );
-		$menu->add('pendingFactors' , rlang(['factorsOf','pending'] ) , app::getBaseAppLink('factors/pending') ,null,null,'factors' );
+		$menu->add('invoices' , rlang('invoices' ) , app::getBaseAppLink('invoices/lists') , 'fa fa-file-text-o' );
+		$menu->addChild('invoices' , 'allinvoices' , rlang('invoices' ) , app::getBaseAppLink('invoices/lists')  );
+		$menu->add('successinvoices' , rlang(['invoicesOf','success'] ) , app::getBaseAppLink('invoices/success') ,null,null,'invoices' );
+		$menu->add('failinvoices' , rlang(['invoicesOf','fail'] ) , app::getBaseAppLink('invoices/fail') ,null,null,'invoices' );
+		$menu->add('pendinginvoices' , rlang(['invoicesOf','pending'] ) , app::getBaseAppLink('invoices/pending') ,null,null,'invoices' );
 		$menu->add('services' , rlang('services' ) , app::getBaseAppLink('service/lists') , 'fa fa-shopping-cart' );
 		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
 		$menu->add('plugins' , rlang('plugins' ) , app::getBaseAppLink('plugins/lists') , 'fa fa-puzzle-piece' );
 		$menu->add('configuration' , rlang('configuration' ) , app::getBaseAppLink('configuration') , 'fa fa-cogs' );
+		$menu->addChild('configuration' ,'webservice', rlang('webservice' ) , app::getBaseAppLink('webservice') , 'fa fa-exchange' );
 		$menu->add('developer' , rlang('developer' ) , app::getBaseAppLink('developer') , 'fa fa-code' );
 
 
@@ -63,12 +65,15 @@ class controller {
 	 *
 	 * @return \App\model\model
 	 */
-	protected function model($model = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
+	protected function model($model = null , $searchVariable = null , $searchWhereClaus = null) {
 		if ( $model == null )
 			$model = $this->model;
 		$model = 'paymentCms\model\\'.$model ;
 		if (class_exists($model)) {
-			return new $model($searchVariable,$searchWhereClaus) ;
+			if ( $searchWhereClaus == null )
+				return new $model($searchVariable) ;
+			else
+				return new $model($searchVariable,$searchWhereClaus) ;
 		} else {
 			App\core\controller\httpErrorHandler::E500($model);
 			exit;
@@ -96,8 +101,22 @@ class controller {
 		}
 		$this->mold->path('default');
 	}
+
+	protected function alert($type , $title , $description ,$icon = null , $close = true ){
+		if ( $icon != null )
+			$temp['icon'] = $icon ;
+		if ( $title != null )
+			$temp['title'] = $title ;
+		$temp['description'] = $description ;
+		$temp['type'] = $type ;
+		$temp['canClose'] = $close ;
+		$this->alert[] = $temp;
+	}
+
 	public function __destruct() {
 		if ( ! is_null($this->mold) and ! is_null($this->menu))
 			$this->mold->set('menu' , $this->menu );
+		if ( ! is_null($this->mold) and ! is_null($this->alert))
+			$this->mold->set('alert' , $this->alert );
 	}
 }

@@ -48,5 +48,9 @@ return [
 	'array_reverse',
 	'array_unshift',
 	'array_unique',
+	'array_filter',
+	'dns_get_record',
 	'glob',
+	'ctype_digit',
+	'register_shutdown_function',
 ];

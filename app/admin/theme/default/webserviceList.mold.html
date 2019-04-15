@@ -1,0 +1,37 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            {foreach from=$apis key=key value=api}
+            <div class="col-md-4">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-{if $api.active}success{else}danger{/if} card-header-icon">
+                        <div class="card-icon">
+                            {if $api.active}{_ "active"}{else}{_ "deActive"}{/if}
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{$api.name}</h4>
+                    </div>
+                    <div class="card-body">
+                        <a href="{$api.domain}" target="_blank">{$api.domain}</a><br>
+                        <span class="ltr text-left badge badge-info m-1">{$api.allowIp|str_replace:",":'</span><span class="ltr text-left badge badge-info m-1">'}</span>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{url}webservice/edit/{$api.apiId}" title="{_ 'edit'}"><i class="material-icons pointer text-warning">edit</i></a>
+                    </div>
+                </div>
+            </div>
+            {foreachelse}
+            <!-- TODO:// add foreach else -->
+            no item
+            {/foreach}
+        </div>
+    </div>
+</div>
+{map navBarButton}
+<a class="btn btn-info" href="{url}webservice/new">
+                      <span class="btn-label">
+                        <i class="fa fa-link"></i>
+                      </span>
+    {_ "add"} {_ "webservice"}
+    <div class="ripple-container"></div>
+</a>
+{/map}

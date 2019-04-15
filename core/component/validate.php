@@ -319,6 +319,15 @@ class validate {
 	}
 
 	/**
+	 * get first error
+	 */
+	public static function errorsIn()
+	{
+		$errors = self::getError();
+		return implode('<br>',$errors);
+	}
+
+	/**
 	 * get errors
 	 */
 	public static function get($key = null)
@@ -473,9 +482,23 @@ class validate {
 
 	}
 
+	private static function _notEmpty()
+	{
+		$value = self::getFirstData();
+		if (!is_array($value))
+			$value = trim($value);
+		$isNotEmpty = false;
+		if (!is_bool($value) && !is_numeric($value) &&  !empty($value))
+			$isNotEmpty = true;
+
+		self::setMultiResult($isNotEmpty, rlang('ERROR_VALID_NOT_EMPTY'), rlang('ERROR_VALID_EMPTY'), self::$field_title);
+
+	}
+
 	private static function _number()
 	{
-		if (!is_numeric(self::getFirstData())) {
+		$value = self::getFirstData() ;
+		if (! ( is_numeric($value) or $value ==  "" ) ) {
 			self::setError(rlang('ERROR_VALID_NUMBER'), self::$field_title);
 		}
 	}
@@ -610,6 +633,81 @@ class validate {
 		$fields = (is_array(self::$field_title)) ? self::$field_title : [self::$field_title, 'YY/MM/DD'];
 		self::setMultiResult($isResult, rlang('ERROR_VALID_DATE'), rlang('ERROR_VALID_NOT_DATE'), $fields);
 	}
+
+
+	/**
+	 * $paramsValidateType include { } / X 0123456789 + . -
+	 * @param $paramsValidateType
+	 *
+	 * @return bool
+	 */
+	private static function _format( $paramsValidateType ){
+		$paramsName = self::$field_title ;
+		$paramsValue = self::getFirstData() ;
+		$num_a=array('0','1','2','3','4','5','6','7','8','9');
+		$key_a=array('۰','۱','۲','۳','۴','۵','۶','۷','۸','۹');
+		$paramsValue = str_replace($key_a,$num_a,$paramsValue);
+		$explodeAccolade = preg_split("/{|}/", $paramsValidateType);
+		$correctGroupWords = array();
+		if ( count($explodeAccolade) >  0 ) {
+			foreach ($explodeAccolade as $indexWord => $valueOfWord) {
+				if (strpos($valueOfWord, '/') === false) {
+					if (count($correctGroupWords) > 0) {
+						foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
+							$correctGroupWords[$indexOfGroupWord] .= $valueOfWord;
+						}
+					} else {
+						$correctGroupWords[] = $valueOfWord;
+					}
+				} else {
+					$explodedWord = explode('/', $valueOfWord);
+					$newCorrectGroupWords = array();
+					foreach ($explodedWord as $numberOfExplodedWord => $oneOfThem) {
+						if (count($correctGroupWords) > 0) {
+							foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
+								$newCorrectGroupWords[] = $valueOfGroupWords . $oneOfThem;
+							}
+						} else {
+							$newCorrectGroupWords[] = $oneOfThem;
+						}
+					}
+					if (count($correctGroupWords) > 0) {
+						foreach ($correctGroupWords as $indexOfGroupWord => $valueOfGroupWords) {
+							unset($correctGroupWords[$indexOfGroupWord]);
+						}
+					}
+					$correctGroupWords = array_merge($correctGroupWords, $newCorrectGroupWords);
+				}
+			}
+		} else
+			$correctGroupWords[] = $paramsValidateType ;
+		usort($correctGroupWords, function($a, $b) {
+			return strlen($a) - strlen($b);
+		});
+		foreach ( $correctGroupWords as $indexOfWord => $correctWord ){
+			if ( strlen($paramsValue) == strlen($correctWord)) {
+				$return = true ;
+				for ($i = 0; $i < strlen($paramsValue); $i++) {
+					if ( substr($correctWord,$i,1) != 'X' ) {
+						if (substr($paramsValue, $i, 1) != substr($correctWord, $i, 1)) {
+							$return = false ;
+							break;
+						}
+					} else {
+						if ( ! ( ( intval(substr($paramsValue,2,1)) > 0 and intval(substr($paramsValue,2,1)) < 10 ) or substr($paramsValue,2,1) == '0' ) ){
+							$return = false ;
+							break;
+						}
+					}
+				}
+				if ( $return )
+					return true;
+			}
+		}
+		self::setError(rlang('ERROR_INVALID_FORMAT'), self::$field_title);
+		return false;
+	}
+
 
 
 }

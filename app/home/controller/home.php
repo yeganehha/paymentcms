@@ -4,6 +4,10 @@
 namespace App\home\controller;
 
 
+use App\api\controller\invoice;
+use App\api\controller\service;
+use paymentCms\component\request;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
@@ -21,12 +25,26 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class home extends \controller {
 
-	public function __construct() {
 
+	public function index($serviceId){
+		if ( request::isPost() ){
+			return $this->checkData($serviceId);
+		}
+		$service = service::info($serviceId);
+		if ( ! $service['status'] ){
+			$this->mold->offAutoCompile();
+			\App\core\controller\httpErrorHandler::E404();
+			return ;
+		}
+		$this->mold->set('service',$service['result']['service']);
+		$this->mold->set('fields',$service['result']['fields']);
+		$this->mold->view('home.mold.html');
 	}
 
-	public function index(){
-		lang(['test','testIng']);
+	public function checkData($serviceId){
+		$this->mold->offAutoCompile();
+		$result = invoice::generate($serviceId,$_POST);
+		show($result);
 	}
 	public function sd(){
 		show(func_get_args());

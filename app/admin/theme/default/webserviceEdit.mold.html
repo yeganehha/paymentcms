@@ -1,0 +1,85 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-7 col-sm-12">
+                <div class="card">
+                    <div class="card-header card-header-rose card-header-icon" >
+                        <div class="card-icon" >
+                            {if isset($newWebservice)}<i class="fa fa-link"></i>{else}<i class="material-icons">edit</i>{/if}
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{if isset($newWebservice)}{_ "add"}{else}{_ "edit"}{/if} {_ "webservice"}</h4>
+                    </div>
+                    <form class="form-horizontal" method="post" action="{url}webservice/{if isset($newWebservice)}new{else}edit/{if isset($api)}{$api->getApiId()}{/if}{/if}">
+                        <div class="card-body">
+                            {call addServiceFormUpDescription}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="col-md-3 col-form-label">{_ "name"} *</label>
+                                    <div class="col-md-9">
+                                        <div class="form-group has-default">
+                                            <input type="text" required id="nameInput" value="{if isset($post.name)}{$post.name}{else}{if isset($api)}{$api->getName()}{/if}{/if}" name="name" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="col-md-3 col-form-label">{_ "link"} *</label>
+                                    <div class="col-md-9">
+                                        <div class="form-group has-default">
+                                            <input type="url" required id="linkInput" value="{if isset($post.link)}{$post.link}{else}{if isset($api)}{$api->getDomain()}{/if}{/if}" name="link" class="form-control ltr text-left">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="col-md-3 col-form-label">{_ "ips"} {_ "allow"}</label>
+                                    <div class="col-md-9">
+                                        <div class="form-group has-default border-bottom">
+                                            <input type="text" name="ips" value="{if isset($post.ips)}{$post.ips}{else}{if isset($api)}{$api->getAllowIp()}{/if}{/if}" class="form-control tagsinput ltr text-left" dir="ltr" data-role="tagsinput" data-color="info" placeholder="ip">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-center mt-2">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input class="form-check-input" id="activeInput" name="active" type="checkbox"  {if isset($post.active)}{if $post.active == 'active' }checked{/if}{else}{if isset($api)}{if $api->getActive()}checked{/if}{else}checked{/if}{/if} value="active"> {_ "active"}
+                                            <span class="form-check-sign">
+                              <span class="check"></span>
+                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {call addServiceFormField}
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-link" type="reset">{_ "refresh"}</button>
+                            <button type="submit" class="btn btn-fill btn-rose">
+                             <span class="btn-label">
+                                {if isset($newWebservice)}<i class="fa fa-link"></i>{else}<i class="material-icons">edit</i>{/if}
+                             </span>
+                                {if isset($newWebservice)}{_ "add"}{else}{_ "edit"}{/if} {_ "webservice"}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm col-md-5">
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon " >
+                        <div class="card-icon" >
+                            <i class="material-icons">info</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "help"} {_ "webservice"}</h4>
+                    </div>
+                    <div class="card-body text-{$text_align} text-secondary">
+                        <strong class="text-info">{_ "name"} :</strong> {_ "service_add_helper_name"}<br>
+                        {call addServiceFormHelp}
+                    </div>
+                    <div class="card-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

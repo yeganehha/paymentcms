@@ -20,33 +20,35 @@
 namespace paymentCms\model;
 
 
-use paymentCms\model\model ;
+use paymentCms\component\model ;
 
-class service implements model {
+class service extends model implements modelInterFace  {
 
-
+	private $primaryKey = 'serviceId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'serviceId';
 	private $serviceId ;
 	private $link ;
 	private $price ;
 	private $description ;
+	private $name ;
+	private $status ;
+	private $lastNameStatus ;
+	private $firstNameStatus ;
+	private $emailStatus ;
+	private $phoneStatus ;
 
-	public function __construct(  $searchVariable = null , $searchWhereClaus = 'serviceId = ? ' ){
-		if ( $searchVariable != null ) {
-			$result = \database::searche('service' ,  $searchWhereClaus  , array($searchVariable) ); 
-			if ( $result != null ) {
-				$this->serviceId = $result['serviceId'] ;
-				$this->link = $result['link'] ;
-				$this->price = $result['price'] ;
-				$this->description = $result['description'] ;
-			} else 
-				return $this->returning(null,false,'service4');
-		}
-		return $this->returning();
-	}
 
-	public function search( $searchVariable, $searchWhereClaus , $tableName = 'service'  , $fields = '*' ) {
-		$results = \database::searche($tableName, $searchWhereClaus, $searchVariable, true ,false,$fields  );
-		return $results ;
+	public function setFromArray($array){
+		$this->serviceId = $array['serviceId'] ;
+		$this->link = $array['link'] ;
+		$this->price = $array['price'] ;
+		$this->description = $array['description'] ;
+		$this->name = $array['name'] ;
+		$this->status = $array['status'] ;
+		$this->lastNameStatus = $array['lastNameStatus'] ;
+		$this->firstNameStatus = $array['firstNameStatus'] ;
+		$this->emailStatus = $array['emailStatus'] ;
+		$this->phoneStatus = $array['phoneStatus'] ;
 	}
 
 
@@ -70,6 +72,36 @@ class service implements model {
 	}
 
 
+	public function setName( $name = null ) {
+		$this->name = $name ;
+	}
+
+
+	public function setStatus( $status = null ) {
+		$this->status = $status ;
+	}
+
+
+	public function setLastNameStatus( $lastNameStatus = null ) {
+		$this->lastNameStatus = $lastNameStatus ;
+	}
+
+
+	public function setFirstNameStatus( $firstNameStatus = null ) {
+		$this->firstNameStatus = $firstNameStatus ;
+	}
+
+
+	public function setEmailStatus( $emailStatus = null ) {
+		$this->emailStatus = $emailStatus ;
+	}
+
+
+	public function setPhoneStatus( $phoneStatus = null ) {
+		$this->phoneStatus = $phoneStatus ;
+	}
+
+
 	public function getServiceId() {
 		return $this->serviceId ;
 	}
@@ -90,34 +122,35 @@ class service implements model {
 	}
 
 
-	public function insertToDataBase( ) {
-		$array['link'] = $this->link ;
-		$array['price'] = $this->price ;
-		$array['description'] = $this->description ;
-		$id = \database::insert('service' , $array  ); 
-		if ( $id ) {
-			$this->serviceId = $id ; 
-			return $this->returning($id) ;
-		}
-		return $this->returning(null,false,'service3') ;
+	public function getName() {
+		return $this->name ;
 	}
 
 
-	public function upDateDataBase( ) {
-		$array['link'] = $this->link ;
-		$array['price'] = $this->price ;
-		$array['description'] = $this->description ;
-		if ( \database::update('service' , $array , array('query' => 'serviceId = ?', 'param' => array($this->serviceId)) ) ) 
-			return $this->returning() ;
-		return $this->returning(null,false,'service2') ;
+	public function getStatus() {
+		return $this->status ;
 	}
 
 
-	public function deleteFromDataBase( ) {
-		if ( \database::delete('service', array('query' => 'serviceId = ?', 'param' => array($this->serviceId)) ) ) 
-			return $this->returning() ;
-		return  $this->returning(null,false,'service1') ;
+	public function getLastNameStatus() {
+		return $this->lastNameStatus ;
 	}
+
+
+	public function getFirstNameStatus() {
+		return $this->firstNameStatus ;
+	}
+
+
+	public function getEmailStatus() {
+		return $this->emailStatus ;
+	}
+
+
+	public function getPhoneStatus() {
+		return $this->phoneStatus ;
+	}
+
 
 
 	public function returnAsArray( ) {
@@ -125,19 +158,28 @@ class service implements model {
 		$array['link'] = $this->link ;
 		$array['price'] = $this->price ;
 		$array['description'] = $this->description ;
+		$array['name'] = $this->name ;
+		$array['status'] = $this->status ;
+		$array['lastNameStatus'] = $this->lastNameStatus ;
+		$array['firstNameStatus'] = $this->firstNameStatus ;
+		$array['emailStatus'] = $this->emailStatus ;
+		$array['phoneStatus'] = $this->phoneStatus ;
 		return $array ;
 	}
 
-
-
-	private function returning($return = null , $status = true , $errorNumber = "service0" , $massagesParams = null ){
-		if ( $return == null )
-				return $status ;
-		else
-				return $return ;
-
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKey() {
+		return $this->primaryKey;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPrimaryKeyShouldNotInsertOrUpdate() {
+		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
 
 
 }
