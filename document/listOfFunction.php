@@ -53,4 +53,11 @@ return [
 	'glob',
 	'ctype_digit',
 	'register_shutdown_function',
+	'mb_strlen',
+	'serialize',
+	'str_repeat',
+	'is_file',
+	'unlink',
+	'strpos',
+	'substr',
 ];
