@@ -7,7 +7,7 @@
                         <div class="card-icon" >
                             <i class="material-icons">search</i>
                         </div>
-                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "services"}</h4>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "invoices"}</h4>
                     </div>
                     <div class="collapse" id="searchServices">
                         <div class="card-body">
@@ -77,33 +77,39 @@
                 <div class="card" id="listToGetFromServer">
                     <div class="card-header card-header-rose card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">shopping_cart</i>
+                            <i class="fa fa-file-text-o"></i>
                         </div>
-                        <h4 class="card-title float-{$float} m-3">{_ "services"}</h4>
+                        <h4 class="card-title float-{$float} m-3">{_ "invoices"}</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table text-{$text_align}">
                                 <thead>
                                 <tr>
-                                    <th class="text-center">#</th>
-                                    <th>{_ "name"}</th>
-                                    <th>{_ "description"}</th>
-                                    <th>{_ "price"}</th>
-                                    <th>{_ "link"}</th>
+                                    <th class="text-center">{$invoices|count}</th>
+                                    <th>{_ "name"} {_ "client"}</th>
+                                    <th>{_ "invoice"} {_ "date"}</th>
+                                    <th>{_ "due"} {_ "date"}</th>
+                                    <th>{_ "pay"} {_ "date"}</th>
+                                    <th>{_ "total"}</th>
+                                    <th>{_ "method"} {_ "pay"}</th>
+                                    <th>{_ "status"}</th>
                                     <th>{_ "actions"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {foreach from=$services key=key value=service}
+                                {foreach from=$invoices key=key value=invoice}
                                 <tr>
-                                    <td class="text-center">{$service.serviceId}</td>
-                                    <td>{$service.name}</td>
-                                    <td>{$service.description}</td>
-                                    <td>{$service.price|number_format}</td>
-                                    <td class="text-right">{$service.link}</td>
+                                    <td class="text-center">{$invoice.invoiceId|ssssss:"df":"dsf":"dfs":$invoice.invoiceId}</td>
+                                    <td>{$invoice.name}</td>
+                                    <td>{$invoice.createdDate|date_format:"jS F, Y"}</td>
+                                    <td>{$invoice.dueDate|jDate:"jS F, Y"}</td>
+                                    <td>{$invoice.paidDate|jDate:"jS F, Y"}</td>
+                                    <td>{$invoice.price|number_format}</td>
+                                    <td>{$invoice.module}</td>
+                                    <td class="text-right">{$invoice.status}</td>
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-info btn-link" href="{url}service/profile/{$service.serviceId}">
+                                        <a class="btn btn-info btn-link" href="{url}invoices/{$invoice.invoiceId}">
                                             <i class="material-icons">remove_red_eye</i>
                                         </a>
                                     </td>
@@ -119,12 +125,3 @@
         </div>
     </div>
 </div>
-{map navBarButton}
-<a class="btn btn-info" href="{url}service/new">
-                      <span class="btn-label">
-                        <i class="material-icons">add_shopping_cart</i>
-                      </span>
-    {_ "add"} {_ "services"}
-    <div class="ripple-container"></div>
-</a>
-{/map}

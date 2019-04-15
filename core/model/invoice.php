@@ -23,12 +23,12 @@ namespace paymentCms\model;
 use paymentCms\component\model;
 use paymentCms\model\modelInterFace ;
 
-class factor extends model implements modelInterFace {
+class invoice extends model implements modelInterFace {
 
 
-	private $primaryKey = 'factorId';
-	private $primaryKeyShouldNotInsertOrUpdate = 'factorId';
-	private $factorId ;
+	private $primaryKey = 'invoiceId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'invoiceId';
+	private $invoiceId ;
 	private $userId ;
 	private $createdDate ;
 	private $dueDate ;
@@ -43,7 +43,7 @@ class factor extends model implements modelInterFace {
 
 
 	public function setFromArray($result) {
-		$this->factorId = $result['factorId'] ;
+		$this->invoiceId = $result['invoiceId'] ;
 		$this->userId = $result['userId'] ;
 		$this->createdDate = $result['createdDate'] ;
 		$this->dueDate = $result['dueDate'] ;
@@ -57,8 +57,8 @@ class factor extends model implements modelInterFace {
 		$this->apiId = $result['apiId'] ;
 	}
 
-	public function setFactorId( $factorId = null ) {
-		$this->factorId = $factorId ;
+	public function setInvoiceId( $invoiceId = null ) {
+		$this->invoiceId = $invoiceId ;
 	}
 
 
@@ -117,8 +117,8 @@ class factor extends model implements modelInterFace {
 	}
 
 
-	public function getFactorId() {
-		return $this->factorId ;
+	public function getInvoiceId() {
+		return $this->invoiceId ;
 	}
 
 
@@ -178,7 +178,7 @@ class factor extends model implements modelInterFace {
 
 
 	public function returnAsArray( ) {
-		$array['factorId'] = $this->factorId ;
+		$array['invoiceId'] = $this->invoiceId ;
 		$array['userId'] = $this->userId ;
 		$array['createdDate'] = $this->createdDate ;
 		$array['dueDate'] = $this->dueDate ;
