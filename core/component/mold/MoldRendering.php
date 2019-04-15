@@ -346,7 +346,7 @@ class MoldRendering {
 			return ;
 		$endedForeach = end($this->moldForeachElse);
 		if ( $endedForeach != null )
-			$this->replace($data['find'], ' } if ( '.$endedForeach.' == null ) { ');
+			$this->replace($data['find'], ' } if ( ! is_array('.$endedForeach.') ) { ');
 		else
 			$this->replace($data['find'], ' } if ( 1 == 0 ) { ');
 	}
