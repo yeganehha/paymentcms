@@ -19,13 +19,28 @@
                                         <span class="text-center title">{$service.description}</span>
                                     </div>
                                     <div class="col-md-12 form-group mt-5">
-                                        <span class="text-center title text-danger">{$service.price} {_ "toman"}</span>
+                                        <span class="text-center title text-danger">{$service.price|number_format} {_ "toman"}</span>
                                     </div>
                                     <button type="submit" class="btn btn-info col-md-12 hidden-sm ">{_ "pay"}</button>
                                     {/if}
                                 </div>
                             </div>
                             <div class="col-md-8 col-sm-12">
+                                {foreach from=$alert key=key value=alert}
+                                <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
+                                    {if isset($alert.icon)}
+                                    <i class="material-icons" data-notify="icon">{$alert.icon}</i>
+                                    {/if}
+                                    {if $alert.canClose}
+                                    <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                    {/if}
+                                    <span  class="text-{$text_align}">
+                                        {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}</span>
+                                </div>
+                                {/foreach}
+                                {call alertHeader}
                                 {if $service.firstNameStatus != 'invisible' or $service.firstNameStatus != 'admin' }
                                 <div class="col-md-6 form-group">
                                     <label for="firstName" class="bmd-label-floating">{_ "firstName"} {if $service.firstNameStatus == 'required'}<span class="text-danger">*</span>{/if}</label>

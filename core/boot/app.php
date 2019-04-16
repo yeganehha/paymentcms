@@ -66,7 +66,7 @@ class App {
 		else
 			$className ='App\\'.self::$appProvider.'\app_provider\\'.self::$app.'\\'.self::$controller ;
 		$methodName = self::$method ;
-		if (class_exists($className,false) and method_exists($className, $methodName)) {
+		if (class_exists($className) and method_exists($className, $methodName)) {
 			$class = new $className ();
 			call_user_func_array([$class, $methodName], self::$params);
 		} else {

@@ -20,9 +20,11 @@ class pluginController {
 
 	protected $model ;
 	protected $mold ;
+	protected $menu ;
 
-	public function __construct(&$mold) {
+	public function __construct(&$mold,&$menu = null) {
 		$this->mold = $mold;
+		$this->menu = $menu;
 	}
 
 	protected function creatView(){

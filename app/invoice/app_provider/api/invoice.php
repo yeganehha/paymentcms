@@ -1,9 +1,10 @@
 <?php
 
 
-namespace App\api\controller;
+namespace App\invoice\app_provider\api;
 
 
+use App\api\controller\service;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\validate;
@@ -23,15 +24,16 @@ use paymentCms\component\validate;
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
-class invoice extends innerController {
+class invoice extends \App\api\controller\innerController {
 
 	public static function generate($serviceId,$baseData = null) {
 		if (is_null($baseData) or !is_array($baseData)) $baseData = $_POST;
 		$data = request::getFromArray($baseData, 'firstName,lastName,email,phone,price,description,customField');
 		unset($baseData);
+		$tempJsonResult = self::$jsonResponse ;
 		self::$jsonResponse = false;
 		$serviceResult = service::info($serviceId);
-		self::$jsonResponse = true;
+		self::$jsonResponse = $tempJsonResult;
 		if ($serviceResult['status'] == false or (isset($serviceResult['result']) and $serviceResult['result'] == null)) {
 			return self::jsonError('service not found!', 404);
 		}
@@ -134,7 +136,7 @@ class invoice extends innerController {
 		}
 		if ( $error === false ){
 			model::commit();
-			return self::json($invoiceModel->getInvoiceId());
+			return self::json(['id' => $invoiceModel->getInvoiceId() , 'link' => \App::getBaseAppLink( str_replace('=','', base64_encode($invoiceModel->getInvoiceId()) ) , 'invoice') ]);
 		} else {
 			model::rollback();
 			return self::jsonError($error,500);
