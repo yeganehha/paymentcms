@@ -30,7 +30,7 @@ class controller {
 		/* @var paymentCms\component\mold\Mold $mold */
 		$mold = new Mold();
 		$this->mold = $mold;
-		$mold->path('default');
+		$mold->path('default', \app::getApp());
 		$mold->cache(10);
 		$mold->header('header.mold.html');
 		$mold->footer('footer.mold.html');

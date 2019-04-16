@@ -12,6 +12,7 @@
 
 
 use paymentCms\component\cache;
+use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\strings;
 
@@ -22,6 +23,7 @@ class App {
 
 	// default  controller and method if url is empty
 	private static $app = 'home';
+	private static $appProvider = null;
 	private static $controller = 'home';
 	private static $method = 'index';
 
@@ -59,9 +61,12 @@ class App {
 		self::checkMethodIsExist();
 		self::getParamsFromUrl();
 
-		$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
+		if ( self::$appProvider == null )
+			$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
+		else
+			$className ='App\\'.self::$appProvider.'\app_provider\\'.self::$app.'\\'.self::$controller ;
 		$methodName = self::$method ;
-		if (class_exists($className) and method_exists($className, $methodName)) {
+		if (class_exists($className,false) and method_exists($className, $methodName)) {
 			$class = new $className ();
 			call_user_func_array([$class, $methodName], self::$params);
 		} else {
@@ -106,9 +111,8 @@ class App {
 	private static function checkControllerIsExist () {
 		if ( !isset(self::$url[0]))
 			return false ;
-		$controller = self::$url[0];
+		$controller = trim(self::$url[0]);
 		if ( !empty($controller)) {
-			$controller = trim($controller);
 			$controllerPatch = self::$appPatch.self::$app.DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . $controller . '.php' ;
 			if (file_exists($controllerPatch)) {
 				if (class_exists('App\\'.self::$app.'\controller\\'.$controller)) {
@@ -116,14 +120,23 @@ class App {
 					self::$controller = $controller;
 					return true ;
 				} else {
-					echo 'App\\'.self::$app.'\controller\\'.$controller;
 					self::$app = 'core';
 					self::$controller = 'httpErrorHandler';
 					self::$method = 'E404';
 					return false ;
 				}
-			} else {
-				return false ;
+			} elseif ( is_dir(self::$appPatch.self::$app )) {
+				$files = file::get_files_by_pattern(self::$appPatch,'*'.DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php');
+				if ( is_array($files) and count($files) > 0 ){
+					$appProvider = strings::deleteWordFirstString(strings::deleteWordLastString($files[0] ,DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php'),self::$appPatch);
+					if (class_exists('App\\'.$appProvider.'\app_provider\\'.self::$app.'\\'.$controller)) {
+						array_shift(self::$url);
+						self::$controller = $controller;
+						self::$appProvider = $appProvider;
+						return true ;
+					}
+				} else
+					return false ;
 			}
 		}
 		return true ;
@@ -138,8 +151,11 @@ class App {
 		if ( !isset(self::$url[0]))
 			return false ;
 		$method = self::$url[0];
-		$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
-		if (class_exists($className)) {
+		if ( self::$appProvider == null )
+			$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
+		else
+			$className ='App\\'.self::$appProvider.'\app_provider\\'.self::$app.'\\'.self::$controller ;
+		if (class_exists($className,false)) {
 			if ( method_exists($className,$method)) {
 				array_shift(self::$url);
 				self::$method = $method;
