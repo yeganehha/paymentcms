@@ -42,11 +42,6 @@ class controller {
 		$this->menu = $menu ;
 		$menu->add('dashboard' , rlang('dashboard' ) , app::getBaseAppLink() , 'fa fa-home' );
 		$menu->add('users' , rlang(['list','users'] ) , app::getBaseAppLink('users/lists') , 'fa fa-users' );
-		$menu->add('invoices' , rlang('invoices' ) , app::getBaseAppLink('invoices/lists') , 'fa fa-file-text-o' );
-		$menu->addChild('invoices' , 'allinvoices' , rlang('invoices' ) , app::getBaseAppLink('invoices/lists')  );
-		$menu->add('successinvoices' , rlang(['invoicesOf','success'] ) , app::getBaseAppLink('invoices/success') ,null,null,'invoices' );
-		$menu->add('failinvoices' , rlang(['invoicesOf','fail'] ) , app::getBaseAppLink('invoices/fail') ,null,null,'invoices' );
-		$menu->add('pendinginvoices' , rlang(['invoicesOf','pending'] ) , app::getBaseAppLink('invoices/pending') ,null,null,'invoices' );
 		$menu->add('services' , rlang('services' ) , app::getBaseAppLink('service/lists') , 'fa fa-shopping-cart' );
 		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
 		$menu->add('plugins' , rlang('plugins' ) , app::getBaseAppLink('plugins/lists') , 'fa fa-puzzle-piece' );

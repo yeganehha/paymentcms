@@ -7,6 +7,7 @@ namespace App\invoice\app_provider\api;
 use App\api\controller\service;
 use paymentCms\component\model;
 use paymentCms\component\request;
+use paymentCms\component\security;
 use paymentCms\component\validate;
 
 /**
@@ -136,7 +137,7 @@ class invoice extends \App\api\controller\innerController {
 		}
 		if ( $error === false ){
 			model::commit();
-			return self::json(['id' => $invoiceModel->getInvoiceId() , 'link' => \App::getBaseAppLink( str_replace('=','', base64_encode($invoiceModel->getInvoiceId()) ) , 'invoice') ]);
+			return self::json(['id' => $invoiceModel->getInvoiceId() , 'link' => \App::getBaseAppLink( urlencode(security::encrypt($invoiceModel->getInvoiceId(),'base64',true)) , 'invoice') ]);
 		} else {
 			model::rollback();
 			return self::jsonError($error,500);

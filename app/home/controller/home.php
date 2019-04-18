@@ -44,9 +44,9 @@ class home extends \controller {
 
 	public function checkData($serviceId){
 		$result = invoice::generate($serviceId,$_POST);
-		if ( isset($result['link']) ) {
+		if ( $result['status'] ) {
 			$this->mold->offAutoCompile();
-			Response::redirect($result['link']);
+			Response::redirect($result['result']['link']);
 		} else {
 			$this->alert('danger' , '',$result['massage']);
 			$service = service::info($serviceId);
