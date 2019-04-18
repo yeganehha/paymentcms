@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\admin\controller;
+namespace App\api\app_provider\admin;
 
 
 use mysql_xdevapi\Exception;
@@ -45,6 +45,7 @@ class webservice extends \controller {
 		}
 
 		$this->mold->set('apis',$apis);
+		$this->mold->path('default', 'api');
 		$this->mold->view('webserviceList.mold.html');
 		$this->mold->setPageTitle(rlang('webservice'));
 		$this->mold->set('activeMenu' , 'webservice');
@@ -56,6 +57,7 @@ class webservice extends \controller {
 			$this->checkData();
 		}
 		$this->mold->set('newWebservice',true);
+		$this->mold->path('default', 'api');
 		$this->mold->view('webserviceEdit.mold.html');
 		$this->mold->setPageTitle(rlang(['add','webservice']));
 	}
@@ -169,6 +171,7 @@ class webservice extends \controller {
 			$this->checkData();
 		}
 		$this->mold->set('api',$model);
+		$this->mold->path('default', 'api');
 		$this->mold->view('webserviceEdit.mold.html');
 		$this->mold->setPageTitle(rlang(['profile','webservice']). ': '.$model->getName());
 	}

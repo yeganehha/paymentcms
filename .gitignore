@@ -2,3 +2,4 @@
 templates_c/*
 app/*/cache
 plugins/*/cache
+core/cache
