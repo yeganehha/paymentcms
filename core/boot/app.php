@@ -11,6 +11,9 @@
  */
 
 
+use paymentCms\component\cache;
+use paymentCms\component\file;
+use paymentCms\component\model;
 use paymentCms\component\strings;
 
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
@@ -20,6 +23,7 @@ class App {
 
 	// default  controller and method if url is empty
 	private static $app = 'home';
+	private static $appProvider = null;
 	private static $controller = 'home';
 	private static $method = 'index';
 
@@ -31,11 +35,36 @@ class App {
 	public static function init() {
 
 		self::generateUrlPrams();
-		self::checkAppIsExist();
+		$appName = self::$app ;
+
+		$links = self::generateAllLinks();
+		if ( is_array($links) ) {
+			usort($links, ['App', 'sortArrayByLength']);
+			$fullAddress = self::getFullRequestUrl();
+			foreach ( $links as $link ){
+				if ( strings::strFirstHas($fullAddress,$link['link']) ){
+					if (  isset(self::$url[0])  and  strings::strLastHas($link['link'],'/'.self::$url[0]) ){
+						$appName =  $link['app'];
+						array_shift(self::$url);
+					}
+				}
+			}
+		} else {
+			if (  isset(self::$url[0]) ) {
+				$appName = self::$url[0];
+				array_shift(self::$url);
+			}
+		}
+
+		self::checkAppIsExist($appName);
 		self::checkControllerIsExist();
 		self::checkMethodIsExist();
 		self::getParamsFromUrl();
-		$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
+
+		if ( self::$appProvider == null )
+			$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
+		else
+			$className ='App\\'.self::$appProvider.'\app_provider\\'.self::$app.'\\'.self::$controller ;
 		$methodName = self::$method ;
 		if (class_exists($className) and method_exists($className, $methodName)) {
 			$class = new $className ();
@@ -55,15 +84,16 @@ class App {
 	 *
 	 * @return bool
 	 */
-	private static function checkAppIsExist () {
-		if ( !isset(self::$url[0]))
+	private static function checkAppIsExist ($app = null ) {
+		if ( $app == null )
+			$app = self::$url[0];
+		if ( !isset($app))
 			return false ;
-		$app = self::$url[0];
 		if ( !empty($app)) {
 			$app = trim(strtolower($app));
 			$appPatch = self::$appPatch.$app;
 			if (is_dir($appPatch)) {
-				array_shift(self::$url);
+//				array_shift(self::$url);
 				self::$app = $app;
 				return true ;
 			} else {
@@ -81,9 +111,8 @@ class App {
 	private static function checkControllerIsExist () {
 		if ( !isset(self::$url[0]))
 			return false ;
-		$controller = self::$url[0];
+		$controller = trim(self::$url[0]);
 		if ( !empty($controller)) {
-			$controller = trim($controller);
 			$controllerPatch = self::$appPatch.self::$app.DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . $controller . '.php' ;
 			if (file_exists($controllerPatch)) {
 				if (class_exists('App\\'.self::$app.'\controller\\'.$controller)) {
@@ -91,14 +120,23 @@ class App {
 					self::$controller = $controller;
 					return true ;
 				} else {
-					echo 'App\\'.self::$app.'\controller\\'.$controller;
 					self::$app = 'core';
 					self::$controller = 'httpErrorHandler';
 					self::$method = 'E404';
 					return false ;
 				}
-			} else {
-				return false ;
+			} elseif ( is_dir(self::$appPatch.self::$app )) {
+				$files = file::get_files_by_pattern(self::$appPatch,'*'.DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php');
+				if ( is_array($files) and count($files) > 0 ){
+					$appProvider = strings::deleteWordFirstString(strings::deleteWordLastString($files[0] ,DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php'),self::$appPatch);
+					if (class_exists('App\\'.$appProvider.'\app_provider\\'.self::$app.'\\'.$controller)) {
+						array_shift(self::$url);
+						self::$controller = $controller;
+						self::$appProvider = $appProvider;
+						return true ;
+					}
+				} else
+					return false ;
 			}
 		}
 		return true ;
@@ -113,8 +151,11 @@ class App {
 		if ( !isset(self::$url[0]))
 			return false ;
 		$method = self::$url[0];
-		$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
-		if (class_exists($className)) {
+		if ( self::$appProvider == null )
+			$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
+		else
+			$className ='App\\'.self::$appProvider.'\app_provider\\'.self::$app.'\\'.self::$controller ;
+		if (class_exists($className,false)) {
 			if ( method_exists($className,$method)) {
 				array_shift(self::$url);
 				self::$method = $method;
@@ -189,14 +230,31 @@ class App {
 	}
 
 	public static function getBaseAppLink($path = null , $app = null ){
-		$baseUrl = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
-		$protocol = 'http';
-		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") $protocol = 'https';
 		if ( $app == null)
 			$app = self::$app ;
+		$baseUrl = self::getAppLinkFromAppsLink($app);
 		$path = str_replace(['\\','/','>'],'/',$path);
 		$path = str_replace('//','/',$path);
 		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;
-		return $protocol. '://' . $_SERVER['HTTP_HOST'] .$baseUrl.$app.'/'.(( ! is_null($path) ) ? $path : '' );
+		return $baseUrl.'/'.(( ! is_null($path) ) ? $path : '' );
+	}
+
+	private static function getAppLinkFromAppsLink($app){
+		$links = self::generateAllLinks();
+		$key = array_search($app, array_column($links, 'app'));
+		return $links[$key]['link'];
+	}
+
+	private static function generateAllLinks(){
+		if ( ! cache::hasLifeTime('appsLink','paymentCms')) {
+			$links = model::searching(null, null, 'appslink');
+			cache::save($links, 'appsLink', 30 * 24 * 60 * 60, 'paymentCms');
+		} else {
+			$links = cache::get('appsLink',null,'paymentCms');
+		}
+		return $links ;
+	}
+	private static function sortArrayByLength($a,$b){
+		return strlen($b['link'])-strlen($a['link']);
 	}
 }

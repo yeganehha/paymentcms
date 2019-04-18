@@ -43,9 +43,10 @@ class Lang {
 		$core_lang_path = payment_path.'core'.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.self::$langToShow.'.php' ;
 		self::loadLangFile($core_lang_path);
 		$files = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.self::$langToShow.'.php');
-		foreach ($files as $file) {
-			self::loadLangFile($file);
-		}
+		if ( is_array($files) )
+			foreach ($files as $file) {
+				self::loadLangFile($file);
+			}
 		if ( is_null($langC) ) {
 			self::$langC = new Lang();
 		} else {

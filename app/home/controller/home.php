@@ -4,9 +4,10 @@
 namespace App\home\controller;
 
 
-use App\api\controller\invoice;
 use App\api\controller\service;
+use App\invoice\controller\invoice;
 use paymentCms\component\request;
+use paymentCms\component\Response;
 
 /**
  * Created by Yeganehha .
@@ -42,11 +43,21 @@ class home extends \controller {
 	}
 
 	public function checkData($serviceId){
-		$this->mold->offAutoCompile();
 		$result = invoice::generate($serviceId,$_POST);
-		show($result);
-	}
-	public function sd(){
-		show(func_get_args());
+		if ( isset($result['link']) ) {
+			$this->mold->offAutoCompile();
+			Response::redirect($result['link']);
+		} else {
+			$this->alert('danger' , '',$result['massage']);
+			$service = service::info($serviceId);
+			if ( ! $service['status'] ){
+				$this->mold->offAutoCompile();
+				\App\core\controller\httpErrorHandler::E404();
+				return ;
+			}
+			$this->mold->set('service',$service['result']['service']);
+			$this->mold->set('fields',$service['result']['fields']);
+			$this->mold->view('home.mold.html');
+		}
 	}
 }

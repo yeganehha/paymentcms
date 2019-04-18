@@ -30,14 +30,13 @@ class controller {
 		/* @var paymentCms\component\mold\Mold $mold */
 		$mold = new Mold();
 		$this->mold = $mold;
-		$mold->path('default');
+		$mold->path('default', \app::getApp());
 		$mold->cache(10);
 		$mold->header('header.mold.html');
 		$mold->footer('footer.mold.html');
 		$mold->set('direction' , 'rtl');
 		$mold->set('text_align' , 'right');
 		$mold->set('float' , 'right');
-		$this->callHooks('adminHeaderNavbar',[1,2]);
 
 		$menu = new menu('sideBar') ;
 		$this->menu = $menu ;
@@ -52,8 +51,9 @@ class controller {
 		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
 		$menu->add('plugins' , rlang('plugins' ) , app::getBaseAppLink('plugins/lists') , 'fa fa-puzzle-piece' );
 		$menu->add('configuration' , rlang('configuration' ) , app::getBaseAppLink('configuration') , 'fa fa-cogs' );
-		$menu->addChild('configuration' ,'webservice', rlang('webservice' ) , app::getBaseAppLink('webservice') , 'fa fa-exchange' );
 		$menu->add('developer' , rlang('developer' ) , app::getBaseAppLink('developer') , 'fa fa-code' );
+
+		$this->callHooks('adminHeaderNavbar',[1,2]);
 
 
 	}
@@ -88,14 +88,21 @@ class controller {
 	}
 
 	protected function callHooks($hookName,$variable){
-		$files = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
+		$files1 = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
+		$files2 = file::get_files_by_pattern(payment_path.'app'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
+		$files = array_merge($files1,$files2);
 		foreach ($files as $file) {
 			$temp = explode(DIRECTORY_SEPARATOR, strings::deleteWordLastString($file,DIRECTORY_SEPARATOR.'hook.php')) ;
-			$class = 'plugin\\'.end($temp).'\hook';
+			$controller = array_pop($temp);
+			$aria = end($temp) ;
+			$class = $aria.'\\'.$controller.'\hook';
 			$method = '_'.$hookName;
 			if ( method_exists($class,$method) ){
-				$this->mold->path(null,end($temp).':plugin');
-				$Object = new $class($this->mold);
+				if ( $aria == 'plugin')
+					$this->mold->path(null,$controller.':plugin');
+				else
+					$this->mold->path(null,$controller);
+				$Object = new $class($this->mold,$this->menu);
 				call_user_func_array([$Object,$method],$variable);
 			}
 		}

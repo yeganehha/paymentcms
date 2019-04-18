@@ -106,6 +106,22 @@ abstract class model {
 		return $this->returning($results) ;
 	}
 
+
+	public static function searching( $searchVariable, $searchWhereClaus , $tableName  , $fields = '*' , $orderBy = null ,$limit = null ) {
+		if ($searchWhereClaus != null ) {
+			if (is_array($searchVariable)) {
+				self::$db->where($searchWhereClaus, $searchVariable);
+			} else{
+				self::$db->where($searchWhereClaus, [$searchVariable]);
+			}
+		}
+		if ( $orderBy != null ){
+			self::$db->orderBy($orderBy['column'], $orderBy['type']);
+		}
+		$results = self::$db->get($tableName, $limit,$fields );
+		return $results ;
+	}
+
 	protected function returning($return = null , $status = true , $errorNumber = "service0" , $massagesParams = null ){
 		if ( $return == null )
 			return $status ;
