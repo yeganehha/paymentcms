@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 
-
+namespace App\user\model;
 // *************************************************************************
 // *                                                                       *
 // * TableClass - The Complete Table To Class PHP Function                 *
@@ -17,40 +17,41 @@
 // *************************************************************************
 
 
-namespace paymentCms\model;
 
 
-use paymentCms\component\model ;
+use paymentCms\component\model;
+use paymentCms\model\modelInterFace ;
 
-class appslink extends model implements modelInterFace  {
+class user_group extends model implements modelInterFace {
 
-	private $primaryKey = ['link'];
-	private $primaryKeyShouldNotInsertOrUpdate = null;
-	private $link ;
-	private $app ;
-
+	private $primaryKey = 'user_groupId';
+	private $primaryKeyShouldNotInsertOrUpdate = 'user_groupId';
+	private $user_groupId ;
+	private $name ;
+	private $loginRequired ;
 
 	public function setFromArray($result) {
-		$this->link = $result['link'] ;
-		$this->app = $result['app'] ;
+		$this->user_groupId = $result['user_groupId'] ;
+		$this->name = $result['name'] ;
+		$this->loginRequired = $result['loginRequired'] ;
 	}
 
-
 	public function returnAsArray( ) {
-		$array['link'] = $this->link ;
-		$array['app'] = $this->app ;
+		$array['user_groupId'] = $this->user_groupId ;
+		$array['name'] = $this->name ;
+		$array['loginRequired'] = $this->loginRequired ;
 		return $array ;
 	}
 
 	/**
-	 * @return array
+	 * @return string
 	 */
 	public function getPrimaryKey() {
 		return $this->primaryKey;
 	}
 
 	/**
-	 * @return null
+	 * @return string
 	 */
 	public function getPrimaryKeyShouldNotInsertOrUpdate() {
 		return $this->primaryKeyShouldNotInsertOrUpdate;
@@ -59,29 +60,43 @@ class appslink extends model implements modelInterFace  {
 	/**
 	 * @return mixed
 	 */
-	public function getLink() {
-		return $this->link;
+	public function getUserGroupId() {
+		return $this->user_groupId;
 	}
 
 	/**
-	 * @param mixed $link
+	 * @param mixed $user_groupId
 	 */
-	public function setLink($link) {
-		$this->link = $link;
+	public function setUserGroupId($user_groupId) {
+		$this->user_groupId = $user_groupId;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getApp() {
-		return $this->app;
+	public function getName() {
+		return $this->name;
 	}
 
 	/**
-	 * @param mixed $app
+	 * @param mixed $name
 	 */
-	public function setApp($app) {
-		$this->app = $app;
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getLoginRequired() {
+		return $this->loginRequired;
+	}
+
+	/**
+	 * @param mixed $loginRequired
+	 */
+	public function setLoginRequired($loginRequired) {
+		$this->loginRequired = $loginRequired;
 	}
 
 

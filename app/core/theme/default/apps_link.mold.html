@@ -1,0 +1,55 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            {foreach from=$links key=key value=link}
+            <div class="col-md-4">
+                <form action="{url}linksConfiguration/edit/{$link.apps_linkId}" method="post">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <a href="{$link.link}" target="_blank" class="text-white"><i class="material-icons">remove_red_eye</i></a>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{$link.app}</h4>
+                        </div>
+                        <div class="card-body text-{$text_align}">
+                            {_ "link"} :
+                            <input type="url" name="link" class="form-control ltr" value="{$link.link}" placeholder="{url ''}...">
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-link btn-outline-secondary" type="reset">{_ "refresh"}</button>
+                            <a class="btn btn-link btn-outline-danger" href="{url}linksConfiguration/delete/{$link.apps_linkId}">{_ "delete"}</a>
+                            <button type="submit" class="btn btn-fill btn-info">{_ 'edit'}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {/foreach}
+            <div class="col-md-4">
+                <form action="{url}linksConfiguration/insert" method="post">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="material-icons">add</i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ "add"}</h4>
+                        </div>
+                        <div class="card-body text-{$text_align}">
+                            {_ "app"} :
+                            <select class="selectpicker" required name="app" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'app'}">
+                                {foreach from=$apps key=key value=app}
+                                <option value="{$app}" {if isset($Mold.post.app) and $Mold.post.app == $app }selected{/if}>{$app}</option>
+                                {/foreach}
+                            </select>
+                            <br>
+                            {_ "link"} :
+                            <input type="url" name="link" class="form-control ltr" placeholder="{url ''}..." {if isset($Mold.post.link)}value="{$Mold.post.link}"{/if}>
+                        </div>
+                        <div class="card-footer ltr">
+                            <button type="submit" class="btn btn-fill btn-success">{_ 'add'}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

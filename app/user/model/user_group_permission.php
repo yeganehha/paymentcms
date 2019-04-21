@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 
-
+namespace App\user\model;
 // *************************************************************************
 // *                                                                       *
 // * TableClass - The Complete Table To Class PHP Function                 *
@@ -17,88 +17,26 @@
 // *************************************************************************
 
 
-namespace paymentCms\model;
+
 
 use paymentCms\component\model;
 use paymentCms\model\modelInterFace ;
 
-class user extends model implements modelInterFace {
+class user_group extends model implements modelInterFace {
 
-	private $primaryKey = 'userId';
-	private $primaryKeyShouldNotInsertOrUpdate = 'userId';
-	private $userId ;
-	private $fname ;
-	private $lname ;
-	private $email ;
-	private $phone ;
+	private $primaryKey = 'user_groupId';
+	private $primaryKeyShouldNotInsertOrUpdate = null;
+	private $user_groupId ;
+	private $accessPage ;
 
 	public function setFromArray($result) {
-		$this->userId = $result['userId'] ;
-		$this->fname = $result['fname'] ;
-		$this->lname = $result['lname'] ;
-		$this->email = $result['email'] ;
-		$this->phone = $result['phone'] ;
+		$this->user_groupId = $result['user_groupId'] ;
+		$this->accessPage = $result['accessPage'] ;
 	}
-
-
-
-	public function setUserId( $userId = null ) {
-		$this->userId = $userId ;
-	}
-
-
-	public function setFname( $fname = null ) {
-		$this->fname = $fname ;
-	}
-
-
-	public function setLname( $lname = null ) {
-		$this->lname = $lname ;
-	}
-
-
-	public function setEmail( $email = null ) {
-		$this->email = $email ;
-	}
-
-
-	public function setPhone( $phone = null ) {
-		$this->phone = $phone ;
-	}
-
-
-	public function getUserId() {
-		return $this->userId ;
-	}
-
-
-	public function getFname() {
-		return $this->fname ;
-	}
-
-
-	public function getLname() {
-		return $this->lname ;
-	}
-
-
-	public function getEmail() {
-		return $this->email ;
-	}
-
-
-	public function getPhone() {
-		return $this->phone ;
-	}
-
-
 
 	public function returnAsArray( ) {
-		$array['userId'] = $this->userId ;
-		$array['fname'] = $this->fname ;
-		$array['lname'] = $this->lname ;
-		$array['email'] = $this->email ;
-		$array['phone'] = $this->phone ;
+		$array['user_groupId'] = $this->user_groupId ;
+		$array['accessPage'] = $this->accessPage ;
 		return $array ;
 	}
 
@@ -116,5 +54,32 @@ class user extends model implements modelInterFace {
 		return $this->primaryKeyShouldNotInsertOrUpdate;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getUserGroupId() {
+		return $this->user_groupId;
+	}
+
+	/**
+	 * @param mixed $user_groupId
+	 */
+	public function setUserGroupId($user_groupId) {
+		$this->user_groupId = $user_groupId;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getAccessPage() {
+		return $this->accessPage;
+	}
+
+	/**
+	 * @param mixed $accessPage
+	 */
+	public function setAccessPage($accessPage) {
+		$this->accessPage = $accessPage;
+	}
 
 }

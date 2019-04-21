@@ -34,11 +34,16 @@ spl_autoload_register(function ($class_name_call) {
 		Lang::addToLangfile($paths[0]);
 		$class_patch = payment_path . $dire . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
 	}
+	$debug = debug_backtrace();
 	if ( file_exists($class_patch)) {
 		require_once $class_patch;
+		if ( isset($debug[2]) and isset($debug[2]['function']) and $debug[2]['function'] == 'class_exists')
+			return true ;
 		if ( method_exists($class_name_call,'__init'))
 			call_user_func([$class_name_call,'__init']);
 	} else {
+		if ( isset($debug[2]) and isset($debug[2]['function']) and $debug[2]['function'] == 'class_exists')
+			return false ;
 		App\core\controller\httpErrorHandler::E500($class_patch);
 		exit;
 	}

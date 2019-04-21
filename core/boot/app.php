@@ -191,7 +191,14 @@ class App {
 		return self::$app;
 	}
 
+	public static function getAppProvider() {
+		return self::$appProvider;
+	}
 
+
+	public static function appsList(){
+		return file::get_name_folders(self::$appPatch);
+	}
 
 	public static function getFullRequestUrl(){
 		$protocol = 'http';
@@ -246,11 +253,11 @@ class App {
 	}
 
 	private static function generateAllLinks(){
-		if ( ! cache::hasLifeTime('appsLink','paymentCms')) {
-			$links = model::searching(null, null, 'appslink');
-			cache::save($links, 'appsLink', 30 * 24 * 60 * 60, 'paymentCms');
+		if ( ! cache::hasLifeTime('apps_link','paymentCms')) {
+			$links = model::searching(null, null, 'apps_link');
+			cache::save($links, 'apps_link', PHP_INT_MAX, 'paymentCms');
 		} else {
-			$links = cache::get('appsLink',null,'paymentCms');
+			$links = cache::get('apps_link',null,'paymentCms');
 		}
 		return $links ;
 	}

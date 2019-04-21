@@ -1,0 +1,161 @@
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5  mb-5">
+        <div class="row mt-5">
+            <div class="col-md-8 ml-auto mr-auto">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-info  card-header-icon d-print-none">
+                        <div class="card-icon ">
+                            <i class="fa fa-file-text-o"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "invoice"} #{$invoice.invoiceId}</h4>
+                        <div class="card-title float-{if $float == 'right'}left{else}right{/if}  m-3 btn-group btn-group-sm">
+                            <button onclick="window.print();" class="btn btn-outline">
+                                <i class="fa fa-print"></i> {_ "print"}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <div class=" border rounded p-3 ">
+                            <div class="row d-print-none">
+                                <div class="col-md-6 float-left text-center">
+                                    <div class="text-center text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
+                                    {if $invoice.paidDate > 0 }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
+                                    <div class="text-center text-bold text-large">{_ "method"} {_ "pay"} : {$invoice.module}</div>
+                                    <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "paid"}</button>
+                                    <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "cancel"}</button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive table-striped">
+                                <table class="table text-{$text_align}">
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            {_ "status"} :
+                                        </td>
+                                        <td>
+                                            <div class="text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
+                                        </td>
+                                        <td>
+                                            {_ "method"} {_ "pay"} :
+                                        </td>
+                                        <td>
+                                            {$invoice.module}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {_ "name"} {_ "client"} :
+                                        </td>
+                                        <td>
+                                            $client->getName()
+                                        </td>
+                                        <td>
+                                            {_ "invoice"} {_ "date"} :
+                                        </td>
+                                        <td>
+                                            {$invoice.createdDate|jDate:"Y/n/j , H-i-s"}
+                                        </td>
+                                    </tr>
+                                    {foreach from=$allFields key=key value=field}
+                                    {if ( $key % 2 ) == 0 }<tr>{/if}
+                                        <td>
+                                            {$field.title} :
+                                        </td>
+                                        <td>
+                                            {if isset($field.value) }
+                                            {$field.value}
+                                            {else}
+                                            ---
+                                            {/if}
+                                        </td>
+                                    {if ( $key % 2 ) == 1 }</tr>{/if}
+                                    {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-header mt-5 float-{$float}">
+                            <h4 class="card-title">{_ "invoiceItems"}</h4>
+                        </div>
+                        <div class="table-responsive table-hover">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "description"}</th>
+                                    <th class="text-center bg-info text-white border-white border rounded" style="width: 200px">{_ "price"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {set name="tempPrice" value=0 }
+                                {foreach from=$items key=key value=item}
+                                <tr class="border-bottom border-top">
+                                    <td class="border-left rounded" style="border-left: 1px solid white !important;">
+                                        {$item.description}
+                                    </td>
+                                    <td class="border-left rounded text-center" style="border-left: 1px solid white !important;">
+                                        {$item.price|number_format:0:'':''} {_ "toman"}
+                                    </td>
+                                </tr>
+                                {math format="x + y" x=$tempPrice y=$item.price set="tempPrice"}
+                                {foreachelse}
+                                <tr class="border-bottom border-top">
+                                    <td class="rounded p-1 text-center" colspan="3">{_ "hasNotItemYet"}</td>
+                                </tr>
+                                {/foreach}
+                                <tr class="border-top" >
+                                    <td class="border-left border-bottom border-right border-white rounded bg-dark text-bold text-large text-left pl-5 text-white " >
+                                       {_ "total"} :
+                                    </td>
+                                    <td class="border-left border-bottom border-right border-white rounded bg-dark text-bold text-large  text-center text-white" >
+                                        {$tempPrice|number_format} {_ "toman"}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-header mt-5 float-{$float}">
+                            <h4 class="card-title">{_ "transactions"}</h4>
+                        </div>
+                        <div class="table-responsive table-striped">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "date"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "method"} {_ "pay"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "transactionId"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "price"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$invoices key=key value=invoice}
+                                <tr class="border-bottom border-top">
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        2019/03/19
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
+                                        module
+                                    </td>
+                                </tr>
+                                {foreachelse}
+                                <tr class="border-bottom border-top">
+                                    <td class="rounded p-1 text-center" colspan="6">{_ "hasNotTransactionYet"}</td>
+                                </tr>
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
