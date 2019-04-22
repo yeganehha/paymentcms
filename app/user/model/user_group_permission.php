@@ -22,7 +22,7 @@ namespace App\user\model;
 use paymentCms\component\model;
 use paymentCms\model\modelInterFace ;
 
-class user_group extends model implements modelInterFace {
+class user_group_permission extends model implements modelInterFace {
 
 	private $primaryKey = 'user_groupId';
 	private $primaryKeyShouldNotInsertOrUpdate = null;

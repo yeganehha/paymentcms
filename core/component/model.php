@@ -107,6 +107,15 @@ abstract class model {
 	}
 
 
+	public static function join($table, $condition = null , $joinOn ="LEFT"){
+		self::$db->join($table, $condition, $joinOn);
+	}
+
+	public static function joinWhere($table, $condition , $conditionValue){
+		self::$db->joinOrWhere($table, $condition, $conditionValue);
+	}
+
+
 	public static function searching( $searchVariable, $searchWhereClaus , $tableName  , $fields = '*' , $orderBy = null ,$limit = null ) {
 		if ($searchWhereClaus != null ) {
 			if (is_array($searchVariable)) {

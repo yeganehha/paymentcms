@@ -38,7 +38,7 @@ class validate {
 
 	/**
 	 *
-	 * @return validate
+	 * @return \paymentCms\component\validate
 	 */
 	public static function check($inputs, $rules, $messages = null)
 	{

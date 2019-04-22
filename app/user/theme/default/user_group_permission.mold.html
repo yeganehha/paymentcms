@@ -1,0 +1,75 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon pointer" >
+                        <div class="card-icon" >
+                            <i class="fa fa-lock"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{if $edit}{_ "edit"}{else}{_ "add"}{/if} {_ "permission"}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-horizontal" action="{url}permissions/{if $edit}edit/{$editId}{else}insert{/if}" method="post" >
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                    <div class="col-md-9">
+                                        <div class="form-group has-default">
+                                            <input type="text" name="name" class="form-control" value="{if isset($Mold.post.name)}{$Mold.post.name}{elseif isset($permission)}{$permission->getName()}{/if}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center mt-3">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input class="form-check-input" {if isset($Mold.post.loginRequired)}{if $Mold.post.loginRequired == 'active' }checked{/if}{elseif isset($permission)}{if $permission->getLoginRequired()}checked{/if}{/if} name="loginRequired" type="checkbox" value="active"> {_ "loginRequired"}
+                                            <span class="form-check-sign">
+                                              <span class="check"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-fill btn-info">{if $edit}{_ "edit"}{else}{_ "add"}{/if}</button>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                {foreach from=$permissions key=app value=controllers}
+                                    <div class="col-md-6 mt-3">
+                                        <div class="card">
+                                            <div class="card-header card-header-info pointer mb-3"  data-toggle="collapse" data-target="#app_{$app}" aria-expanded="false" aria-controls="searchServices">
+                                                <h4 class="card-title float-{$float} m-3">{$app}</h4>
+                                            </div>
+                                            <div class="collapse" id="app_{$app}">
+                                                <div class="card-body text-{$text_align}">
+                                    {foreach from=$controllers key=controller value=methods}
+                                        {foreach from=$methods.methods key=key value=method}
+                                        <div class="col-md-12 mt-1">
+                                            <div class="form-check">
+                                                <label class="form-check-label text-dark">
+                                                    {math format="x.y.'_'.z.'_'.t" set="tempName" x="permission:" y=$app z=$controller t=$method }
+                                                    {math format="y.'_'.z.'_'.t" set="tempName2" y=$app z=$controller t=$method }
+                                                    <input class="form-check-input text-dark" name="permission[]" {if isset($Mold.post.permission)}{if in_array($tempName2,$Mold.post.permission)}checked{/if}{elseif isset($permissionActive)}{if in_array($tempName2,$permissionActive)}checked{/if}{/if} type="checkbox" value="{$tempName2}">{if [_ $tempName] != '' }{_ $tempName}{else}permission:{$app}_{$controller}_{$method}{/if}
+                                                    <span class="form-check-sign">
+                                                      <span class="check"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {/foreach}
+                                    {/foreach}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {/foreach}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
