@@ -49,16 +49,10 @@ spl_autoload_register(function ($class_name_call) {
 	}
 });
 
-function show($pram = null , $exit = true ){
-	echo '<pre>';
-	var_dump($pram);
-	echo '</pre>';
-	if ( $exit )
-		exit;
-}
 
 require_once __DIR__ .DIRECTORY_SEPARATOR. 'app.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'controller.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'pluginController.php';
 require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'databaseConection.php';
 require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'lang.php';
+require_once payment_path. 'core'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'function.php';
