@@ -25,5 +25,7 @@ return [
 	'account' => 'کاربر',
 	'accountArea' => 'ناحیه کاربری',
 	'logOut' => 'خروج',
+	'registerDate' => 'تاریخ ثبت نام',
+	'user' => 'کاربر',
 	'' => '',
 ];

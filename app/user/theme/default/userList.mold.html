@@ -3,64 +3,56 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-rose card-header-icon pointer"  data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">
+                    <div class="card-header card-header-rose card-header-icon pointer"  data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">
                         <div class="card-icon" >
                             <i class="material-icons">search</i>
                         </div>
-                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "invoices"}</h4>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "users"}</h4>
                     </div>
-                    <div class="collapse" id="searchServices">
+                    <div class="collapse" id="searchUsers">
                         <div class="card-body">
                             {set loadDivID,"#listToGetFromServer"}
                             {set loadDivIDInHtml,"listToGetFromServer"}
                             <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
                                 <div class="row">
                                    <div class="col-md-4">
-                                       <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                       <label class="col-md-3 col-form-label">{_ "firstName"}</label>
                                        <div class="col-md-9">
                                            <div class="form-group has-default">
-                                               <input type="text" name="name" class="form-control">
+                                               <input type="text" name="fname" class="form-control">
                                            </div>
                                        </div>
                                    </div>
                                    <div class="col-md-4">
-                                       <label class="col-md-3 col-form-label">{_ "description"}</label>
+                                       <label class="col-md-3 col-form-label">{_ "lastName"}</label>
                                        <div class="col-md-9">
                                            <div class="form-group has-default">
-                                               <input type="text" name="description" class="form-control">
+                                               <input type="text" name="lname" class="form-control">
                                            </div>
                                        </div>
                                    </div>
                                     <div class="col-md-4">
-                                        <label class="col-md-3 col-form-label">{_ "price"}</label>
+                                        <label class="col-md-3 col-form-label">{_ "email"}</label>
                                         <div class="col-md-9">
                                             <div class="form-group has-default">
-                                                <input type="text" name="price" class="form-control">
+                                                <input type="text" name="email" class="form-control">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                    <div class="col-md-4">
-                                       <label class="col-md-3 col-form-label">{_ "link"}</label>
+                                       <label class="col-md-3 col-form-label">{_ "phone"}</label>
                                        <div class="col-md-9">
                                            <div class="form-group has-default">
-                                               <input type="text" name="link" class="form-control">
+                                               <input type="text" name="phone" class="form-control">
                                            </div>
                                        </div>
                                    </div>
                                    <div class="col-md-4 text-center mt-3">
-                                       <div class="form-check">
-                                           <label class="form-check-label">
-                                               <input class="form-check-input" name="active" type="checkbox" value="active"> {_ "active"}
-                                               <span class="form-check-sign">
-                                                  <span class="check"></span>
-                                                </span>
-                                           </label>
-                                       </div>
                                    </div>
                                    <div class="col-md-4">
-                                       <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">{_ "close"}</button>
+                                       <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
                                        <button type="submit" class="btn btn-fill btn-rose">{_ "search"}</button>
                                    </div>
                                 </div>
@@ -77,39 +69,34 @@
                 <div class="card" id="listToGetFromServer">
                     <div class="card-header card-header-rose card-header-icon">
                         <div class="card-icon">
-                            <i class="fa fa-file-text-o"></i>
+                            <i class="fa fa-users"></i>
                         </div>
-                        <h4 class="card-title float-{$float} m-3">{_ "invoices"}</h4>
+                        <h4 class="card-title float-{$float} m-3">{_ "users"}</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table text-{$text_align}">
                                 <thead>
                                 <tr>
-                                    <th class="text-center">{$invoices|count}</th>
-                                    <th>{_ "name"} {_ "client"}</th>
-                                    <th>{_ "invoice"} {_ "date"}</th>
-                                    <th>{_ "due"} {_ "date"}</th>
-                                    <th>{_ "pay"} {_ "date"}</th>
-                                    <th>{_ "total"}</th>
-                                    <th>{_ "method"} {_ "pay"}</th>
-                                    <th>{_ "status"}</th>
-                                    <th>{_ "actions"}</th>
+                                    <th class="text-center"></th>
+                                    <th>{_ "firstName"}</th>
+                                    <th>{_ "lastName"}</th>
+                                    <th>{_ "email"}</th>
+                                    <th>{_ "phone"}</th>
+                                    <th>{_ "registerDate"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {foreach from=$invoices key=key value=invoice}
+                                {foreach from=$users key=key value=user}
                                 <tr>
-                                    <td class="text-center">{$invoice.invoiceId|ssssss:"df":"dsf":"dfs":$invoice.invoiceId}</td>
-                                    <td>{$invoice.name}</td>
-                                    <td>{$invoice.createdDate|date_format:"jS F, Y"}</td>
-                                    <td>{$invoice.dueDate|jDate:"jS F, Y"}</td>
-                                    <td>{$invoice.paidDate|jDate:"jS F, Y"}</td>
-                                    <td>{$invoice.price|number_format}</td>
-                                    <td>{$invoice.module}</td>
-                                    <td class="text-right">{$invoice.status}</td>
+                                    <td class="text-center">{$user.userId}</td>
+                                    <td>{$user.fname}</td>
+                                    <td>{$user.lname}</td>
+                                    <td>{$user.email}</td>
+                                    <td>{$user.phone}</td>
+                                    <td>{$user.register_time|jDate:"jS F, Y"}</td>
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-info btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                        <a class="btn btn-info btn-link" href="{url}users/profile/{$user.userId}">
                                             <i class="material-icons">remove_red_eye</i>
                                         </a>
                                     </td>
@@ -125,3 +112,12 @@
         </div>
     </div>
 </div>
+{map navBarButton}
+<a class="btn btn-info" href="{url}users/insert">
+                      <span class="btn-label">
+                        <i class="material-icons">person_add</i>
+                      </span>
+    {_ "add"} {_ "user"} {_ "new"}
+    <div class="ripple-container"></div>
+</a>
+{/map}
