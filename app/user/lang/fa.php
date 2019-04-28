@@ -18,5 +18,12 @@ return [
 	'permission' => 'سطح دسترسی',
 	'gustUser' => 'کاربر مهمان',
 	'loginRequired' => 'نیاز به ورود',
+	'loginInToAccount' => 'ورود به حساب کاربری',
+	'username' => 'نام کاربری',
+	'password' => 'رمز عبور',
+	'login' => 'ورود',
+	'account' => 'کاربر',
+	'accountArea' => 'ناحیه کاربری',
+	'logOut' => 'خروج',
 	'' => '',
 ];

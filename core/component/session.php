@@ -6,7 +6,7 @@
  * Date: 7/8/2017
  * Time: 8:39 PM
  */
-namespace paymentCms\component\session;
+namespace paymentCms\component;
 
 
 class session extends \SessionHandler
@@ -20,7 +20,7 @@ class session extends \SessionHandler
 	/**
 	 * @param int $gc_probability
 	 *
-	 * @return session
+	 * @return \paymentCms\component\session
 	 */
 	public static function setGcProbability($gc_probability) {
 		self::$gc_probability = $gc_probability;
@@ -53,18 +53,25 @@ class session extends \SessionHandler
 		}
 		if(session_id() == '')
 			session_start();
+		self::$object = new session();
 	}
 
 	/**
 	 * @param bool $manualSession
 	 *
-	 * @return session
+	 * @return \paymentCms\component\session
 	 */
 	public static function setManualSession($manualSession) {
 		self::$manualSession = $manualSession;
 		return self::$object;
 	}
 
+	/**
+	 * @param        $lifeTime
+	 * @param string $type
+	 *
+	 * @return \paymentCms\component\session
+	 */
 	public static function lifeTime($lifeTime, $type = 'sec'){
 		if ($type == 'min') $lifeTime = $lifeTime * 60;
 		if ($type == 'hour') $lifeTime = $lifeTime * 60 * 60;
@@ -101,6 +108,24 @@ class session extends \SessionHandler
 		        return $_SESSION;
         }
         return null ;
+	}
+
+	public static function has(){
+		$args = func_get_args() ;
+        if (func_num_args() > 1) {
+	        $return = true ;
+	        foreach ($args as $arg) {
+		        if (!isset($_SESSION[$arg])) $return = false;
+		        if ( ! $return) break;
+	        }
+            return $return ;
+        } elseif (func_num_args() == 1) {
+	        if ( isset($_SESSION[$args[0]]) )
+		        return true;
+	        else
+	        	return false ;
+        } else
+        	return false;
 	}
 
 	public static function remove(){

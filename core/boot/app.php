@@ -322,6 +322,21 @@ class App {
 		}
 		return $links ;
 	}
+
+	/**
+	 * @return string
+	 */
+	public static function getController() {
+		return self::$controller;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getMethod() {
+		return self::$method;
+	}
+
 	private static function sortArrayByLength($a,$b){
 		return strlen($b['link'])-strlen($a['link']);
 	}

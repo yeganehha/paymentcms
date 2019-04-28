@@ -48,6 +48,7 @@ class controller {
 		$menu->add('developer' , rlang('developer' ) , app::getBaseAppLink('developer') , 'fa fa-code' );
 
 		$this->callHooks('adminHeaderNavbar',[1,2]);
+		$this->callHooks('controllerStartToRun',[]);
 
 
 	}
