@@ -27,8 +27,8 @@ class hook extends pluginController {
 	public function _adminHeaderNavbar($vars2){
 		$this->menu->after('dashboard','invoices' , rlang('invoices' ) , \app::getBaseAppLink('invoices/lists' ,'admin') , 'fa fa-file-text-o' );
 		$this->menu->addChild('invoices' , 'allinvoices' , rlang('invoices' ) , \app::getBaseAppLink('invoices/lists' ,'admin')  );
-		$this->menu->add('successinvoices' , rlang(['invoicesOf','success'] ) , \app::getBaseAppLink('invoices/success' ,'admin') ,null,null,'invoices' );
-		$this->menu->add('failinvoices' , rlang(['invoicesOf','fail'] ) , \app::getBaseAppLink('invoices/fail' ,'admin') ,null,null,'invoices' );
-		$this->menu->add('pendinginvoices' , rlang(['invoicesOf','pending'] ) , \app::getBaseAppLink('invoices/pending' ,'admin') ,null,null,'invoices' );
+		$this->menu->add('paidinvoices' , rlang(['invoicesOf','success'] ) , \app::getBaseAppLink('invoices/lists/paid' ,'admin') ,null,null,'invoices' );
+		$this->menu->add('failedinvoices' , rlang(['invoicesOf','fail'] ) , \app::getBaseAppLink('invoices/lists/failed' ,'admin') ,null,null,'invoices' );
+		$this->menu->add('pendinginvoices' , rlang(['invoicesOf','pending'] ) , \app::getBaseAppLink('invoices/lists/pending' ,'admin') ,null,null,'invoices' );
 	}
 }

@@ -76,7 +76,7 @@ class invoices extends \controller {
 		$this->mold->view('invoice.mold.html');
 		$this->mold->setPageTitle(rlang('invoice'));
 	}
-	public function lists() {
+	public function lists($status = 'all') {
 		$get = request::post('page=1,perEachPage=25,name,description,price,link,active' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
@@ -110,6 +110,10 @@ class invoices extends \controller {
 				$variable[] = 'status = ?' ;
 			}
 		}
+		if ( $status != 'all' and ( $status == 'pending' or  $status == 'canceled' or  $status == 'refused' or  $status == 'failed' or  $status == 'paid' )  ) {
+			$value[] = $status ;
+			$variable[] = 'status = ?' ;
+		}
 		$model = parent::model('invoice');
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode('or' , $variable) , null, 'COUNT(invoiceId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
@@ -117,7 +121,7 @@ class invoices extends \controller {
 		$this->mold->path('default', 'invoice');
 		$this->mold->view('invoiceList.mold.html');
 		$this->mold->setPageTitle(rlang('invoices'));
-		$this->mold->set('activeMenu' , 'allinvoices');
+		$this->mold->set('activeMenu' , $status.'invoices');
 		$this->mold->set('invoices' , $search);
 	}
 

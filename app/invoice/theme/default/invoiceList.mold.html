@@ -86,7 +86,7 @@
                             <table class="table text-{$text_align}">
                                 <thead>
                                 <tr>
-                                    <th class="text-center">{$invoices|count}</th>
+                                    <th class="text-center"></th>
                                     <th>{_ "name"} {_ "client"}</th>
                                     <th>{_ "invoice"} {_ "date"}</th>
                                     <th>{_ "due"} {_ "date"}</th>
@@ -100,7 +100,7 @@
                                 <tbody>
                                 {foreach from=$invoices key=key value=invoice}
                                 <tr>
-                                    <td class="text-center">{$invoice.invoiceId|ssssss:"df":"dsf":"dfs":$invoice.invoiceId}</td>
+                                    <td class="text-center">{$invoice.invoiceId}</td>
                                     <td>{$invoice.name}</td>
                                     <td>{$invoice.createdDate|date_format:"jS F, Y"}</td>
                                     <td>{$invoice.dueDate|jDate:"jS F, Y"}</td>
@@ -113,6 +113,10 @@
                                             <i class="material-icons">remove_red_eye</i>
                                         </a>
                                     </td>
+                                </tr>
+                                {foreachelse}
+                                <tr>
+                                    <td class="text-center" colspan="8">{_ "hasNotDataYet"}</td>
                                 </tr>
                                 {/foreach}
                                 </tbody>

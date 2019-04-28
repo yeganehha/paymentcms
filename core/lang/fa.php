@@ -102,6 +102,7 @@ return [
 	'refused' => 'رد شده',
 	'failed' => 'ناموفق',
 	'hasNotTransactionYet' => 'پرداختی تا کنون ثبت نگردیده است!',
+	'hasNotDataYet' => 'داده‌ای تا کنون ثبت نگردیده است!',
 	'numberOfRecordsShowPerEachPage' => 'تعداد رکورد ها نمایش داده شده : ',
 
 	/*
