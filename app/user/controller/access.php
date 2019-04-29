@@ -7,6 +7,7 @@ namespace App\user\controller;
 use paymentCms\component\request;
 use paymentCms\component\Response;
 use paymentCms\component\session;
+use paymentCms\component\validate;
 
 /**
  * Created by Yeganehha .
@@ -28,8 +29,29 @@ class access extends \controller  {
 	public function login(){
 		$this->mold->view('login.mold.html');
 		if ( request::isPost()) {
+			$get = request::post('password,username' ,null);
+			$rules = [
+				"password" => ["required", rlang('password')],
+				"username" => ["required", rlang('username')],
+			];
+			$valid = validate::check($get, $rules);
+			if ($valid->isFail()){
+				$this->alert('danger','',$valid->errorsIn() );
+				return false;
+			}
+
+			/* @var \App\user\model\user $model */
+			$model = $this->model('user' );
+			$model->setPassword($get['password']);
+			$password = $model->getPassword();
+
+			$model = $this->model('user' , [$password,$get['username'],$get['username']] , 'password = ? and ( phone = ? or email = ?) ' );
+			if ( $model->getUserId() == null ){
+				$this->alert('danger','',rlang('cantFindUser') );
+				return false;
+			}
 			session::regenerateSessionId();
-			session::lifeTime(1 ,'hour')->set('userAppLoginInformation',['user_group_id' => 1]);
+			session::lifeTime(1 ,'hour')->set('userAppLoginInformation',$model->returnAsArray());
 			if ( request::isGet('callBack') ){
 				Response::redirect(urldecode(request::getOne('callBack')));
 			} else

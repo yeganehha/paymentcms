@@ -83,8 +83,9 @@ class hook extends pluginController {
 			for ( $i = 0 ; $i < count($permission) ; $i ++ ){
 				if ( $groupId != null and $permission[$i]['user_groupId'] == $groupId and $permission[$i]['accessPage']  == $page )
 						return $permission[$i];
-				elseif ( $permission[$i]['accessPage']  == $page )
+				elseif ( $groupId == null and $permission[$i]['accessPage']  == $page ) {
 					$result[$permission[$i]['loginRequired']] = $permission[$i];
+				}
 			}
 			if ( isset($result[0]))
 				return $result[0];

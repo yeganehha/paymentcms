@@ -82,6 +82,7 @@ abstract class model {
 	}
 
 	public static function debugQuery($end = false){
+		show(self::db()->getLastError(),false);
 		show(self::db()->getLastQuery() , $end);
 	}
 

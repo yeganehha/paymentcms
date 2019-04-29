@@ -66,14 +66,79 @@ class users extends \controller {
 			}
 		}
 		$model = parent::model('user');
-		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode('or' , $variable) , null, 'COUNT(userId) as co' )) [0]['co'];
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' or ' , $variable) , null, 'COUNT(userId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode('or' , $variable) )  , null, '*'  , ['column' => 'userId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
 		$this->mold->path('default', 'user');
 		$this->mold->view('userList.mold.html');
 		$this->mold->setPageTitle(rlang('users'));
 		$this->mold->set('activeMenu' , 'users');
-		$this->mold->set('invoices' , $search);
+		$this->mold->set('users' , $search);
 	}
-
+	public function insert(){
+		if ( request::isPost() ) {
+			$this->checkData();
+		}
+		/* @var \App\user\model\user_group $model */
+		$model = $this->model('user_group');
+		$access = $model->search(null,null);
+		$this->mold->set('access',$access);
+		$this->mold->set('newUser',true);
+		$this->mold->path('default', 'user');
+		$this->mold->view('userProfile.mold.html');
+		$this->mold->setPageTitle(rlang(['add','user']));
+	}
+	private function checkData($userId = null){
+		$get = request::post('fname,lname,email,phone,password,groupId,block=0,admin_note' ,null);
+		$rules = [
+			"fname" => ["required", rlang('firstName')],
+			"lname" => ["required", rlang('lastName')],
+			"groupId" => ["required|match:>0", rlang('permission')],
+			"password" => ["required", rlang('password')],
+			"email" => ["required|email", rlang('email')],
+			"phone" => ["required|mobile", rlang('phone')],
+			"block" => ["required|format:{0/1}", rlang('block')],
+		];
+		$valid = validate::check($get, $rules);
+		if ($valid->isFail()){
+			$this->alert('danger','',$valid->errorsIn() );
+			return false;
+		}
+		/* @var \App\user\model\user $model */
+		if ($userId == null) {
+			$model = $this->model('user');
+		} else {
+			$model = $this->model('user' , $userId);
+			if ( $model->getUserId() != $userId ){
+				$this->alert('danger','',rlang('cantFindUser') );
+				return false;
+			}
+		}
+		$model->setUserGroupId($get['groupId']);
+		$model->setFname($get['fname']);
+		$model->setLname($get['lname']);
+		$model->setEmail($get['email']);
+		$model->setPhone($get['phone']);
+		$model->setPassword($get['password']);
+		$model->setBlock($get['block']);
+		$model->setAdminNote($get['admin_note']);
+		$model->setRegisterTime( ($model->getRegisterTime() != null ) ? $model->getRegisterTime() : date('Y-m-d H:i:s') );
+		if ($userId == null) {
+			$result = $model->insertToDataBase();
+			if ( $result !== false ) {
+				Response::redirect(\App::getBaseAppLink('users/profile/' . $result, 'admin'));
+				exit;
+			} else {
+				$this->alert('danger','',rlang('tryAGain') );
+				return false;
+			}
+		} else {
+			$result = $model->upDateDataBase();
+			if ( $result )
+				Response::redirect(\App::getBaseAppLink('users/profile/'.$result.'/updateDone' , 'admin'));
+			else
+				Response::redirect(\App::getBaseAppLink('users/profile/'.$result.'/updateError' , 'admin'));
+			exit;
+		}
+	}
 }
