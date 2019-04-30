@@ -4,9 +4,11 @@
 namespace App\user\app_provider\admin;
 
 
+use App\core\controller\httpErrorHandler;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
+use paymentCms\component\session;
 use paymentCms\component\strings;
 use paymentCms\component\validate;
 use paymentCms\model\api;
@@ -88,17 +90,46 @@ class users extends \controller {
 		$this->mold->view('userProfile.mold.html');
 		$this->mold->setPageTitle(rlang(['add','user']));
 	}
+	public function profile($userId,$updateStatus = null){
+		if ( request::isPost() ) {
+			$this->checkData($userId);
+		}
+		/* @var \App\user\model\user $user */
+		$user = $this->model('user' , $userId );
+		if ( $user->getUserId() != $userId ){
+			httpErrorHandler::E404();
+			return false ;
+		}
+		if ( $updateStatus == 'updateDone') {
+			$this->alert('success' , '',rlang('editUserSuccessFully'));
+			$this->mold->set('activeTab','edit');
+		}elseif ( $updateStatus == 'insertDone') {
+			$this->alert('success' , '',rlang('insertUserSuccessFully'));
+		}
+
+		/* @var \App\user\model\user_group $model */
+		$model = $this->model('user_group');
+		$access = $model->search(null,null);
+
+		$this->mold->set('access',$access);
+		$this->mold->set('user',$user);
+		$this->mold->path('default', 'user');
+		$this->mold->view('userProfile.mold.html');
+		$this->mold->setPageTitle(rlang(['profile','user']));
+	}
+
 	private function checkData($userId = null){
 		$get = request::post('fname,lname,email,phone,password,groupId,block=0,admin_note' ,null);
 		$rules = [
 			"fname" => ["required", rlang('firstName')],
 			"lname" => ["required", rlang('lastName')],
 			"groupId" => ["required|match:>0", rlang('permission')],
-			"password" => ["required", rlang('password')],
 			"email" => ["required|email", rlang('email')],
 			"phone" => ["required|mobile", rlang('phone')],
 			"block" => ["required|format:{0/1}", rlang('block')],
 		];
+		if ( $userId == null )
+			$rules[] = 	["password" => ["required", rlang('password')] ];
 		$valid = validate::check($get, $rules);
 		if ($valid->isFail()){
 			$this->alert('danger','',$valid->errorsIn() );
@@ -119,26 +150,31 @@ class users extends \controller {
 		$model->setLname($get['lname']);
 		$model->setEmail($get['email']);
 		$model->setPhone($get['phone']);
-		$model->setPassword($get['password']);
+		if ( $userId != null and $get['password'] != null ) $model->setPassword($get['password']);
 		$model->setBlock($get['block']);
 		$model->setAdminNote($get['admin_note']);
 		$model->setRegisterTime( ($model->getRegisterTime() != null ) ? $model->getRegisterTime() : date('Y-m-d H:i:s') );
 		if ($userId == null) {
 			$result = $model->insertToDataBase();
 			if ( $result !== false ) {
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $result, 'admin'));
+				Response::redirect(\App::getBaseAppLink('users/profile/' . $model->getUserId().'/insertDone', 'admin'));
 				exit;
 			} else {
-				$this->alert('danger','',rlang('tryAGain') );
+				$this->alert('danger','',rlang('pleaseTryAGain') );
 				return false;
 			}
 		} else {
 			$result = $model->upDateDataBase();
-			if ( $result )
-				Response::redirect(\App::getBaseAppLink('users/profile/'.$result.'/updateDone' , 'admin'));
-			else
-				Response::redirect(\App::getBaseAppLink('users/profile/'.$result.'/updateError' , 'admin'));
-			exit;
+			if ( $result ) {
+				if ( $model->getUserId() == session::get('userAppLoginInformation')['userId'])
+					session::lifeTime(1 ,'hour')->set('userAppLoginInformation',$model->returnAsArray());
+				Response::redirect(\App::getBaseAppLink('users/profile/' . $model->getUserId() . '/updateDone', 'admin'));
+			}
+			else {
+				$this->alert('danger', '', rlang('pleaseTryAGain'));
+				$this->mold->set('activeTab','edit');
+				return false;
+			}
 		}
 	}
 }

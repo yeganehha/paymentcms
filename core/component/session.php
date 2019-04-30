@@ -11,7 +11,7 @@ namespace paymentCms\component;
 
 class session extends \SessionHandler
 {
-	private static $lifeTime = 0;
+	private static $lifeTime = 60 * 60;
 	private static $object = null ;
 	private static $manualSession = false ;
 	private static $gc_probability = 1 ;

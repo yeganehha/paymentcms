@@ -28,7 +28,10 @@ return [
 	'registerDate' => 'تاریخ ثبت نام',
 	'user' => 'کاربر',
 	'cantFindUser' => 'کاربر مورد نظر یافت نشد!',
-	'tryAGain' => 'لطفا مجددا تلاش کنید!',
 	'block' => 'مسدود شده',
+	'profile' => 'پروفایل',
+	'admin_note' => 'یاداشت مدیریت',
+	'insertUserSuccessFully' => 'ثبت کاربر جدید با موفقیت انجام شد.',
+	'editUserSuccessFully' => 'ویرایش کاربر جدید با موفقیت انجام شد!',
 	'' => '',
 ];
