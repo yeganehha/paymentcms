@@ -4,6 +4,7 @@
 namespace App\invoice\controller;
 
 
+use paymentCms\component\security;
 use paymentCms\component\strings;
 
 /**
@@ -24,7 +25,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class home extends \controller {
 
 	public function index($base64InvoiceId){
-		$invoiceId = base64_decode($base64InvoiceId);
+		$invoiceId = security::decrypt(urldecode($base64InvoiceId),'base64');
 		/* @var \paymentcms\model\invoice $invoice */
 		$invoice = $this->model('invoice' , $invoiceId);
 		if ( $invoice->getInvoiceId() == null ){

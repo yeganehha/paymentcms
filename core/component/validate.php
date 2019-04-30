@@ -38,7 +38,7 @@ class validate {
 
 	/**
 	 *
-	 * @return validate
+	 * @return \paymentCms\component\validate
 	 */
 	public static function check($inputs, $rules, $messages = null)
 	{
@@ -567,7 +567,9 @@ class validate {
 
 	private static function _email()
 	{
-		if (filter_var(self::getFirstData(), FILTER_VALIDATE_EMAIL) === false)
+		$email = self::getFirstData();
+		if ( $email == '' ) return true;
+		if (filter_var($email, FILTER_VALIDATE_EMAIL) === false)
 			self::setError(rlang('ERROR_VALID_EMAIL'));
 	}
 
@@ -612,6 +614,7 @@ class validate {
 	private static function _mobile()
 	{
 		$mobile = self::getFirstData();
+		if ( $mobile == '' ) return true;
 		if (strlen($mobile) != 11 || substr($mobile, 0, 2) != '09')
 			self::setError(rlang('ERROR_VALID_MOBILE'), self::$field_title);
 	}

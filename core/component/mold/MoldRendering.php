@@ -363,19 +363,31 @@ class MoldRendering {
 	private function _lang($data){
 		if ( !$this->engineStatus )
 			return ;
-		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+		if ( $this->runFromPhp ){
+			$this->replace($data['find'],'rlang('.$data['otherValues'].')' );
+		} else {
+			$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+		}
 	}
 
 	private function _l($data){
 		if ( !$this->engineStatus )
 			return ;
-		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+		if ( $this->runFromPhp ){
+			$this->replace($data['find'],'rlang('.$data['otherValues'].')' );
+		} else {
+			$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+		}
 	}
 
 	private function __($data){
 		if ( !$this->engineStatus )
 			return ;
-		$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+		if ( $this->runFromPhp ){
+			$this->replace($data['find'],'rlang('.$data['otherValues'].')' );
+		} else {
+			$this->replace($data['find'],'lang('.$data['otherValues'].') ; ' );
+		}
 	}
 
 	private function _php($data){

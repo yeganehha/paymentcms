@@ -1,0 +1,100 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon pointer"  data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">
+                        <div class="card-icon" >
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "permission"}</h4>
+                    </div>
+                    <div class="collapse" id="searchServices">
+                        <div class="card-body">
+                            {set loadDivID,"#listToGetFromServer"}
+                            {set loadDivIDInHtml,"listToGetFromServer"}
+                            <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="name" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-center mt-3">
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" name="gustUser" type="checkbox" value="active"> {_ "gustUser"}
+                                                <span class="form-check-sign">
+                                                  <span class="check"></span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">{_ "close"}</button>
+                                        <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-info card-header-icon">
+                        <div class="card-icon">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "permission"}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="text-center"></th>
+                                    <th>{_ "name"}</th>
+                                    <th class="text-center">{_ "gustUser"}</th>
+                                    <th class="text-center">{_ "actions"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$groups key=key value=group}
+                                <tr>
+                                    <td class="text-center">{$group.user_groupId}</td>
+                                    <td>{$group.name}</td>
+                                    <td class="text-center"><i class="fa {if $group.loginRequired == 0 }fa-unlock text-warning{else}fa-lock text-success{/if}"></i></td>
+                                    <td class="td-actions text-center">
+                                        <a class="btn btn-info btn-link" href="{url}permissions/edit/{$group.user_groupId}">
+                                            <i class="material-icons">remove_red_eye</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                        {view "[url patch]pagination.mold.html"}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{map navBarButton}
+<a class="btn btn-info" href="{url}permissions/insert">
+                      <span class="btn-label">
+                        <i class="fa fa-lock"></i>
+                      </span>
+    {_ "add"} {_ "permission"}
+    <div class="ripple-container"></div>
+</a>
+{/map}

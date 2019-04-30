@@ -82,6 +82,7 @@ abstract class model {
 	}
 
 	public static function debugQuery($end = false){
+		show(self::db()->getLastError(),false);
 		show(self::db()->getLastQuery() , $end);
 	}
 
@@ -104,6 +105,15 @@ abstract class model {
 		}
 		$results = self::$db->get($tableName, $limit,$fields );
 		return $this->returning($results) ;
+	}
+
+
+	public static function join($table, $condition = null , $joinOn ="LEFT"){
+		self::$db->join($table, $condition, $joinOn);
+	}
+
+	public static function joinWhere($table, $condition , $conditionValue){
+		self::$db->joinOrWhere($table, $condition, $conditionValue);
 	}
 
 

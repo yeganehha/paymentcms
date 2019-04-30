@@ -41,19 +41,14 @@ class controller {
 		$menu = new menu('sideBar') ;
 		$this->menu = $menu ;
 		$menu->add('dashboard' , rlang('dashboard' ) , app::getBaseAppLink() , 'fa fa-home' );
-		$menu->add('users' , rlang(['list','users'] ) , app::getBaseAppLink('users/lists') , 'fa fa-users' );
-		$menu->add('invoices' , rlang('invoices' ) , app::getBaseAppLink('invoices/lists') , 'fa fa-file-text-o' );
-		$menu->addChild('invoices' , 'allinvoices' , rlang('invoices' ) , app::getBaseAppLink('invoices/lists')  );
-		$menu->add('successinvoices' , rlang(['invoicesOf','success'] ) , app::getBaseAppLink('invoices/success') ,null,null,'invoices' );
-		$menu->add('failinvoices' , rlang(['invoicesOf','fail'] ) , app::getBaseAppLink('invoices/fail') ,null,null,'invoices' );
-		$menu->add('pendinginvoices' , rlang(['invoicesOf','pending'] ) , app::getBaseAppLink('invoices/pending') ,null,null,'invoices' );
 		$menu->add('services' , rlang('services' ) , app::getBaseAppLink('service/lists') , 'fa fa-shopping-cart' );
-		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
+//		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
 		$menu->add('plugins' , rlang('plugins' ) , app::getBaseAppLink('plugins/lists') , 'fa fa-puzzle-piece' );
 		$menu->add('configuration' , rlang('configuration' ) , app::getBaseAppLink('configuration') , 'fa fa-cogs' );
 		$menu->add('developer' , rlang('developer' ) , app::getBaseAppLink('developer') , 'fa fa-code' );
 
 		$this->callHooks('adminHeaderNavbar',[1,2]);
+		$this->callHooks('controllerStartToRun',[]);
 
 
 	}
@@ -65,20 +60,30 @@ class controller {
 	 *
 	 * @return \App\model\model
 	 */
-	protected function model($model = null , $searchVariable = null , $searchWhereClaus = null) {
-		if ( $model == null )
-			$model = $this->model;
-		$model = 'paymentCms\model\\'.$model ;
+	protected function model($modelName = null , $searchVariable = null , $searchWhereClaus = null) {
+		if ( $modelName == null )
+			$modelName = $this->model;
+		if ( empty(\app::getAppProvider()) )
+			$model = 'App\\'.\app::getApp().'\model\\'.$modelName ;
+		else
+			$model = 'App\\'.\app::getAppProvider().'\model\\'.$modelName ;
 		if (class_exists($model)) {
 			if ( $searchWhereClaus == null )
 				return new $model($searchVariable) ;
 			else
 				return new $model($searchVariable,$searchWhereClaus) ;
 		} else {
-			App\core\controller\httpErrorHandler::E500($model);
-			exit;
+			$model = 'paymentCms\model\\'.$modelName ;
+			if (class_exists($model)) {
+				if ( $searchWhereClaus == null )
+					return new $model($searchVariable) ;
+				else
+					return new $model($searchVariable,$searchWhereClaus) ;
+			} else {
+				App\core\controller\httpErrorHandler::E500($model);
+				exit;
+			}
 		}
-
 	}
 
 	protected function pagination($total, $page, $number = 25 ){

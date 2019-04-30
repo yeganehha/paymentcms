@@ -191,7 +191,75 @@ class App {
 		return self::$app;
 	}
 
+	public static function getAppProvider() {
+		return self::$appProvider;
+	}
 
+
+	public static function appsList(){
+		return file::get_name_folders(self::$appPatch);
+	}
+
+	public static function appsControllerList($app = null){
+		$result = [];
+		if ( $app != null ){
+			$result1 = file::get_name_file(self::$appPatch.$app.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR,false,[],['.php']);
+			$result2 = file::get_name_file_by_pattern(self::$appPatch,false,'*'.DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'*.php');
+			return array_merge($result1,$result2);
+		} else {
+			$apps = self::appsList();
+			if ( is_array($apps) ){
+				foreach ($apps as $app ){
+					$result1 =  file::get_name_file(self::$appPatch.$app.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR,false,[],['.php']);
+					$result2 = file::get_name_file_by_pattern(self::$appPatch,false,'*'.DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'*.php');
+					$result[$app] = array_merge($result1,$result2);
+				}
+			}
+		}
+		return array_filter($result) ;
+	}
+
+	public static function appsControllerMethodList($app = null , $controller = null ){
+		$return = [];
+		if ( $app != null and $controller != null ){
+			if ( is_file(self::$appPatch.$app.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.$controller.'.php') ){
+				$methods =  get_class_methods( 'App\\'.$app.'\controller\\'.$controller );
+				for ( $i = count($methods) -1  ; $i >= 0 ; $i-- )
+					if ( strings::strFirstHas($methods[$i],'__'))
+						unset($methods[$i]);
+					if ( count($methods) == 0 )
+						return false ;
+				return [ 'app' => $app ,'appProvider' => '', 'controller' => $controller,'methods' =>$methods];
+			} else {
+				$files = file::get_files_by_pattern(self::$appPatch,'*'.DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.$controller.'.php');
+				if ( is_array($files) and count($files) > 0 ){
+					$appProvider = strings::deleteWordFirstString(strings::deleteWordLastString($files[0] ,DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php'),self::$appPatch);
+					$methods =  get_class_methods( 'App\\'.$appProvider.'\app_provider\\'.$app.'\\'.$controller) ;
+					for ( $i = count($methods) -1  ; $i >= 0 ; $i-- )
+						if ( strings::strFirstHas($methods[$i],'__'))
+							unset($methods[$i]);
+					if ( count($methods) == 0 )
+						return false ;
+					return [ 'app' => $app ,'appProvider' => $appProvider, 'controller' => $controller,'methods' => $methods];
+				}
+			}
+		} elseif ( $app != null and $controller == null ){
+			$controllers = self::appsControllerList($app);
+			foreach ($controllers as $tempController ){
+				$result =self::appsControllerMethodList($app,$tempController) ;
+				if ( $result != false )
+					$return[$tempController] = $result ;
+			}
+		} else {
+			$apps = self::appsList();
+			foreach ($apps as $tmpApp ){
+				$result =self::appsControllerMethodList($tmpApp) ;
+				if ( $result != false )
+					$return[$tmpApp] = $result ;
+			}
+		}
+		return $return ;
+	}
 
 	public static function getFullRequestUrl(){
 		$protocol = 'http';
@@ -246,14 +314,29 @@ class App {
 	}
 
 	private static function generateAllLinks(){
-		if ( ! cache::hasLifeTime('appsLink','paymentCms')) {
-			$links = model::searching(null, null, 'appslink');
-			cache::save($links, 'appsLink', 30 * 24 * 60 * 60, 'paymentCms');
+		if ( ! cache::hasLifeTime('apps_link','paymentCms')) {
+			$links = model::searching(null, null, 'apps_link');
+			cache::save($links, 'apps_link', PHP_INT_MAX, 'paymentCms');
 		} else {
-			$links = cache::get('appsLink',null,'paymentCms');
+			$links = cache::get('apps_link',null,'paymentCms');
 		}
 		return $links ;
 	}
+
+	/**
+	 * @return string
+	 */
+	public static function getController() {
+		return self::$controller;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getMethod() {
+		return self::$method;
+	}
+
 	private static function sortArrayByLength($a,$b){
 		return strlen($b['link'])-strlen($a['link']);
 	}

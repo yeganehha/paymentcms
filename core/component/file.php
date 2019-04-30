@@ -351,10 +351,12 @@ class file
         $get_folders = array_diff($get_folders, array(".", ".."));
 
         $result = [];
-        foreach ($get_folders as $folder) {
-            if (is_dir($dir . $folder)) {
-                $result[] = $folder;
-            }
+        if ( is_array($get_folders) ) {
+	        foreach ($get_folders as $folder) {
+		        if (is_dir($dir . $folder)) {
+			        $result[] = $folder;
+		        }
+	        }
         }
         return $result;
     }
@@ -413,7 +415,7 @@ class file
         if (!file_exists($directory)) return;
         $arr_files = array();
         $get_files = scandir($directory);
-        if ( ! strLastHas($directory , DIRECTORY_SEPARATOR))
+        if ( ! strings::strLastHas($directory , DIRECTORY_SEPARATOR))
 	        $directory .= DIRECTORY_SEPARATOR ;
         $get_files = array_filter($get_files);
         $get_files = array_diff($get_files, array(".", ".."));
@@ -440,6 +442,40 @@ class file
 
         }
         return $arr_files;
+    }
+
+	public static function get_name_file($directory,$showExts = false, $no_file = array(), $exts = array(), $ext_action = "out"){
+		$get_files = self::get_files($directory,$no_file,$exts,$ext_action);
+    	$result = [];
+		if ( is_array($get_files) ) {
+			foreach ($get_files as $file) {
+				if ( $showExts )
+					$file = basename($file);
+				else {
+					$file = basename($file);
+					$file = substr($file,0,  strrpos($file,'.') );
+				}
+				$result[] = $file ;
+			}
+		}
+		return $result;
+    }
+
+	public static function get_name_file_by_pattern($directory,$showExts = false,$pattern = '*', $flag = 0){
+		$get_files = self::get_files_by_pattern($directory,$pattern,$flag);
+    	$result = [];
+		if ( is_array($get_files) ) {
+			foreach ($get_files as $file) {
+				if ( $showExts )
+					$file = basename($file);
+				else {
+					$file = basename($file);
+					$file = substr($file,0,  strrpos($file,'.') );
+				}
+				$result[] = $file ;
+			}
+		}
+		return $result;
     }
 
     // get all files in folder

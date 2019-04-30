@@ -13,10 +13,11 @@
 
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
-
 return [
 	'canNotInsertFieldValue' => 'در وارد سازی اطلاعات درخواستی صورتحساب مشکلی پیش آمده!',
 	'canNotInsertItems' => 'در درج آیتم های صورتحساب مشکلی پیش آمده!',
 	'canNotInsertInvoice' => 'در ثبت صورتحساب مشکلی پیش آمده!',
 	'service_add_helper_name' => 'نام سرویس فقط در ناحیه مدیریت و برای شناسیی سریع تر سرویس به استفاده می شود.',
+	'permission:api_service_info' => 'مشخصات سرویس در درگاه ارتباطی',
+	'permission:api_service_info' => 'مشخصات سرویس در درگاه ارتباطی',
 ];
