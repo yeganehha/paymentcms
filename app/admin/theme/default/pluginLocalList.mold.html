@@ -1,0 +1,59 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-info card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">extension</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "plugins"}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th>{_ "name"}</th>
+                                    <th>{_ "description"}</th>
+                                    <th>{_ "author"}</th>
+                                    <th>{_ "actions"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$apps key=appName value=app}
+                                <tr>
+                                    <td class="text-center">{$appName}</td>
+                                    <td>{$app.name}</td>
+                                    <td>{$app.description}<br><small class="small text-gray">{$app.version}</small></td>
+                                    <td>{$app.author}<br><small class="small text-gray">{$app.support}</small></td>
+                                    <td class="td-actions text-right">
+                                        <a class="btn btn-info btn-link" href="{url}service/profile/{$service.serviceId}">
+                                            <i class="material-icons">remove_red_eye</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {foreachelse}
+                                <tr>
+                                    <td class="text-center" colspan="6">{_ "hasNotDataYet"}</td>
+                                </tr>
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{map navBarButton}
+<a class="btn btn-info" href="{url}plugins/install">
+                      <span class="btn-label">
+                        <i class="material-icons">add_shopping_cart</i>
+                      </span>
+    {_ "add"} {_ "plugin"}
+    <div class="ripple-container"></div>
+</a>
+{/map}

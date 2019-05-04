@@ -49,7 +49,7 @@ spl_autoload_register(function ($class_name_call) {
 	}
 });
 
-
+define('PCVERSION' ,'1.0.0.1');
 require_once __DIR__ .DIRECTORY_SEPARATOR. 'app.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'controller.php';
 require_once __DIR__ .DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'component'.DIRECTORY_SEPARATOR.'pluginController.php';

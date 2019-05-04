@@ -87,7 +87,9 @@ class controller {
 	}
 
 	protected function pagination($total, $page, $number = 25 ){
+		if ( $page < 1 ) $page = 1 ;
 		$total = ceil($total / $number ) ;
+		if ( $page > $total ) $page = $total ;
 		$this->mold->set('pagination' , ['total' => $total ,'perEachPage' => $number , 'currentPage' => $page]);
 		return ['start' => ($page -1 ) * $number , 'limit' => $number];
 	}

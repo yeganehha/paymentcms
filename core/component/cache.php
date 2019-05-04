@@ -87,6 +87,22 @@ class cache {
 		}
 	}
 
+
+	public static function update($name, $data , $value ,$lifeTime = 30*24*60*60 , $app = null){
+		self::$name = $name ;
+		self::$app = $app;
+		if ( ! self::checkDataIsValidOrNo() ) return ;
+		if ( is_null($data) )
+			return false ;
+		else {
+			$temp = call_user_func( self::generateFunctionName('storage')) ;
+			$result = self::setVariable($data,$value , $temp );
+			if ( ! $result )
+ 				return false;
+			return self::save($temp,$name,$lifeTime , $app);
+		}
+	}
+
 	/**
 	 * @param      $name
 	 * @param null $app
@@ -111,7 +127,7 @@ class cache {
 				$return = null ;
 				if ( isset($data) and is_array($data)) {
 					foreach ( $data as $dataIndex => $dataValue ) {
-						if ( $return == '__CACHE_SYSTEM_DO_NOT_FIND_RESULT__' )
+						if ( $return[$dataIndex] == '__CACHE_SYSTEM_DO_NOT_FIND_RESULT__' )
 							break ;
 						if ( ($tempValue = self::getVariable($thenFind, $dataValue)) != '__CACHE_SYSTEM_DO_NOT_FIND_RESULT__')
 							$return[$dataIndex] = $tempValue ;
@@ -138,6 +154,45 @@ class cache {
 				return $data[$find];
 			else
 				return '__CACHE_SYSTEM_DO_NOT_FIND_RESULT__';
+	}
+
+	private static function setVariable ($find,$newValue,&$data) {
+		if ( ($dotPos = strpos($find,'.')) !== false) {
+			$nowFind = substr($find, 0 ,$dotPos);
+			$thenFind = substr($find,$dotPos+1);
+			if ( $nowFind == '*' ) {
+				$return = true ;
+				if ( isset($data) and is_array($data)) {
+					foreach ( $data as $dataIndex => $dataValue ) {
+						if ( $return == false )
+							break ;
+						if ( ($tempValue = self::setVariable($thenFind,$newValue, $dataValue)) == false)
+							$return = false ;
+					}
+				} elseif ( isset($data) and ! is_array($data)) {
+					if (isset($data[$nowFind])) {
+						$data[$nowFind] = $newValue;
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+				return $return;
+			} else {
+				if (isset($data[$nowFind])) {
+					return self::setVariable($thenFind,$newValue, $data[$nowFind]);
+				} else {
+					return false;
+				}
+			}
+		} else
+			if ( isset($data[$find])) {
+				$data[$find] = $newValue;
+				return true;
+			} else
+				return false;
 	}
 
 	private static function writeOnFile($data){

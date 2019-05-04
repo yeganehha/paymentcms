@@ -200,6 +200,26 @@ class App {
 		return file::get_name_folders(self::$appPatch);
 	}
 
+	public static function appsListWithConfig(){
+		$apps = file::get_name_folders(self::$appPatch);
+		$return = [];
+		if ( is_array($apps) ){
+			foreach ($apps as $app ){
+				$file_name = self::$appPatch.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'info.php';
+				if ( file_exists($file_name) ) {
+					$temp = require_once $file_name;
+					if ( isset($temp['info'])) {
+						$return[$app] = $temp['info'];
+						$return[$app]['status'] = cache::get('appStatus', $app ,'paymentCms');
+						if ( $return[$app]['status'] == null )
+							$return[$app]['status'] = 'notInstall';
+					}
+				}
+			}
+		}
+		return $return ;
+	}
+
 	public static function appsControllerList($app = null){
 		$result = [];
 		if ( $app != null ){
@@ -233,7 +253,7 @@ class App {
 			} else {
 				$files = file::get_files_by_pattern(self::$appPatch,'*'.DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.$controller.'.php');
 				if ( is_array($files) and count($files) > 0 ){
-					$appProvider = strings::deleteWordFirstString(strings::deleteWordLastString($files[0] ,DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php'),self::$appPatch);
+					$appProvider = strings::deleteWordFirstString(strings::deleteWordLastString($files[0] ,DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.$controller.'.php'),self::$appPatch);
 					$methods =  get_class_methods( 'App\\'.$appProvider.'\app_provider\\'.$app.'\\'.$controller) ;
 					for ( $i = count($methods) -1  ; $i >= 0 ; $i-- )
 						if ( strings::strFirstHas($methods[$i],'__'))

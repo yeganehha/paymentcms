@@ -1,0 +1,86 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-rose card-header-icon pointer"  data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">
+                        <div class="card-icon" >
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "plugins"}</h4>
+                    </div>
+                    <div class="collapse" id="searchServices">
+                        <div class="card-body">
+                            {set loadDivID,"#listToGetFromServer"}
+                            {set loadDivIDInHtml,"listToGetFromServer"}
+                            <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
+                                <div class="row">
+                                   <div class="col-md-8">
+                                       <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                       <div class="col-md-9">
+                                           <div class="form-group has-default">
+                                               <input type="text" name="name" class="form-control">
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <div class="col-md-4">
+                                       <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">{_ "close"}</button>
+                                       <button type="submit" class="btn btn-fill btn-rose">{_ "search"}</button>
+                                   </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            {foreach from=$apps key=key value=app}
+            <div class="col-md-4">
+                <div class="card card-product">
+                    <div class="card-header card-header-image" data-header-animation="true">
+                        <a href="#pablo">
+                            <img class="img" src="{$app.icon}">
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-actions text-center">
+                            <button type="button" class="btn btn-default btn-link" rel="tooltip" data-placement="bottom" title="View">
+                                <i class="material-icons">art_track</i>
+                            </button>
+                            <button type="button" class="btn btn-success btn-link" rel="tooltip" data-placement="bottom" title="Edit">
+                                <i class="material-icons">edit</i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-link" rel="tooltip" data-placement="bottom" title="Remove">
+                                <i class="material-icons">close</i>
+                            </button>
+                            <button type="button" class="btn btn-default btn-link" rel="tooltip" data-placement="bottom" title="{_ 'version'}">
+                                {$app.version}
+                            </button>
+                        </div>
+                        <h4 class="card-title">
+                            {$app.name}
+                        </h4>
+                        <div class="card-description">
+                            description come soon ...
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price">
+                            <h4>{_ "installedNumber"} : {$app.count}</h4>
+                        </div>
+                        <div class="stats">
+                            <p class="card-category"><i class="material-icons">person</i> {$app.author}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {foreachelse}
+            {_ "hasNotDataYet"}
+            {/foreach}
+            {view "[url patch]pagination.mold.html"}
+            </div>
+        </div>
+    </div>

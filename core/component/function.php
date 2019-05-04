@@ -33,6 +33,18 @@ function getUserAgent()
 	return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
 }
 
+function curl($url,$data){
+	$curl_conn = curl_init();
+	curl_setopt($curl_conn, CURLOPT_URL, $url);
+	curl_setopt($curl_conn, CURLOPT_POST, 1);
+	curl_setopt($curl_conn, CURLOPT_POSTFIELDS, $data);
+	curl_setopt($curl_conn, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($curl_conn, CURLOPT_RETURNTRANSFER, 1);
+	$output = curl_exec($curl_conn);
+	curl_close($curl_conn);
+	return $output;
+}
+
 function show($pram = null , $exit = true ){
 	echo '<pre>';
 	var_dump($pram);

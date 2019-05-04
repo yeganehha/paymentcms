@@ -89,7 +89,7 @@ abstract class model {
 
 
 
-	public function search( $searchVariable, $searchWhereClaus , $tableName = null , $fields = '*' , $orderBy = null ,$limit = null ) {
+	public function search( $searchVariable, $searchWhereClaus , $tableName = null , $fields = '*' , $orderBy = null ,$limit = null , $groupBy = null) {
 		if ($searchWhereClaus != null ) {
 			if (is_array($searchVariable)) {
 				self::$db->where($searchWhereClaus, $searchVariable);
@@ -102,6 +102,9 @@ abstract class model {
 		}
 		if ( $orderBy != null ){
 			self::$db->orderBy($orderBy['column'], $orderBy['type']);
+		}
+		if ( $groupBy != null ){
+			self::$db->groupBy($groupBy);
 		}
 		$results = self::$db->get($tableName, $limit,$fields );
 		return $this->returning($results) ;

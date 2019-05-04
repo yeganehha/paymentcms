@@ -28,6 +28,7 @@ return [
 	'field' => 'فیلد',
 	'management' => 'مدیریت',
 	'plugins' => 'پلاگین ها',
+	'plugin' => 'پلاگین',
 	'configuration' => 'تنظیمات',
 	'developer' => 'توسعه دهنده',
 	'success' => 'موفق',
@@ -104,6 +105,7 @@ return [
 	'hasNotTransactionYet' => 'پرداختی تا کنون ثبت نگردیده است!',
 	'hasNotDataYet' => 'داده‌ای تا کنون ثبت نگردیده است!',
 	'numberOfRecordsShowPerEachPage' => 'تعداد رکورد ها نمایش داده شده : ',
+	'version' => 'شماره نسخه',
 
 	/*
 	 * Validation Class
