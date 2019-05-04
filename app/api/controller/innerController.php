@@ -64,18 +64,24 @@ class innerController {
 	 *
 	 * @return \App\model\model
 	 */
-	protected static function model($model  , $searchVariable = null , $searchWhereClaus = null) {
-		$model = 'paymentCms\model\\'.$model ;
+	protected static function model($modelName  , $searchVariable = null , $searchWhereClaus = null) {
+		if (empty(\app::getAppProvider()))
+			$model = 'App\\' . \app::getApp() . '\model\\' . $modelName;
+		else
+			$model = 'App\\' . \app::getAppProvider() . '\model\\' . $modelName;
 		if (class_exists($model)) {
-			if ( $searchWhereClaus == null )
-				return new $model($searchVariable) ;
-			else
-				return new $model($searchVariable,$searchWhereClaus) ;
+			if ($searchWhereClaus == null) return new $model($searchVariable); else
+				return new $model($searchVariable, $searchWhereClaus);
 		} else {
-			\App\core\controller\httpErrorHandler::E500($model);
-			exit;
+			$model = 'paymentCms\model\\' . $modelName;
+			if (class_exists($model)) {
+				if ($searchWhereClaus == null) return new $model($searchVariable); else
+					return new $model($searchVariable, $searchWhereClaus);
+			} else {
+				App\core\controller\httpErrorHandler::E500($model);
+				exit;
+			}
 		}
-
 	}
 
 	protected static function callHooks($hookName,$variable){
