@@ -29,9 +29,14 @@
                                     <td>{$app.description}<br><small class="small text-gray">{$app.version}</small></td>
                                     <td>{$app.author}<br><small class="small text-gray">{$app.support}</small></td>
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-info btn-link" href="{url}service/profile/{$service.serviceId}">
-                                            <i class="material-icons">remove_red_eye</i>
-                                        </a>
+                                        {if $app.status == 'notInstall' }
+                                            <a class="btn btn-success" href="{url}plugins/installLocal/{$appName}">
+                                                <i class="material-icons">save</i> {_ "install"}
+                                            </a>
+                                            <a class="btn btn-danger" href="{url}plugins/deleteLocal/{$appName}">
+                                                <i class="material-icons">delete</i> {_ "delete"}
+                                            </a>
+                                        {/if}
                                     </td>
                                 </tr>
                                 {foreachelse}

@@ -4,9 +4,12 @@
 namespace App\admin\controller;
 
 
+use mysql_xdevapi\Exception;
+use paymentCms\component\cache;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
+use paymentCms\component\strings;
 use paymentCms\component\validate;
 use paymentCms\model\api;
 
@@ -35,6 +38,50 @@ class plugins extends \controller {
 		$this->mold->setPageTitle(rlang('plugins'));
 		$this->mold->set('activeMenu' , 'plugins');
 		$this->mold->set('apps' , $apps);
+	}
+
+	public function installLocal($app = null){
+		if ( is_null($app)){
+			Response::redirect(\app::getBaseAppLink('plugins/lists'));
+			return false;
+		}
+		$appStatus = cache::get('appStatus', $app ,'paymentCms');
+		if ( $appStatus == null ){
+			$file_name = payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'info.php';
+			if ( file_exists($file_name) ) {
+				$appData = require_once $file_name;
+				if ( isset($appData['db']) and !  is_null($appData['db'])) {
+					$query = $this->generateQueryCreatTable($appData['db']);
+					model::transaction();
+					try {
+						if ( model::queryUnprepared($query) ) {
+							model::commit();
+							$this->changeCacheOfAppStatus($app,'deActive');
+							$this->alert('success' ,null ,rlang('appInstalled'));
+							$this->lists();
+							return true;
+						}
+					} catch (Exception $exception){
+						model::rollback();
+						$this->alert('danger' ,null ,rlang('pleaseTryAGain'));
+						$this->lists();
+						return true;
+					}
+				} else {
+					$this->changeCacheOfAppStatus($app,'deActive');
+					$this->alert('success' ,null ,rlang('appInstalled'));
+					$this->lists();
+					return true;
+				}
+			} else {
+				$this->alert('danger', null, rlang('cantFindInfo.php') . '<br>' . $file_name);
+				$this->lists();
+				return false;
+			}
+		} else {
+			$this->lists();
+			return true;
+		}
 	}
 
 	public function install(){
@@ -248,5 +295,41 @@ class plugins extends \controller {
 	private function generateAllAppsStatus(){
 		$links = model::searching(null, null, 'apps_link');
 		return cache::save($links, 'apps_link', PHP_INT_MAX, 'paymentCms');
+	}
+
+	private function generateQueryCreatTable($tables){
+		$query = '';
+		if ( is_array($tables) ) {
+			foreach ( $tables as $tableName => $tableData) {
+				$query .= 'CREATE TABLE IF NOT EXISTS `'.$tableName.'` ('.chr(10) ;
+				foreach ( $tableData['fields'] as $fieldName => $fieldData) {
+					$query .= '  `'.$fieldName.'` '.$fieldData.','.chr(10) ;
+				}
+				if ( isset($tableData['PRIMARY KEY']) and is_array($tableData['PRIMARY KEY']) and ! is_null($tableData['PRIMARY KEY'])) {
+					foreach ($tableData['PRIMARY KEY'] as $fieldName) {
+						$query .= ' PRIMARY KEY (`'.$fieldName.'`) USING BTREE,'.chr(10);
+					}
+				}
+				if ( isset($tableData['KEY']) and is_array($tableData['KEY']) and ! is_null($tableData['KEY'])) {
+					foreach ($tableData['KEY'] as $fieldName) {
+						$query .= ' KEY `'.$fieldName.'` (`'.$fieldName.'`),'.chr(10);
+					}
+				}
+				if ( isset($tableData['REFERENCES']) and is_array($tableData['REFERENCES']) and ! is_null($tableData['REFERENCES'])) {
+					foreach ($tableData['REFERENCES'] as $fieldName => $fieldData) {
+						$query .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
+					}
+				}
+				$query = strings::deleteWordLastString($query,','.chr(10) ).chr(10);
+				$query .= ') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;'.chr(10).chr(10);
+
+			}
+		}
+		return $query ;
+	}
+	private function changeCacheOfAppStatus($app , $status ){
+		$appStatus = cache::get('appStatus', null  ,'paymentCms');
+		$appStatus[$app] = $status ;
+		cache::save($appStatus,'appStatus' , PHP_INT_MAX , 'paymentCms');
 	}
 }

@@ -205,9 +205,9 @@ class App {
 		$return = [];
 		if ( is_array($apps) ){
 			foreach ($apps as $app ){
-				$file_name = self::$appPatch.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'info.php';
+				$file_name = self::$appPatch.$app.DIRECTORY_SEPARATOR.'info.php';
 				if ( file_exists($file_name) ) {
-					$temp = require_once $file_name;
+					$temp = require $file_name;
 					if ( isset($temp['info'])) {
 						$return[$app] = $temp['info'];
 						$return[$app]['status'] = cache::get('appStatus', $app ,'paymentCms');
