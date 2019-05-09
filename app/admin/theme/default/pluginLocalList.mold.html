@@ -23,16 +23,13 @@
                                 </thead>
                                 <tbody>
                                 {foreach from=$apps key=appName value=app}
-                                <tr>
+                                <tr id="app_{$appName}">
                                     <td class="text-center">{$appName}</td>
                                     <td>{$app.name}</td>
                                     <td>{$app.description}<br><small class="small text-gray">{$app.version}</small></td>
                                     <td>{$app.author}<br><small class="small text-gray">{$app.support}</small></td>
                                     <td class="td-actions text-right">
                                         {if $app.status == 'notInstall' }
-                                            <a class="btn btn-success" href="{url}plugins/installingLocal/{$appName}">
-                                                <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "install"} {_ "and"} {_ "activing"}
-                                            </a>
                                             <a class="btn btn-success" href="{url}plugins/installLocal/{$appName}">
                                                 <i class="material-icons">save</i> {_ "install"}
                                             </a>
@@ -45,6 +42,10 @@
                                             </a>
                                             <a class="btn btn-danger" href="{url}plugins/uninstallLocal/{$appName}">
                                                 <i class="material-icons">delete</i> {_ "delete"}
+                                            </a>
+                                        {elseif $app.status == 'active' }
+                                            <a class="btn btn-danger" href="{url}plugins/deActive/{$appName}">
+                                                <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "deActive"}
                                             </a>
                                         {/if}
                                     </td>
