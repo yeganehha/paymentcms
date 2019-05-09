@@ -30,10 +30,20 @@
                                     <td>{$app.author}<br><small class="small text-gray">{$app.support}</small></td>
                                     <td class="td-actions text-right">
                                         {if $app.status == 'notInstall' }
+                                            <a class="btn btn-success" href="{url}plugins/installingLocal/{$appName}">
+                                                <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "install"} {_ "and"} {_ "activing"}
+                                            </a>
                                             <a class="btn btn-success" href="{url}plugins/installLocal/{$appName}">
                                                 <i class="material-icons">save</i> {_ "install"}
                                             </a>
-                                            <a class="btn btn-danger" href="{url}plugins/deleteLocal/{$appName}">
+                                            <a class="btn btn-danger" href="{url}plugins/uninstallLocal/{$appName}">
+                                                <i class="material-icons">delete</i> {_ "delete"}
+                                            </a>
+                                        {elseif $app.status == 'deActive' }
+                                            <a class="btn btn-success" href="{url}plugins/installing/{$appName}">
+                                                <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "activing"}
+                                            </a>
+                                            <a class="btn btn-danger" href="{url}plugins/uninstallLocal/{$appName}">
                                                 <i class="material-icons">delete</i> {_ "delete"}
                                             </a>
                                         {/if}

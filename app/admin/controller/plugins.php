@@ -6,6 +6,7 @@ namespace App\admin\controller;
 
 use mysql_xdevapi\Exception;
 use paymentCms\component\cache;
+use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -83,6 +84,46 @@ class plugins extends \controller {
 			return true;
 		}
 	}
+
+	public function uninstallLocal($app = null){
+			if ( is_null($app)){
+				Response::redirect(\app::getBaseAppLink('plugins/lists'));
+				return false;
+			}
+			$file_name = payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'info.php';
+			if ( file_exists($file_name) ) {
+				$appData = require_once $file_name;
+				if ( isset($appData['db']) and !  is_null($appData['db'])) {
+					$query = $this->generateQueryDropTable($appData['db']);
+					model::transaction();
+					try {
+						if ( model::queryUnprepared($query) ) {
+							model::commit();
+							file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
+							$this->changeCacheOfAppStatus($app,null);
+							$this->alert('success' ,null ,rlang('appUninstalled'));
+							$this->lists();
+							return true;
+						}
+					} catch (Exception $exception){
+						model::rollback();
+						$this->alert('danger' ,null ,rlang('pleaseTryAGain'));
+						$this->lists();
+						return true;
+					}
+				} else {
+					file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
+					$this->changeCacheOfAppStatus($app,null);
+					$this->alert('success' ,null ,rlang('appInstalled'));
+					$this->lists();
+					return true;
+				}
+			} else {
+				$this->alert('danger', null, rlang('cantFindInfo.php') . '<br>' . $file_name);
+				$this->lists();
+				return false;
+			}
+		}
 
 	public function install(){
 		$get = request::post('page=1,perEachPage=25,name' ,null);
@@ -327,9 +368,21 @@ class plugins extends \controller {
 		}
 		return $query ;
 	}
+	private function generateQueryDropTable($tables){
+		$query = '';
+		if ( is_array($tables) ) {
+			foreach ( $tables as $tableName => $tableData) {
+				$query .= 'DROP TABLE IF EXISTS `'.$tableName.'` ;'.chr(10) ;
+			}
+		}
+		return $query ;
+	}
 	private function changeCacheOfAppStatus($app , $status ){
 		$appStatus = cache::get('appStatus', null  ,'paymentCms');
-		$appStatus[$app] = $status ;
+		if ( $status == null )
+			unset($appStatus[$app]);
+		else
+			$appStatus[$app] = $status ;
 		cache::save($appStatus,'appStatus' , PHP_INT_MAX , 'paymentCms');
 	}
 }
