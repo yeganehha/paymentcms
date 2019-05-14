@@ -35,18 +35,18 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid" id="listToGetFromServer">
         <div class="row">
             {foreach from=$apps key=key value=app}
             <div class="col-md-4">
                 <div class="card card-product">
-                    <div class="card-header card-header-image" data-header-animation="true">
+                    <div class="card-header card-header-image" data-header-animation="false">
                         <a href="#pablo">
                             <img class="img" src="{$app.icon}">
                         </a>
                     </div>
                     <div class="card-body">
-                        <div class="card-actions text-center">
+                        <div class="card-actions text-center" style="display: none">
                             <button type="button" class="btn btn-default btn-link" rel="tooltip" data-placement="bottom" title="View">
                                 <i class="material-icons">art_track</i>
                             </button>
@@ -69,10 +69,11 @@
                     </div>
                     <div class="card-footer">
                         <div class="price">
-                            <h4>{_ "installedNumber"} : {$app.count}</h4>
+                            <a href="{url}plugins/installLocal/{$app.name}" class="btn btn-info">{_ "install"}</a>
                         </div>
                         <div class="stats">
-                            <p class="card-category"><i class="material-icons">person</i> {$app.author}</p>
+                            <p class="card-category"><i class="fa fa-user"></i> {$app.author} </p>
+                            <p class="card-category mr-3 ml-3" > {_ "installedNumber"} : {$app.count} </p>
                         </div>
                     </div>
                 </div>
