@@ -117,6 +117,12 @@ class App {
 			if (file_exists($controllerPatch)) {
 				if (class_exists('App\\'.self::$app.'\controller\\'.$controller)) {
 					array_shift(self::$url);
+					if ( ! self::checkAppIsInstalled(self::$app,false) ){
+						self::$app = 'core';
+						self::$controller = 'httpErrorHandler';
+						self::$method = 'E404';
+						return false ;
+					}
 					self::$controller = $controller;
 					return true ;
 				} else {
@@ -131,6 +137,12 @@ class App {
 					$appProvider = strings::deleteWordFirstString(strings::deleteWordLastString($files[0] ,DIRECTORY_SEPARATOR.'app_provider'.DIRECTORY_SEPARATOR.self::$app.DIRECTORY_SEPARATOR.$controller.'.php'),self::$appPatch);
 					if (class_exists('App\\'.$appProvider.'\app_provider\\'.self::$app.'\\'.$controller)) {
 						array_shift(self::$url);
+						if ( ! self::checkAppIsInstalled($appProvider,true) or ! self::checkAppIsInstalled(self::$app,false) ){
+							self::$app = 'core';
+							self::$controller = 'httpErrorHandler';
+							self::$method = 'E404';
+							return false ;
+						}
 						self::$controller = $controller;
 						self::$appProvider = $appProvider;
 						return true ;
@@ -142,6 +154,18 @@ class App {
 		return true ;
 	}
 
+	private static function checkAppIsInstalled($app,$isAppProvider = false){
+		if ( $app == 'core' )
+			return true ;
+		$statusApp = cache::get('appStatus' ,$app,'paymentCms');
+		if ( $statusApp != 'active' )
+			return false ;
+		if ( $isAppProvider )
+			self::$appProvider = $app;
+		else
+			self::$app = $app ;
+		return true;
+	}
 
 	/**
 	 *
