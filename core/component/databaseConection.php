@@ -473,7 +473,7 @@ class database {
 	 * @return bool|mysqli_result
 	 * @throws Exception
 	 */
-	private function queryUnprepared($query)
+	public function queryUnprepared($query)
 	{
 		// Execute query
 		$stmt = $this->mysqli()->query($query);

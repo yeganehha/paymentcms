@@ -16,6 +16,13 @@ This set of fonts are used in this project under the license: (.....)
 --------------------------------------------------------------------------------------
 *	
 **/
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/fontIcon.woff2') format('woff2');
+}
 @font-face {
 	font-family: IRANSans;
 	font-style: normal;

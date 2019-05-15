@@ -8,16 +8,20 @@ return [
 		'support' => 'http://erfanebrahimi.ir',
 	] ,
 	'db' => [
-		'table name' => [
+		'test1' => [
 			'fields' => [
-				'field name' => 'field Value for install',
+				'testId' => 'INT NOT NULL AUTO_INCREMENT',
+				'factorId' => 'INT NOT NULL',
+				'name' => 'TEXT NULL DEFAULT NULL',
+				'chart' => "VARCHAR(65) NULL DEFAULT 'test'",
 			],
-			'primaryKeys' => [
-				'fieldId',
-				'FieldId2'
+			'KEY' => [
 			],
-			'relationship' => [
-				'tabel oaction ' => 'filds'
+			'PRIMARY KEY' => [
+				'testId'
+			],
+			'REFERENCES' => [
+				'factorId' => [ 'table' => 'invoice' , 'column' => 'invoiceId' , 'on_delete' => 'RESTRICT' , 'on_update' => 'RESTRICT' ]
 			]
 		]
 	]
