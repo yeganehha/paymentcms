@@ -197,8 +197,9 @@ class plugins extends \controller {
 	private function generateQueryCreatTable($tables){
 		$query = '';
 		if ( is_array($tables) ) {
+			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			foreach ( $tables as $tableName => $tableData) {
-				$query .= 'CREATE TABLE IF NOT EXISTS `'.$tableName.'` ('.chr(10) ;
+				$query .= 'CREATE TABLE IF NOT EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ('.chr(10) ;
 				foreach ( $tableData['fields'] as $fieldName => $fieldData) {
 					$query .= '  `'.$fieldName.'` '.$fieldData.','.chr(10) ;
 				}
@@ -227,8 +228,9 @@ class plugins extends \controller {
 	private function generateQueryDropTable($tables){
 		$query = '';
 		if ( is_array($tables) ) {
+			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			foreach ( $tables as $tableName => $tableData) {
-				$query .= 'DROP TABLE IF EXISTS `'.$tableName.'` ;'.chr(10) ;
+				$query .= 'DROP TABLE IF EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ;'.chr(10) ;
 			}
 		}
 		return $query ;

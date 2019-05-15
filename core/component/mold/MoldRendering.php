@@ -255,6 +255,57 @@ class MoldRendering {
 		}
 	}
 
+	private function _func($data){
+		if ( !$this->engineStatus )
+			return ;
+		if (preg_match('/(method)( *)=/', $data['otherValues']) ) {
+
+			$re = '/(method)\s*=\s*(["\'])(?:(?=(\\\\?))\3.)*?\2/';
+			preg_match_all($re, $data['otherValues'], $matches, PREG_SET_ORDER, 0);
+			if ( count($matches) != 1 )
+				die('error in func function!(method is required and unique)');
+			$method = explode($matches[0][2] , $matches[0][0])[1];
+			$data['otherValues'] = str_replace($matches[0][0] ,'', $data['otherValues']);
+
+			$re = '/(class)\s*=\s*(["\'])(?:(?=(\\\\?))\3.)*?\2/';
+			preg_match_all($re, $data['otherValues'], $matches, PREG_SET_ORDER, 0);
+			if ( count($matches) != 1 )
+				die('error in func function!(class is required and unique)');
+			$class = explode($matches[0][2] , $matches[0][0])[1];
+			$data['otherValues'] = str_replace($matches[0][0] ,'', $data['otherValues']);
+
+			$re = '/([\S]+)\s*=\s*([\S]+)/';
+			preg_match_all($re, $data['otherValues'], $matches, PREG_SET_ORDER, 0);
+			for( $i = 0 ; $i < count($matches ) ; $i++ ){
+				$dataOfMethod [ trim(strtolower(str_replace(["\"","'"],"" , $matches[$i][1]))) ] = $matches[$i][2];
+			}
+			if ( isset($dataOfMethod['set']) ){
+				$set = $dataOfMethod['set'];
+				unset($dataOfMethod['set']);
+			}
+//			if () {
+				$format = '';
+				if ( ! empty($dataOfMethod) ){
+					$formats = null ;
+					foreach ( $dataOfMethod as $variable => $value ){
+						$formats[] = '"'.$variable.'" => '.$value ;
+					}
+					$format = implode(' , ' , $formats);
+				}
+				if ( isset($set) ){
+					$this->replace($data['find'], '$moldData->set(' . trim($set) . ' , $moldData->CallUserFunction("'.$class.'","'.$method.'",['.$format.'] ) );');
+				} else {
+					if ( $this->runFromPhp ) {
+						$this->replace($data['find'], ' $moldData->CallUserFunction("'.$class.'","'.$method.'",['.$format.'] ) ');
+					}else
+						$this->replace($data['find'], 'echo $moldData->CallUserFunction("'.$class.'","'.$method.'",['.$format.'] ) ; ');
+				}
+//			}
+		} else {
+			die('error in func function!(method is required)');
+		}
+	}
+
 	private function _for($data){
 		if ( !$this->engineStatus )
 			return ;

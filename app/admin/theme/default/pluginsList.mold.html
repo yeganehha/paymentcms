@@ -71,9 +71,11 @@
                         <div class="price">
                             <a href="{url}plugins/installLocal/{$app.name}" class="btn btn-info">{_ "install"}</a>
                         </div>
+                        {func method="isAppActive" class="App\admin\controller\plugins_mold" set="setValue" app=$app.name version=$app.version}
                         <div class="stats">
                             <p class="card-category"><i class="fa fa-user"></i> {$app.author} </p>
                             <p class="card-category mr-3 ml-3" > {_ "installedNumber"} : {$app.count} </p>
+                            <p class="card-category mr-3 ml-3" > {$setValue} </p>
                         </div>
                     </div>
                 </div>

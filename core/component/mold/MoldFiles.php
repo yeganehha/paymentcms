@@ -427,7 +427,7 @@ class MoldFiles {
 	}
 
 	private function generateCacheFilePath($currentTemplate){
-		return $this->directorySeparator(\app::getAppPath('cache/theme/',$currentTemplate['app']).md5($currentTemplate['path']).'.'.$currentTemplate['file'].'.php' ) ;
+		return $this->directorySeparator(\app::getAppPath('cache/theme/',$currentTemplate['app']).$currentTemplate['file'].'.'.md5($currentTemplate['path']).'.php' ) ;
 	}
 
 	private function directorySeparator($directory){

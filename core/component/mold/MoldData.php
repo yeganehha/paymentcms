@@ -108,4 +108,14 @@ class MoldData {
 	public function d() {
 		return $this->data;
 	}
+
+	public function CallUserFunction($class,$method,$data){
+		if ( class_exists($class) ){
+			$object = new $class();
+			if ( method_exists($object,$method) and is_callable([$object,$method])){
+				return call_user_func_array([$object,$method],$data);
+			}
+		}
+		return 'Function Error!';
+	}
 }
