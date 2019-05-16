@@ -168,6 +168,16 @@ class Mold {
 	}
 
 	/**
+	 * get path of file to be read and then compile
+	 * @link https://pinoox.com/documnet/mold/methods/getPath
+	 * @return array['folder','app'] :
+	 * @example ->getPath();
+	 */
+	public function getPath(){
+		return $this->moldFiles->getPath();
+	}
+
+	/**
 	 * push file in to the list of file should compile after header and before footer
 	 * @link https://pinoox.com/documnet/mold/methods/view
 	 * @param string : name of file that should compile

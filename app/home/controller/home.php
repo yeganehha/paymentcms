@@ -31,14 +31,13 @@ class home extends \controller {
 		if ( request::isPost() ){
 			return $this->checkData($serviceId);
 		}
-		$service = service::info($serviceId);
+		$service = service::info($serviceId,$this->mold);
 		if ( ! $service['status'] ){
 			$this->mold->offAutoCompile();
 			\App\core\controller\httpErrorHandler::E404();
 			return ;
 		}
 		$this->mold->set('service',$service['result']['service']);
-		$this->mold->set('fields',$service['result']['fields']);
 		$this->mold->view('home.mold.html');
 	}
 
@@ -49,14 +48,13 @@ class home extends \controller {
 			Response::redirect($result['result']['link']);
 		} else {
 			$this->alert('danger' , '',$result['massage']);
-			$service = service::info($serviceId);
+			$service = service::info($serviceId,$this->mold);
 			if ( ! $service['status'] ){
 				$this->mold->offAutoCompile();
 				\App\core\controller\httpErrorHandler::E404();
 				return ;
 			}
 			$this->mold->set('service',$service['result']['service']);
-			$this->mold->set('fields',$service['result']['fields']);
 			$this->mold->view('home.mold.html');
 		}
 	}

@@ -34,6 +34,7 @@ class field extends model implements modelInterFace  {
 	private $values ;
 	private $regex ;
 	private $serviceId ;
+	private $serviceType ;
 	private $status ;
 	private $orderNumber ;
 
@@ -45,6 +46,7 @@ class field extends model implements modelInterFace  {
 		$this->values = $result['values'] ;
 		$this->regex = $result['regex'] ;
 		$this->serviceId = $result['serviceId'] ;
+		$this->serviceType = $result['serviceType'] ;
 		$this->status = $result['status'] ;
 		$this->orderNumber = $result['orderNumber'] ;
 	}
@@ -148,6 +150,7 @@ class field extends model implements modelInterFace  {
 		$array['values'] = $this->values ;
 		$array['regex'] = $this->regex ;
 		$array['serviceId'] = $this->serviceId ;
+		$array['serviceType'] = $this->serviceType ;
 		$array['status'] = $this->status ;
 		$array['orderNumber'] = $this->orderNumber ;
 		return $array ;
@@ -166,6 +169,20 @@ class field extends model implements modelInterFace  {
 	 */
 	public function getPrimaryKeyShouldNotInsertOrUpdate() {
 		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getServiceType() {
+		return $this->serviceType;
+	}
+
+	/**
+	 * @param mixed $serviceType
+	 */
+	public function setServiceType($serviceType) {
+		$this->serviceType = $serviceType;
 	}
 
 

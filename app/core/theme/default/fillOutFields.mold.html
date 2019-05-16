@@ -1,0 +1,62 @@
+{map fillOutFieldServiceForm}
+{if is_array($fields)}
+{foreach from=$fields key=key value=field}
+{if $field.type == 'textarea'}
+<div class="col-md-12">
+    <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+    <div class="col-md-10">
+        <div class="form-check">
+            <textarea rows="4" cols="50"  class="form-control" id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" >{$field.values}</textarea>
+        </div>
+    </div>
+</div>
+{elseif $field.type == 'checkbox'}
+<div class="col-md-12">
+    <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+    <div class="col-md-10">
+        {foreach from=$field.values key=keyValue value=value}
+        <div class="form-check">
+            <label class="form-check-label">
+                <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]" > {$value}
+                <span class="form-check-sign"><span class="check"></span></span>
+            </label>
+        </div>
+        {/foreach}
+    </div>
+</div>
+{elseif $field.type == 'radio'}
+<div class="col-md-12">
+    <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+    <div class="col-md-10">
+        {foreach from=$field.values key=keyValue value=value}
+        <div class="form-check">
+            <label class="form-check-label">
+                <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" > {$value}
+                <span class="circle"><span class="check"></span></span>
+            </label>
+        </div>
+        {/foreach}
+    </div>
+</div>
+{elseif $field.type == 'select'}
+<div class="col-md-12">
+    <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+    <div class="col-md-10">
+        <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" {if $field.status  == 'required'}required{/if} data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
+        {foreach from=$field.values key=keyValue value=value}
+        <option value="{$value}"  >{$value}</option>
+        {/foreach}
+        </select>
+    </div>
+</div>
+{else}
+<div class="col-md-12">
+    <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+    <div class="col-md-10">
+        <input type="{$field.type}"  id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" value="{$field.values}" class="form-control">
+    </div>
+</div>
+{/if}
+{/foreach}
+{/if}
+{/map}

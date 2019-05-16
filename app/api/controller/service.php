@@ -4,6 +4,8 @@
 namespace App\api\controller;
 
 
+use App\core\controller\fieldService;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
@@ -26,7 +28,7 @@ class service extends innerController {
 		return $this->info($serviceId);
 	}
 
-	public static function info($serviceId){
+	public static function info($serviceId,&$mold = null){
 		/* @var \paymentCms\model\service $model */
 		$model = self::model('service',$serviceId);
 		if ( is_null($model->getServiceId()) ){
@@ -35,16 +37,9 @@ class service extends innerController {
 		if ( $model->getStatus() != true ){
 			return self::jsonError('service not found!' ,403 );
 		}
-		/* @var \paymentCms\model\field $fieldModel */
-		$fieldModel = self::model('field') ;
-		$fields = $fieldModel->search([$serviceId,'admin' , 'invisible' ],'serviceId = ? and status != ? and status != ?',null,'*',['column'=>'orderNumber' , 'type' => 'desc' ]);
-		if ( $fields === true)
-			$fields = [] ;
 
-		foreach ($fields as $key => $field){
-			if ( $field['type'] == 'checkbox' or $field['type'] == 'radio' or $field['type'] == 'select' )
-				$fields[$key]['values'] = explode(',', $field['values']);
-		}
+		$fields = fieldService::getFieldsToFillOut($serviceId,'service' ,$mold);
+
 		return self::json(['service' => $model->returnAsArray() , 'fields' => $fields]);
 	}
 }
