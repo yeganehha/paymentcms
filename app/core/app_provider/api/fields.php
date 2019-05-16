@@ -104,4 +104,49 @@ class fields extends \App\api\controller\innerController {
 			return self::jsonError($exception->getMessage(),500);
 		}
 	}
+
+
+	public static function fillOutForm($serviceId , $serviceType , $data , $objectId ){
+		$fields = self::getFieldsToEdit($serviceId,$serviceType , ['admin' , 'invisible'] , true);
+		if (!empty($fields) and is_array($fields)) {
+			foreach ($fields['result'] as $key => $field) {
+				$regix = null;
+				if ($field['regex'] != null) {
+					$regix = explode(',', $field['regex']);
+				}
+				if ($field['status'] == 'required') {
+					$regix[] = 'required';
+				}
+				if ($regix == null or count($regix) == 0)
+					continue;
+				$rules[$field['fieldId']] = [implode('|', array_unique(array_filter($regix))), $field['title']];
+			}
+		}
+		if (isset($rules)) {
+			$valid = validate::check($data, $rules);
+			if ($valid->isFail()) {
+				return self::jsonError($valid->errorsIn());
+			}
+		}
+		if ( is_array($data) and ! empty($data) ){
+			model::transaction();
+			foreach ( $data as $fieldId => $fieldValue){
+				if ( $fieldValue == null )
+					continue ;
+				/* @var \paymentCms\model\fieldvalue $fieldValueModel */
+				$fieldValueModel = self::model('fieldvalue') ;
+				$fieldValueModel->setObjectId($objectId);
+				$fieldValueModel->setFieldId($fieldId);
+				$fieldValueModel->setValue($fieldValue);
+				$fieldValueStatus = $fieldValueModel->insertToDataBase();
+				if ( ! $fieldValueStatus ) {
+					model::rollback();
+					return self::jsonError(rlang('canNotInsertFieldValue'),500);
+				}
+			}
+			model::commit();
+			return self::json(null);
+		}
+		return self::json(null);
+	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\user\app_provider\user;
+namespace App\user\app_provider\api;
 
 /**
  * Created by Yeganehha .
@@ -19,8 +19,8 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class user extends \App\api\controller\innerController  {
 
-	public static function getUserId($userData) {
-
+	public static function getUserId($whereValue , $whereClause) {
+		return self::model('user',$whereValue , $whereClause ) ;
 	}
 
 }

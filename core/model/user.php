@@ -17,7 +17,7 @@
 // *************************************************************************
 
 
-namespace App\user\model;
+namespace paymentCms\model;
 
 use paymentCms\component\model;
 use paymentCms\component\security;

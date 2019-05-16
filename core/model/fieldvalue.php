@@ -24,16 +24,16 @@ use paymentCms\component\model ;
 
 class fieldvalue extends model implements modelInterFace  {
 
-	private $primaryKey = ['fieldId','invoiceId'];
+	private $primaryKey = ['fieldId','objectId'];
 	private $primaryKeyShouldNotInsertOrUpdate = null;
 	private $fieldId ;
-	private $invoiceId ;
+	private $objectId ;
 	private $value ;
 
 
 	public function setFromArray($result) {
 		$this->fieldId = $result['fieldId'] ;
-		$this->invoiceId = $result['invoiceId'] ;
+		$this->objectId = $result['objectId'] ;
 		$this->value = $result['value'] ;
 	}
 
@@ -42,8 +42,8 @@ class fieldvalue extends model implements modelInterFace  {
 	}
 
 
-	public function setInvoiceId( $invoiceId = null ) {
-		$this->invoiceId = $invoiceId ;
+	public function setObjectId( $objectId = null ) {
+		$this->objectId = $objectId ;
 	}
 
 
@@ -57,8 +57,8 @@ class fieldvalue extends model implements modelInterFace  {
 	}
 
 
-	public function getInvoiceId() {
-		return $this->invoiceId ;
+	public function getObjectId() {
+		return $this->objectId ;
 	}
 
 
@@ -69,7 +69,7 @@ class fieldvalue extends model implements modelInterFace  {
 
 	public function returnAsArray( ) {
 		$array['fieldId'] = $this->fieldId ;
-		$array['invoiceId'] = $this->invoiceId ;
+		$array['objectId'] = $this->objectId ;
 		$array['value'] = $this->value ;
 		return $array ;
 	}

@@ -50,4 +50,8 @@ class fieldService extends \controller {
 	public static function updateFields($serviceId,$serviceType,$fields,$deletedFields=null){
 		return \App\core\app_provider\api\fields::updateFields($serviceId,$serviceType , $fields , $deletedFields);
 	}
+
+	public static function fillOutForm($serviceId,$serviceType,$data,$objectId){
+		return \App\core\app_provider\api\fields::fillOutForm($serviceId,$serviceType , $data , $objectId);
+	}
 }

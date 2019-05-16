@@ -14,7 +14,7 @@
 <div class="col-md-12">
     <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
     <div class="col-md-10">
-        {foreach from=$field.values key=keyValue value=value}
+        {foreach from=$field.valuesDe key=keyValue value=value}
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]" > {$value}
@@ -28,7 +28,7 @@
 <div class="col-md-12">
     <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
     <div class="col-md-10">
-        {foreach from=$field.values key=keyValue value=value}
+        {foreach from=$field.valuesDe key=keyValue value=value}
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" > {$value}
@@ -43,7 +43,7 @@
     <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
     <div class="col-md-10">
         <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" {if $field.status  == 'required'}required{/if} data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
-        {foreach from=$field.values key=keyValue value=value}
+        {foreach from=$field.valuesDe key=keyValue value=value}
         <option value="{$value}"  >{$value}</option>
         {/foreach}
         </select>
