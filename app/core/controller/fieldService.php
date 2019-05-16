@@ -51,7 +51,11 @@ class fieldService extends \controller {
 		return \App\core\app_provider\api\fields::updateFields($serviceId,$serviceType , $fields , $deletedFields);
 	}
 
-	public static function fillOutForm($serviceId,$serviceType,$data,$objectId){
-		return \App\core\app_provider\api\fields::fillOutForm($serviceId,$serviceType , $data , $objectId);
+	public static function fillOutForm($serviceId,$serviceType,$data,$objectId , $objectType){
+		return \App\core\app_provider\api\fields::fillOutForm($serviceId,$serviceType , $data , $objectId , $objectType);
+	}
+
+	public static function showFilledOutForm($serviceId,$serviceType,$objectId , $objectType){
+		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType);
 	}
 }

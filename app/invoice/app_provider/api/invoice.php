@@ -101,7 +101,7 @@ class invoice extends \App\api\controller\innerController {
 			$itemsModel->setInvoiceId($invoiceModel->getInvoiceId());
 			$itemId = $itemsModel->insertToDataBase();
 			if ( $itemId !== false ){
-				$resultFillOutForm = fieldService::fillOutForm($service['serviceId'],'service',$data['customField'],$invoiceModel->getInvoiceId());
+				$resultFillOutForm = fieldService::fillOutForm($service['serviceId'],'service',$data['customField'],$invoiceModel->getInvoiceId() , 'invoice');
 				if ( ! $resultFillOutForm['status'] )
 					$error = $resultFillOutForm['massage'];
 			} else {

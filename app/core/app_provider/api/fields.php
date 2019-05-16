@@ -9,6 +9,7 @@ use mysql_xdevapi\Exception;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\security;
+use paymentCms\component\strings;
 use paymentCms\component\validate;
 
 /**
@@ -28,12 +29,20 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class fields extends \App\api\controller\innerController {
 
-	public static function getFieldsToEdit($serviceId , $serviceType , $statusNotBe = null , $defineKeys = false ){
+	public static function getFieldsToEdit($serviceId , $serviceType , $statusNotBe = null , $defineKeys = false , $fieldsId = null ){
 		/* @var \paymentCms\model\field $fieldModel */
 		$fieldModel = self::model('field') ;
-		$searchWhere = 'serviceId = ? and serviceType = ? ';
-		$searchValue[] = $serviceId ;
+		$searchWhere = ' serviceType = ? and ( 0 ';
 		$searchValue[] = $serviceType ;
+		if ( $serviceId != null ){
+			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($serviceId)),', ').')' ;
+			$searchValue = array_merge($searchValue,$serviceId);
+		}
+		if ( $fieldsId != null ){
+			$searchWhere .= ' or fieldId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($fieldsId)),', ').')' ;
+			$searchValue = array_merge($searchValue,$fieldsId);
+		}
+		$searchWhere .= ' ) ';
 		if ( $statusNotBe != null ){
 			if ( is_array($statusNotBe) ){
 				foreach ($statusNotBe as $statusOne ) {
@@ -106,7 +115,7 @@ class fields extends \App\api\controller\innerController {
 	}
 
 
-	public static function fillOutForm($serviceId , $serviceType , $data , $objectId ){
+	public static function fillOutForm($serviceId , $serviceType , $data , $objectId , $objectType ){
 		$fields = self::getFieldsToEdit($serviceId,$serviceType , ['admin' , 'invisible'] , true);
 		if (!empty($fields) and is_array($fields)) {
 			foreach ($fields['result'] as $key => $field) {
@@ -136,6 +145,7 @@ class fields extends \App\api\controller\innerController {
 				/* @var \paymentCms\model\fieldvalue $fieldValueModel */
 				$fieldValueModel = self::model('fieldvalue') ;
 				$fieldValueModel->setObjectId($objectId);
+				$fieldValueModel->setObjectType($objectType);
 				$fieldValueModel->setFieldId($fieldId);
 				$fieldValueModel->setValue($fieldValue);
 				$fieldValueStatus = $fieldValueModel->insertToDataBase();
@@ -148,5 +158,26 @@ class fields extends \App\api\controller\innerController {
 			return self::json(null);
 		}
 		return self::json(null);
+	}
+
+	public static function showFilledOutForm($serviceId , $serviceType , $objectId , $objectType ){
+		/* @var \paymentCms\model\fieldvalue $fieldValueModel */
+		$fieldValueModel = self::model('fieldvalue') ;
+		$fieldsFill = [] ;
+		$fieldsFillTemp = $fieldValueModel->search([$objectId,$objectType],'objectId = ? and objectType = ? ' ,'fieldvalue'  );
+		if ( is_array($fieldsFillTemp) )
+			foreach ( $fieldsFillTemp as $fieldFill) {
+				$fieldsFill[ $fieldFill['fieldId'] ] = $fieldFill ;
+			}
+		unset($fieldsFillTemp);
+
+		$allFields = self::getFieldsToEdit($serviceId,$serviceType , ['admin' , 'invisible'] , true , array_keys($fieldsFill));
+		if ( is_array($allFields['result']) )
+			foreach ( $allFields['result'] as $index => $allField)
+				if ( isset($fieldsFill[$allField['fieldId']]))
+					$allFields['result'][$index]['value'] = $fieldsFill[$allField['fieldId']]['value'] ;
+
+
+		return self::json($allFields['result']);
 	}
 }
