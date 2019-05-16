@@ -36,11 +36,11 @@ class fields extends \App\api\controller\innerController {
 		$searchValue[] = $serviceType ;
 		if ( $serviceId != null ){
 			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($serviceId)),', ').')' ;
-			$searchValue = array_merge($searchValue,$serviceId);
+			$searchValue = array_merge($searchValue,(array)$serviceId);
 		}
 		if ( $fieldsId != null ){
 			$searchWhere .= ' or fieldId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($fieldsId)),', ').')' ;
-			$searchValue = array_merge($searchValue,$fieldsId);
+			$searchValue = array_merge($searchValue,(array)$fieldsId);
 		}
 		$searchWhere .= ' ) ';
 		if ( $statusNotBe != null ){
@@ -160,7 +160,7 @@ class fields extends \App\api\controller\innerController {
 		return self::json(null);
 	}
 
-	public static function showFilledOutForm($serviceId , $serviceType , $objectId , $objectType ){
+	public static function showFilledOutForm($serviceId , $serviceType , $objectId , $objectType ,$statusNotBe = null ){
 		/* @var \paymentCms\model\fieldvalue $fieldValueModel */
 		$fieldValueModel = self::model('fieldvalue') ;
 		$fieldsFill = [] ;
@@ -171,7 +171,7 @@ class fields extends \App\api\controller\innerController {
 			}
 		unset($fieldsFillTemp);
 
-		$allFields = self::getFieldsToEdit($serviceId,$serviceType , ['admin' , 'invisible'] , true , array_keys($fieldsFill));
+		$allFields = self::getFieldsToEdit($serviceId,$serviceType , $statusNotBe , true , array_keys($fieldsFill));
 		if ( is_array($allFields['result']) )
 			foreach ( $allFields['result'] as $index => $allField)
 				if ( isset($fieldsFill[$allField['fieldId']]))

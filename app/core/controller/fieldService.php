@@ -56,6 +56,10 @@ class fieldService extends \controller {
 	}
 
 	public static function showFilledOutForm($serviceId,$serviceType,$objectId , $objectType){
-		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType);
+		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType , ['admin' , 'invisible']);
+	}
+
+	public static function showFilledOutFormWithAllFields($serviceId,$serviceType,$objectId , $objectType){
+		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType );
 	}
 }
