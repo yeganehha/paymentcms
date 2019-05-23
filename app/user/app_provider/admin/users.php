@@ -94,7 +94,7 @@ class users extends \controller {
 		if ( request::isPost() ) {
 			$this->checkData($userId);
 		}
-		/* @var \App\user\model\user $user */
+		/* @var \paymentCms\model\user $user */
 		$user = $this->model('user' , $userId );
 		if ( $user->getUserId() != $userId ){
 			httpErrorHandler::E404();
@@ -116,65 +116,28 @@ class users extends \controller {
 		$this->mold->path('default', 'user');
 		$this->mold->view('userProfile.mold.html');
 		$this->mold->setPageTitle(rlang(['profile','user']));
+		return $user;
 	}
 
-	private function checkData($userId = null){
-		$get = request::post('fname,lname,email,phone,password,groupId,block=0,admin_note' ,null);
-		$rules = [
-			"fname" => ["required", rlang('firstName')],
-			"lname" => ["required", rlang('lastName')],
-			"groupId" => ["required|match:>0", rlang('permission')],
-			"email" => ["required|email", rlang('email')],
-			"phone" => ["required|mobile", rlang('phone')],
-			"block" => ["required|format:{0/1}", rlang('block')],
-		];
-		if ( $userId == null )
-			$rules[] = 	["password" => ["required", rlang('password')] ];
-		$valid = validate::check($get, $rules);
-		if ($valid->isFail()){
-			$this->alert('danger','',$valid->errorsIn() );
-			return false;
-		}
-		/* @var \App\user\model\user $model */
-		if ($userId == null) {
-			$model = $this->model('user');
-		} else {
-			$model = $this->model('user' , $userId);
-			if ( $model->getUserId() != $userId ){
-				$this->alert('danger','',rlang('cantFindUser') );
-				return false;
-			}
-		}
-		$model->setUserGroupId($get['groupId']);
-		$model->setFname($get['fname']);
-		$model->setLname($get['lname']);
-		$model->setEmail($get['email']);
-		$model->setPhone($get['phone']);
-		if ( $userId != null and $get['password'] != null ) $model->setPassword($get['password']);
-		$model->setBlock($get['block']);
-		$model->setAdminNote($get['admin_note']);
-		$model->setRegisterTime( ($model->getRegisterTime() != null ) ? $model->getRegisterTime() : date('Y-m-d H:i:s') );
-		if ($userId == null) {
-			$result = $model->insertToDataBase();
-			if ( $result !== false ) {
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $model->getUserId().'/insertDone', 'admin'));
-				exit;
+	/**
+	 * @param null $userId
+	 *
+	 * @return bool
+	 * [no-access]
+	 */
+	public function checkData($userId = null){
+		$result = \App\user\app_provider\api\user::editUser($userId,$_POST);
+		if ( $result['status'] ){
+			if ($userId == null) {
+				Response::redirect(\App::getBaseAppLink('users/profile/' . $result['result'] . '/insertDone', 'admin'));
 			} else {
-				$this->alert('danger','',rlang('pleaseTryAGain') );
-				return false;
+				Response::redirect(\App::getBaseAppLink('users/profile/' . $result['result'] . '/updateDone', 'admin'));
 			}
+			exit;
 		} else {
-			$result = $model->upDateDataBase();
-			if ( $result ) {
-				if ( $model->getUserId() == session::get('userAppLoginInformation')['userId'])
-					session::lifeTime(1 ,'hour')->set('userAppLoginInformation',$model->returnAsArray());
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $model->getUserId() . '/updateDone', 'admin'));
-			}
-			else {
-				$this->alert('danger', '', rlang('pleaseTryAGain'));
-				$this->mold->set('activeTab','edit');
-				return false;
-			}
+			$this->alert('danger', '', $result['massage'] );
+			$this->mold->set('activeTab','edit');
+			return false;
 		}
 	}
 }
