@@ -1,7 +1,7 @@
 <?php
 
 
-namespace plugin\footer;
+namespace plugin\gateway;
 
 
 /**

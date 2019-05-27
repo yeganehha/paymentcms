@@ -2,61 +2,123 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card" id="listToGetFromServer">
-                    <div class="card-header card-header-info card-header-icon">
-                        <div class="card-icon">
-                            <i class="material-icons">extension</i>
+                <div class="card">
+                    <div class="card-header card-header-info  card-header-tabs">
+                        <div class="nav-tabs-navigation">
+                            <div class="nav-tabs-wrapper">
+                                <span class="nav-tabs-title"></span>
+                                <ul class="nav nav-tabs" data-tabs="tabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link {if ! isset($pluginsActive) }active{/if}" href="#apps" data-toggle="tab">
+                                            <i class="material-icons">extension</i> {_ "plugins"}
+                                            <div class="ripple-container"></div>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {if isset($pluginsActive) }active{/if}" href="#plugins" data-toggle="tab">
+                                            <i class="material-icons">memory</i> {_ "addons"}
+                                            <div class="ripple-container"></div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <h4 class="card-title float-{$float} m-3">{_ "plugins"}</h4>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table text-{$text_align}">
-                                <thead>
-                                <tr>
-                                    <th class="text-center">#</th>
-                                    <th>{_ "name"}</th>
-                                    <th>{_ "description"}</th>
-                                    <th>{_ "author"}</th>
-                                    <th>{_ "actions"}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {foreach from=$apps key=appName value=app}
-                                <tr id="app_{$appName}">
-                                    <td class="text-center">{$appName}</td>
-                                    <td>{$app.name}</td>
-                                    <td>{$app.description}<br><small class="small text-gray">{$app.version}</small></td>
-                                    <td>{$app.author}<br><small class="small text-gray">{$app.support}</small></td>
-                                    <td class="td-actions text-right">
-                                        {if $app.status == 'notInstall' }
-                                            <a class="btn btn-success" href="{url}plugins/installLocal/{$appName}">
-                                                <i class="material-icons">save</i> {_ "install"}
-                                            </a>
-                                            <a class="btn btn-danger" href="{url}plugins/uninstallLocal/{$appName}">
-                                                <i class="material-icons">delete</i> {_ "delete"}
-                                            </a>
-                                        {elseif $app.status == 'deActive' }
-                                            <a class="btn btn-success" href="{url}plugins/installing/{$appName}">
-                                                <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "activing"}
-                                            </a>
-                                            <a class="btn btn-danger" href="{url}plugins/uninstallLocal/{$appName}">
-                                                <i class="material-icons">delete</i> {_ "delete"}
-                                            </a>
-                                        {elseif $app.status == 'active' }
-                                            <a class="btn btn-danger" href="{url}plugins/deActive/{$appName}">
-                                                <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "deActive"}
-                                            </a>
-                                        {/if}
-                                    </td>
-                                </tr>
-                                {foreachelse}
-                                <tr>
-                                    <td class="text-center" colspan="6">{_ "hasNotDataYet"}</td>
-                                </tr>
-                                {/foreach}
-                                </tbody>
-                            </table>
+                        <div class="tab-content">
+                            <div class="tab-pane {if ! isset($pluginsActive) }active{/if}" id="apps">
+                                <div class="table-responsive">
+                                    <table class="table text-{$text_align}">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">#</th>
+                                            <th>{_ "name"}</th>
+                                            <th>{_ "description"}</th>
+                                            <th>{_ "author"}</th>
+                                            <th>{_ "actions"}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {foreach from=$apps key=appName value=app}
+                                        <tr id="app_{$appName}">
+                                            <td class="text-center">{$appName}</td>
+                                            <td>{$app.name}</td>
+                                            <td>{$app.description}<br><small class="small text-gray">{$app.version}</small></td>
+                                            <td>{$app.author}<br><small class="small text-gray">{$app.support}</small></td>
+                                            <td class="td-actions text-right">
+                                                {if $app.status == 'notInstall' }
+                                                <a class="btn btn-success m-1" href="{url}plugins/installLocal/{$appName}">
+                                                    <i class="material-icons">save</i> {_ "install"}
+                                                </a>
+                                                <a class="btn btn-danger m-1" href="{url}plugins/uninstallLocal/{$appName}">
+                                                    <i class="material-icons">delete</i> {_ "delete"}
+                                                </a>
+                                                {elseif $app.status == 'deActive' }
+                                                <a class="btn btn-success m-1" href="{url}plugins/installing/{$appName}">
+                                                    <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "activing"}
+                                                </a>
+                                                <a class="btn btn-danger m-1" href="{url}plugins/uninstallLocal/{$appName}">
+                                                    <i class="material-icons">delete</i> {_ "delete"}
+                                                </a>
+                                                {elseif $app.status == 'active' }
+                                                <a class="btn btn-danger m-1" href="{url}plugins/deActive/{$appName}">
+                                                    <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "deActive"}
+                                                </a>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                        {foreachelse}
+                                        <tr>
+                                            <td class="text-center" colspan="6">{_ "hasNotDataYet"}</td>
+                                        </tr>
+                                        {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane  {if isset($pluginsActive) }active{/if}" id="plugins">
+                                <div class="table-responsive">
+                                    <table class="table text-{$text_align}">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">#</th>
+                                            <th>{_ "name"}</th>
+                                            <th>{_ "description"}</th>
+                                            <th>{_ "author"}</th>
+                                            <th>{_ "actions"}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {foreach from=$plugins key=pluginName value=plugin}
+                                        <tr id="app_{$pluginName}">
+                                            <td class="text-center">{$pluginName}</td>
+                                            <td>{$plugin.name}</td>
+                                            <td>{$plugin.description}<br><small class="small text-gray">{$plugin.version}</small></td>
+                                            <td>{$plugin.author}<br><small class="small text-gray">{$plugin.support}</small></td>
+                                            <td class="td-actions text-right">
+                                                {if $plugin.status == 'deActive' }
+                                                <a class="btn btn-success m-1" href="{url}plugins/installingPlugin/{$pluginName}">
+                                                    <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "activing"}
+                                                </a>
+                                                <a class="btn btn-danger m-1" href="{url}plugins/uninstallLocalPlugin/{$pluginName}">
+                                                    <i class="material-icons">delete</i> {_ "delete"}
+                                                </a>
+                                                {elseif $plugin.status == 'active' }
+                                                <a class="btn btn-danger m-1" href="{url}plugins/deActivePlugin/{$pluginName}">
+                                                    <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "deActive"}
+                                                </a>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                        {foreachelse}
+                                        <tr>
+                                            <td class="text-center" colspan="6">{_ "hasNotDataYet"}</td>
+                                        </tr>
+                                        {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

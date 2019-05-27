@@ -16,4 +16,5 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 return [
 	'fff' => '**fff**',
+	'gateWayTest' => 'درگاه پرداخت تستی',
 ];
