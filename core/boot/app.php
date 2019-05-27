@@ -31,6 +31,7 @@ class App {
 	private static $url = [];
 
 	private static $appPatch = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR;
+	private static $pluginPatch = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR;
 
 	public static function init() {
 
@@ -237,6 +238,31 @@ class App {
 						$return[$app]['status'] = cache::get('appStatus', $app ,'paymentCms');
 						if ( $return[$app]['status'] == null )
 							$return[$app]['status'] = 'notInstall';
+					}
+				}
+			}
+		}
+		return $return ;
+	}
+
+
+	public static function pluginsList(){
+		return file::get_name_folders(self::$pluginPatch);
+	}
+
+	public static function pluginsListWithConfig(){
+		$plugins = file::get_name_folders(self::$pluginPatch);
+		$return = [];
+		if ( is_array($plugins) ){
+			foreach ($plugins as $plugin ){
+				$file_name = self::$pluginPatch.$plugin.DIRECTORY_SEPARATOR.'info.php';
+				if ( file_exists($file_name) ) {
+					$temp = require $file_name;
+					if ( isset($temp['info'])) {
+						$return[$plugin] = $temp['info'];
+						$return[$plugin]['status'] = cache::get('pluginStatus', $plugin ,'paymentCms');
+						if ( $return[$plugin]['status'] == null )
+							$return[$plugin]['status'] = 'deActive';
 					}
 				}
 			}

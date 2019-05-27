@@ -4,6 +4,7 @@
 namespace App\invoice\controller;
 
 
+use App\core\controller\fieldService;
 use paymentCms\component\security;
 use paymentCms\component\strings;
 
@@ -38,38 +39,13 @@ class home extends \controller {
 		if ( is_array($items) )
 			$servicesId = array_column($items, 'serviceId');
 
-		$fieldsFill = [] ;
-		$fieldsFillTemp = $invoice->search($invoice->getInvoiceId(),'invoiceId = ?' ,'fieldvalue' );
-		if ( is_array($fieldsFillTemp) )
-			foreach ( $fieldsFillTemp as $fieldFill) {
-				$fieldsFill[ $fieldFill['fieldId'] ] = $fieldFill ;
-			}
-		unset($fieldsFillTemp);
-
-
-		$searchFieldQuery = 'status != ? and status != ? and ( 0 ';
-		$searchFieldVariable = ['admin' , 'invisible'];
-		if ( $servicesId != null ){
-			$searchFieldQuery .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($servicesId)),', ').')' ;
-			$searchFieldVariable = array_merge($searchFieldVariable,$servicesId);
-		}
-		if ( array_keys($fieldsFill) != null ){
-			$searchFieldQuery .= ' or fieldId IN ('.strings::deleteWordLastString(str_repeat('? , ',count(array_keys($fieldsFill))),', ').')' ;
-			$searchFieldVariable = array_merge($searchFieldVariable,array_keys($fieldsFill));
-		}
-		$searchFieldQuery .= ' ) ';
-		$allFields =$invoice->search(array_filter($searchFieldVariable),$searchFieldQuery ,'field','*' ,['column'=>'orderNumber','type'=>'desc']);
-
-		if ( is_array($allFields) )
-			foreach ( $allFields as $index => $allField)
-				if ( isset($fieldsFill[$allField['fieldId']]))
-					$allFields[$index]['value'] = $fieldsFill[$allField['fieldId']]['value'] ;
+		$allFields = fieldService::showFilledOutForm($servicesId , 'service' ,$invoice->getInvoiceId() , 'invoice' );
 
 		//		$this->mold->offAutoCompile();
 		//		show($allFields);
 		$this->mold->set('invoice' , $invoice->returnAsArray());
 		$this->mold->set('items' , $items);
-		$this->mold->set('allFields' , $allFields);
+		$this->mold->set('allFields' , $allFields['result']);
 		$this->mold->path('default', 'invoice');
 		$this->mold->view('invoiceClient.mold.html');
 		$this->mold->setPageTitle(rlang('invoice'));

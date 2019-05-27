@@ -5,9 +5,11 @@ namespace App\invoice\app_provider\api;
 
 
 use App\api\controller\service;
+use App\core\controller\fieldService;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\security;
+use paymentCms\component\strings;
 use paymentCms\component\validate;
 
 /**
@@ -29,7 +31,7 @@ class invoice extends \App\api\controller\innerController {
 
 	public static function generate($serviceId,$baseData = null) {
 		if (is_null($baseData) or !is_array($baseData)) $baseData = $_POST;
-		$data = request::getFromArray($baseData, 'firstName,lastName,email,phone,price,description,customField');
+		$data = request::getFromArray($baseData, 'firstName,lastName,email,phone,price,description,customField,hookAction,returnTo');
 		unset($baseData);
 		$tempJsonResult = self::$jsonResponse ;
 		self::$jsonResponse = false;
@@ -48,19 +50,6 @@ class invoice extends \App\api\controller\innerController {
 		if ($service['firstNameStatus'] == 'required') $rules['firstName'] = ['required', rlang('firstName')];
 		if ($service['emailStatus'] == 'required' or ($service['emailStatus'] == 'visible' and $data['email'] != null)) $rules['email'] = ['required|email', rlang('email')];
 		if ($service['phoneStatus'] == 'required' or ($service['phoneStatus'] == 'visible' and $data['phone'] != null)) $rules['phone'] = ['required|mobile', rlang('phone')];
-		if (!empty($fields) and is_array($fields)) {
-			foreach ($fields as $key => $field) {
-				$regix = null;
-				if ($field['regex'] != null) {
-					$regix = explode(',', $field['regex']);
-				}
-				if ($field['status'] == 'required') {
-					$regix[] = 'required';
-				}
-				if ($regix == null or count($regix) == 0) continue;
-				$rules['customField.' . $field['fieldId']] = [implode('|', array_unique(array_filter($regix))), $field['title']];
-			}
-		}
 		if (isset($rules)) {
 			$valid = validate::check($data, $rules);
 			if ($valid->isFail()) {
@@ -76,8 +65,7 @@ class invoice extends \App\api\controller\innerController {
 		elseif ( $data['email'] != null )
 			$userSystem = [ 'value' => $data['email']  , 'variable' => 'email' ];
 		if ( isset($userSystem) ){
-			/* @var \paymentCms\model\user $userModel */
-			$userModel = self::model('user',$userSystem['value'] , $userSystem['variable'] .' = ? ' ) ;
+			$userModel = \App\user\app_provider\api\user::getUser($userSystem['value'],$userSystem['variable'] . ' = ?');
 		}
 		/* end getting user information */
 
@@ -88,20 +76,23 @@ class invoice extends \App\api\controller\innerController {
 		$invoiceModel->setStatus('pending');
 		$invoiceModel->setPrice($service['price']);
 		$invoiceModel->setApiId(self::$api->getApiId());
-		$invoiceModel->setBackUri('back uri ....');
-		$invoiceModel->setCreatedIp('ip ...');
+		$invoiceModel->setBackUri($data['returnTo']);
+		$invoiceModel->setCreatedIp(security::getIp() );
 		$invoiceModel->setDueDate(date('Y-m-d H:i:s' , time()+4*24*60*60));
 		$invoiceModel->setCreatedDate(date('Y-m-d H:i:s'));
 		if ( isset($userModel) ) {
 			if ( $userModel->getUserId() != null )
 				$invoiceModel->setUserId($userModel->getUserId());
 			else {
-				$s = 0 ;
-				// TODO : add user with api
+				$resultGenerateUser = \App\user\app_provider\api\user::generateUser(['fname'=>$data['firstName'],'lname'=>$data['lastName'],'email' => $data['email'],'phone'=>$data['phone'],'password'=>strings::generateRandomLowString(8),'groupId'=>1]);
+				if ( $resultGenerateUser['status'] )
+					$invoiceModel->setUserId( $resultGenerateUser['result']);
+				else
+					$error = $resultGenerateUser['massage'];
 			}
 		}
 		$invoiceModel->setModule('module ...');
-		$invoiceModel->setRequestAction('action ...');
+		$invoiceModel->setRequestAction($data['hookAction']);
 		$invoiceId = $invoiceModel->insertToDataBase();
 		if ( $invoiceId !== false ){
 			/* @var \paymentCms\model\items $itemsModel */
@@ -113,22 +104,9 @@ class invoice extends \App\api\controller\innerController {
 			$itemsModel->setInvoiceId($invoiceModel->getInvoiceId());
 			$itemId = $itemsModel->insertToDataBase();
 			if ( $itemId !== false ){
-				if ( is_array($data['customField']) and ! empty($data['customField']) ){
-					foreach ( $data['customField'] as $fieldId => $fieldValue){
-						if ( $fieldValue == null )
-							continue ;
-						/* @var \paymentCms\model\fieldvalue $fieldValueModel */
-						$fieldValueModel = self::model('fieldvalue') ;
-						$fieldValueModel->setInvoiceId($invoiceModel->getInvoiceId());
-						$fieldValueModel->setFieldId($fieldId);
-						$fieldValueModel->setValue($fieldValue);
-						$fieldValueStatus = $fieldValueModel->insertToDataBase();
-						if ( ! $fieldValueStatus ) {
-							$error = rlang('canNotInsertFieldValue');
-							break;
-						}
-					}
-				}
+				$resultFillOutForm = fieldService::fillOutForm($service['serviceId'],'service',$data['customField'],$invoiceModel->getInvoiceId() , 'invoice');
+				if ( ! $resultFillOutForm['status'] )
+					$error = $resultFillOutForm['massage'];
 			} else {
 				$error = rlang('canNotInsertItems');
 			}

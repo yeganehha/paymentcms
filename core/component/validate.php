@@ -384,7 +384,6 @@ class validate {
 		$data = self::getData();
 		$length = self::getValueFromParams($lengthParams);
 		$operator = self::getOperatorFromParams($lengthParams);
-
 		if (is_array($data)) {
 			foreach ($data as $d) {
 				if (is_array($d)) continue;
@@ -416,7 +415,7 @@ class validate {
 	 */
 	private static function getOperatorFromParams($params)
 	{
-		preg_match('/!=|==|<=|<|>=|>/', $params, $out);
+		preg_match('/!=|==|=|<=|<|>=|>/', $params, $out);
 		return isset($out[0]) ? $out[0] : '';
 	}
 

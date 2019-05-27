@@ -8,7 +8,9 @@ use paymentCms\component\cache;
 use paymentCms\component\model;
 use paymentCms\component\Response;
 use paymentCms\component\session;
+use paymentCms\component\strings;
 use pluginController;
+use ReflectionClass;
 
 /**
  * Created by Yeganehha .
@@ -42,6 +44,16 @@ class hook extends pluginController {
 		$appProvider = \App::getAppProvider();
 		$controller = \App::getController();
 		$method = \App::getMethod();
+
+		if ( $appProvider == null )
+			$className ='App\\'.$app.'\controller\\'.$controller ;
+		else
+			$className ='App\\'.$appProvider.'\app_provider\\'.$app.'\\'.$controller ;
+		if ( ( $resultCommentCheck = $this->checkCommentAccess($className,$method) ) !== null ) {
+			if ( ! $resultCommentCheck )
+				httpErrorHandler::E403();
+			return $resultCommentCheck;
+		}
 
 		if ( $app == 'user' and $controller == 'access' )
 			return true;
@@ -93,5 +105,50 @@ class hook extends pluginController {
 				return $result[1];
 			return null;
 		}
+	}
+	private static function checkCommentAccess($controllerClass, $method )
+	{
+		if (version_compare(phpversion(), '5.0.0', '<')) {
+			return null;
+		}
+		try {
+			$rc = new ReflectionClass($controllerClass);
+			$stringClass = $rc->getDocComment();
+			if ( ( $tempReturn = self::checkAccessComment($stringClass)) === null ){
+				$stringMethod = $rc->getMethod($method)->getDocComment();
+				return self::checkAccessComment($stringMethod);
+			}
+			return $tempReturn ;
+		} catch (\ReflectionException $e) {
+			return null;
+		}
+	}
+
+	private static function checkAccessComment($string)
+	{
+		$pattern = "[no-access]";
+		if (strings::strhas($string, $pattern)) {
+			return false;
+		}
+
+		$pattern = "[user-access]";
+		if (strings::strhas($string, $pattern) ) {
+			if ( ! session::has('userAppLoginInformation') )
+				return false;
+		}
+
+		$pattern = "[notUser-access]";
+		if (strings::strhas($string, $pattern) ) {
+			if ( session::has('userAppLoginInformation') )
+				return false;
+			return true;
+		}
+
+		$pattern = "[global-access]";
+		if (strings::strhas($string, $pattern) ) {
+			return true;
+		}
+
+		return null ;
 	}
 }

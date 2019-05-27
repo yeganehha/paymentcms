@@ -33,6 +33,10 @@ class plugins extends \controller {
 	public function index(){
 		Response::redirect(\app::getBaseAppLink('plugins/lists'));
 	}
+	public function pLists($status = null,$file_name=null){
+		$this->mold->set('pluginsActive' , true);
+		$this->lists($status ,$file_name);
+	}
 	public function lists($status = null,$file_name=null) {
 		if ( $status == 'appInstalled')
 			$this->alert('success' ,null ,rlang('appInstalled'));
@@ -45,10 +49,12 @@ class plugins extends \controller {
 		elseif ($status == 'pleaseTryAGain')
 			$this->alert('danger' ,null ,rlang('pleaseTryAGain'));
 		$apps = \App::appsListWithConfig();
+		$plugins = \App::pluginsListWithConfig();
 		$this->mold->view('pluginLocalList.mold.html');
 		$this->mold->setPageTitle(rlang('plugins'));
 		$this->mold->set('activeMenu' , 'plugins');
 		$this->mold->set('apps' , $apps);
+		$this->mold->set('plugins' , $plugins);
 	}
 
 	public function installLocal($app = null){
@@ -106,6 +112,38 @@ class plugins extends \controller {
 			return true;
 		}
 	}
+
+	public function installingPlugin($plugin = null){
+		if ( is_null($plugin)){
+			Response::redirect(\app::getBaseAppLink('plugins/pLists'));
+			return false;
+		}
+		$appStatus = cache::get('pluginStatus', $plugin ,'paymentCms');
+		if ( $appStatus == 'deActive' or   $appStatus == null ){
+			$this->changeCacheOfAppStatus($plugin,'active' , 'pluginStatus');
+			Response::redirect(\app::getBaseAppLink('plugins/pLists/appInstalled#app_'.$plugin));
+			return true;
+		} else {
+			Response::redirect(\app::getBaseAppLink('plugins/pLists#app_'.$plugin));
+			return true;
+		}
+	}
+	public function deActivePlugin($plugin = null){
+		if ( is_null($plugin)){
+			Response::redirect(\app::getBaseAppLink('plugins/pLists'));
+			return false;
+		}
+		$appStatus = cache::get('pluginStatus', $plugin ,'paymentCms');
+		if ( $appStatus == 'active' ){
+			$this->changeCacheOfAppStatus($plugin,'deActive','pluginStatus');
+			Response::redirect(\app::getBaseAppLink('plugins/pLists/appUninstalled#app_'.$plugin));
+			return true;
+		} else {
+			Response::redirect(\app::getBaseAppLink('plugins/pLists#app_'.$plugin));
+			return true;
+		}
+	}
+
 	public function deActive($app = null){
 		if ( is_null($app)){
 			Response::redirect(\app::getBaseAppLink('plugins/lists'));
@@ -123,40 +161,57 @@ class plugins extends \controller {
 	}
 
 	public function uninstallLocal($app = null){
-			if ( is_null($app)){
-				Response::redirect(\app::getBaseAppLink('plugins/lists'));
-				return false;
-			}
-			$file_name = payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'info.php';
-			if ( file_exists($file_name) ) {
-				$appData = require_once $file_name;
-				if ( isset($appData['db']) and !  is_null($appData['db'])) {
-					$query = $this->generateQueryDropTable($appData['db']);
-					model::transaction();
-					try {
-						if ( model::queryUnprepared($query) ) {
-							model::commit();
-							file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
-							$this->changeCacheOfAppStatus($app,null);
-							Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
-							return true;
-						}
-					} catch (Exception $exception){
-						model::rollback();
-						Response::redirect(\app::getBaseAppLink('plugins/lists/pleaseTryAGain#app_'.$app));
+		if ( is_null($app)){
+			Response::redirect(\app::getBaseAppLink('plugins/lists'));
+			return false;
+		}
+		$file_name = payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app.DIRECTORY_SEPARATOR.'info.php';
+		if ( file_exists($file_name) ) {
+			$appData = require_once $file_name;
+			if ( isset($appData['db']) and !  is_null($appData['db'])) {
+				$query = $this->generateQueryDropTable($appData['db']);
+				model::transaction();
+				try {
+					if ( model::queryUnprepared($query) ) {
+						model::commit();
+						file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
+						$this->changeCacheOfAppStatus($app,null);
+						Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
 						return true;
 					}
-				} else {
-					file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
-					$this->changeCacheOfAppStatus($app,null);
-					Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
+				} catch (Exception $exception){
+					model::rollback();
+					Response::redirect(\app::getBaseAppLink('plugins/lists/pleaseTryAGain#app_'.$app));
 					return true;
 				}
 			} else {
-				Response::redirect(\app::getBaseAppLink('plugins/lists/cantFindInfo/'.urlencode($file_name).'#app_'.$app));
-				return false;
+				file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
+				$this->changeCacheOfAppStatus($app,null);
+				Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
+				return true;
 			}
+		} else {
+			Response::redirect(\app::getBaseAppLink('plugins/lists/cantFindInfo/'.urlencode($file_name).'#app_'.$app));
+			return false;
 		}
+	}
+
+	public function uninstallLocalPlugin($plugin = null){
+		if ( is_null($plugin)){
+			Response::redirect(\app::getBaseAppLink('plugins/pLists'));
+			return false;
+		}
+		$file_name = payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.$plugin.DIRECTORY_SEPARATOR.'info.php';
+		if ( file_exists($file_name) ) {
+			file::removedir(payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.$plugin);
+			$this->changeCacheOfAppStatus($plugin,null,'pluginStatus');
+			Response::redirect(\app::getBaseAppLink('plugins/pLists/appUninstalled#app_'.$plugin));
+			return true;
+		} else {
+			Response::redirect(\app::getBaseAppLink('plugins/pLists/cantFindInfo/'.urlencode($file_name).'#app_'.$app));
+			return false;
+		}
+	}
 
 	public function install(){
 		$get = request::post('page=1,perEachPage=25,name' ,null);
@@ -235,12 +290,12 @@ class plugins extends \controller {
 		}
 		return $query ;
 	}
-	private function changeCacheOfAppStatus($app , $status ){
-		$appStatus = cache::get('appStatus', null  ,'paymentCms');
+	private function changeCacheOfAppStatus($app , $status , $name = 'appStatus'){
+		$appStatus = cache::get($name, null  ,'paymentCms');
 		if ( $status == null )
 			unset($appStatus[$app]);
 		else
 			$appStatus[$app] = $status ;
-		cache::save($appStatus,'appStatus' , PHP_INT_MAX , 'paymentCms');
+		cache::save($appStatus,$name , PHP_INT_MAX , 'paymentCms');
 	}
 }

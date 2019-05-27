@@ -4,6 +4,7 @@
 namespace App\invoice\app_provider\admin;
 
 
+use App\core\controller\fieldService;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -41,37 +42,14 @@ class invoices extends \controller {
 		if ( is_array($items) )
 			$servicesId = array_column($items, 'serviceId');
 
-		$fieldsFill = [] ;
-		$fieldsFillTemp = $invoice->search($invoice->getInvoiceId(),'invoiceId = ?' ,'fieldvalue' );
-		if ( is_array($fieldsFillTemp) )
-			foreach ( $fieldsFillTemp as $fieldFill) {
-				$fieldsFill[ $fieldFill['fieldId'] ] = $fieldFill ;
-			}
-		unset($fieldsFillTemp);
 
-
-		$searchFieldQuery = ' 0 ';
-		$searchFieldVariable = [];
-		if ( $servicesId != null ){
-			$searchFieldQuery .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($servicesId)),', ').')' ;
-			$searchFieldVariable = array_merge($searchFieldVariable,$servicesId);
-		}
-		if ( array_keys($fieldsFill) != null ){
-			$searchFieldQuery .= ' or fieldId IN ('.strings::deleteWordLastString(str_repeat('? , ',count(array_keys($fieldsFill))),', ').')' ;
-			$searchFieldVariable = array_merge($searchFieldVariable,array_keys($fieldsFill));
-		}
-		$allFields =$invoice->search(array_filter($searchFieldVariable),$searchFieldQuery ,'field','*' ,['column'=>'orderNumber','type'=>'desc']);
-
-		if ( is_array($allFields) )
-			foreach ( $allFields as $index => $allField)
-				if ( isset($fieldsFill[$allField['fieldId']]))
-					$allFields[$index]['value'] = $fieldsFill[$allField['fieldId']]['value'] ;
+		$allFields = fieldService::showFilledOutFormWithAllFields($servicesId,'service',$invoice->getInvoiceId() , 'invoice');
 
 //		$this->mold->offAutoCompile();
 //		show($allFields);
 		$this->mold->set('invoice' , $invoice->returnAsArray());
 		$this->mold->set('items' , $items);
-		$this->mold->set('allFields' , $allFields);
+		$this->mold->set('allFields' , $allFields['result']);
 		$this->mold->path('default', 'invoice');
 		$this->mold->view('invoice.mold.html');
 		$this->mold->setPageTitle(rlang('invoice'));

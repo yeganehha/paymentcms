@@ -48,6 +48,10 @@ class MoldFiles {
 		$this->folder = $folder ;
 	}
 
+	public function getPath(){
+		return ['folder' => $this->folder , 'app' => $this->app];
+	}
+
 	public function setDirectPath($path){
 		$this->path = $this->directorySeparator( $path );
 	}

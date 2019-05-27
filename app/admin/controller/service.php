@@ -4,6 +4,7 @@
 namespace App\admin\controller;
 
 
+use App\core\controller\fieldService;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -73,7 +74,7 @@ class service extends \controller {
 		$this->mold->set('services' , $search);
 	}
 
-	public function new(){
+	public function insert(){
 		if ( request::isPost() ){
 			$this->checkBaseData();
 		}
@@ -136,10 +137,6 @@ class service extends \controller {
 			'lastNameStatus' => ['format:{visible/invisible/required}'	, rlang(['status','lastName'])],
 			'emailStatus' => ['format:{visible/invisible/required}'	, rlang(['status','email'])],
 			'phoneStatus' => ['format:{visible/invisible/required}'	, rlang(['status','phone'])],
-			'moreField.*.status' => ['format:{visible/invisible/required,admin}'	, rlang('status')],
-			'moreField.*.type' => ['format:{text/url/password/email/select/radio/checkbox/textarea/date/number/file}'	, rlang('type')],
-			'moreField.*.name' => ['notEmpty'	, rlang('name')],
-			'moreField.*.order' => ['number'	, rlang('orderToShow')],
 		];
 		$valid = validate::check($form, $rules);
 		if ($valid->isFail()){
@@ -156,29 +153,12 @@ class service extends \controller {
 			$model->setPhoneStatus($form['phoneNameStatus']);
 			$status = $model->upDateDataBase();
 			if ($status ) {
-				if ( is_array($form['moreField']) and count($form['moreField']) > 0 )
-					foreach ($form['moreField'] as $key => $field ){
-					if ( $field['id'] > 0 )
-						$modelField = $this->model('field',$field['id']);
-					else
-						$modelField = $this->model('field');
-					$modelField->setStatus($field['status']);
-					$modelField->setDescription($field['description']);
-					$modelField->setOrder($field['order']);
-					$modelField->setRegex($field['regex']);
-					$modelField->setTitle($field['name']);
-					$modelField->setType($field['type']);
-					$modelField->setValues($field['value']);
-					$modelField->setServiceId($model->getServiceId());
-					if ( $field['id'] > 0 )
-						$modelField->upDateDataBase();
-					else
-						$modelField->insertToDataBase();
-				}
-				if ( is_array($form['deleteField']) and count($form['deleteField']) > 0 ){
-					$modelField->db()->where('fieldId' , $form['deleteField'] , 'IN');
-					$modelField->db()->where('serviceId' , $model->getServiceId() );
-					$modelField->db()->delete('field' );
+				$resultUpdateField = fieldService::updateFields($model->getServiceId(),'service' ,$form['moreField'],$form['deleteField']);
+				if ( ! $resultUpdateField['status'] ) {
+					model::rollback();
+					$this->alert('warning' , null, rlang('pleaseTryAGain').'<br>'.$resultUpdateField['massage'],'error');
+					$this->mold->set('post',$form);
+					return false;
 				}
 				model::commit();
 				Response::redirect(\app::getBaseAppLink('service/profile/' . $model->getServiceId() . '/moreConfigurationActionDone'));
@@ -214,14 +194,8 @@ class service extends \controller {
 			$this->alert('success',null,rlang(['fields','services','successfully','was']));
 		}
 
-		/* @var \paymentCms\model\field $fieldModel */
-		$fieldModel = $this->model('field') ;
-		$fields = $fieldModel->search($serviceId,'serviceId = ? ' ,null,'*',['column'=>'orderNumber' , 'type' => 'desc' ]  );
-		if ( $fields === true)
-			$fields = [] ;
+		fieldService::getFieldsToEdit($serviceId,'service',$this->mold);
 		$this->mold->set('service',$model);
-		$this->mold->set('fields',$fields);
-		$this->mold->set('numberOfFields',count($fields));
 		$this->mold->view('serviceProfile.mold.html');
 		$this->mold->setPageTitle(rlang(['profile','services']). ': '.$model->getName());
 	}
@@ -242,12 +216,7 @@ class service extends \controller {
 			Response::redirect(\app::getBaseAppLink('service/profile/' . $model->getServiceId() ));
 
 
-		$this->mold->set('activeTab','moreInfo');
-		/* @var \paymentCms\model\field $fieldModel */
-		$fieldModel = $this->model('field') ;
-		$fields = $fieldModel->search($serviceId , 'serviceId = ?' , null ,'*',['column' => 'orderNumber' , 'type' => 'desc']);
-		if ( $fields === true)
-			$fields = [] ;
+		$fields = fieldService::getFieldsToEdit($serviceId,'service',$this->mold);
 		$this->mold->set('service',$model);
 		$this->mold->set('fields',$fields);
 		$this->mold->set('numberOfFields',count($fields));

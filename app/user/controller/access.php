@@ -18,14 +18,20 @@ use paymentCms\component\validate;
  * virsion : 0.0.0.1
  * update Time : 4/27/2019 - 6:00 PM
  * Discription of this Page :
+ *
  */
 
 
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
-
+/*
+ *
+ */
 class access extends \controller  {
 
+	/**
+	 * [notUser-access]
+	 */
 	public function login(){
 		$this->mold->view('login.mold.html');
 		if ( request::isPost()) {
@@ -59,10 +65,16 @@ class access extends \controller  {
 		}
 	}
 
+	/**
+	 * [notUser-access]
+	 */
 	public function register(){
 
 	}
 
+	/**
+	 * [user-access]
+	 */
 	public function logout(){
 		session::remove('userAppLoginInformation');
 		Response::redirect(\App::getBaseAppLink(null,'home'));

@@ -24,16 +24,18 @@ use paymentCms\component\model ;
 
 class fieldvalue extends model implements modelInterFace  {
 
-	private $primaryKey = ['fieldId','invoiceId'];
+	private $primaryKey = ['fieldId','objectId'];
 	private $primaryKeyShouldNotInsertOrUpdate = null;
 	private $fieldId ;
-	private $invoiceId ;
+	private $objectId ;
+	private $objectType ;
 	private $value ;
 
 
 	public function setFromArray($result) {
 		$this->fieldId = $result['fieldId'] ;
-		$this->invoiceId = $result['invoiceId'] ;
+		$this->objectId = $result['objectId'] ;
+		$this->objectType = $result['objectType'] ;
 		$this->value = $result['value'] ;
 	}
 
@@ -42,8 +44,8 @@ class fieldvalue extends model implements modelInterFace  {
 	}
 
 
-	public function setInvoiceId( $invoiceId = null ) {
-		$this->invoiceId = $invoiceId ;
+	public function setObjectId( $objectId = null ) {
+		$this->objectId = $objectId ;
 	}
 
 
@@ -57,8 +59,8 @@ class fieldvalue extends model implements modelInterFace  {
 	}
 
 
-	public function getInvoiceId() {
-		return $this->invoiceId ;
+	public function getObjectId() {
+		return $this->objectId ;
 	}
 
 
@@ -69,7 +71,8 @@ class fieldvalue extends model implements modelInterFace  {
 
 	public function returnAsArray( ) {
 		$array['fieldId'] = $this->fieldId ;
-		$array['invoiceId'] = $this->invoiceId ;
+		$array['objectId'] = $this->objectId ;
+		$array['objectType'] = $this->objectType ;
 		$array['value'] = $this->value ;
 		return $array ;
 	}
@@ -87,6 +90,20 @@ class fieldvalue extends model implements modelInterFace  {
 	 */
 	public function getPrimaryKeyShouldNotInsertOrUpdate() {
 		return $this->primaryKeyShouldNotInsertOrUpdate;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getObjectType() {
+		return $this->objectType;
+	}
+
+	/**
+	 * @param mixed $objectType
+	 */
+	public function setObjectType($objectType) {
+		$this->objectType = $objectType;
 	}
 
 
