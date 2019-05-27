@@ -10,6 +10,7 @@
  * Description of this Page :
  */
 
+use paymentCms\component\cache;
 use paymentCms\component\file;
 use paymentCms\component\menu\menu;
 use paymentCms\component\mold\Mold;
@@ -95,13 +96,30 @@ class controller {
 	}
 
 	protected function callHooks($hookName,$variable){
-		$files1 = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
-		$files2 = file::get_files_by_pattern(payment_path.'app'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
-		$files = array_merge($files1,$files2);
+		$files = [];
+		$appsActives = cache::get('appStatus', null  ,'paymentCms');
+		if ( is_array($appsActives) and ! empty($appsActives) ) {
+			foreach ($appsActives as $appName => $appStatus) {
+				if ($appStatus == 'active') {
+					if ( is_file(payment_path . 'app' . DIRECTORY_SEPARATOR.$appName. DIRECTORY_SEPARATOR . 'hook.php') ) {
+						$files[] = [ 'aria' => 'app' , 'controller' => $appName ];
+					}
+				}
+			}
+		}
+		$pluginSActives = cache::get('pluginStatus', null  ,'paymentCms');
+		if ( is_array($pluginSActives) and ! empty($pluginSActives) ) {
+			foreach ($pluginSActives as $pluginName => $pluginStatus) {
+				if ($pluginStatus == 'active') {
+					if ( is_file(payment_path . 'plugins' . DIRECTORY_SEPARATOR.$pluginName. DIRECTORY_SEPARATOR . 'hook.php') ) {
+						$files[] = [ 'aria' => 'plugin' , 'controller' => $pluginName ];
+					}
+				}
+			}
+		}
 		foreach ($files as $file) {
-			$temp = explode(DIRECTORY_SEPARATOR, strings::deleteWordLastString($file,DIRECTORY_SEPARATOR.'hook.php')) ;
-			$controller = array_pop($temp);
-			$aria = end($temp) ;
+			$controller = $file['controller'];
+			$aria = $file['aria'] ;
 			$class = $aria.'\\'.$controller.'\hook';
 			$method = '_'.$hookName;
 			if ( method_exists($class,$method) ){

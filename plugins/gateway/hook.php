@@ -22,6 +22,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class hook extends \pluginController {
 
 	public function _adminHeaderNavbar(){
+//		echo '<script>alert("ssssssss");</script>';
 //		$this->mold->view('test.footer.mold.html');
 	}
 }

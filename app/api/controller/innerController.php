@@ -4,6 +4,7 @@
 namespace App\api\controller;
 
 
+use paymentCms\component\cache;
 use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\mold\Mold;
@@ -78,20 +79,47 @@ class innerController {
 				if ($searchWhereClaus == null) return new $model($searchVariable); else
 					return new $model($searchVariable, $searchWhereClaus);
 			} else {
-				App\core\controller\httpErrorHandler::E500($model);
+				\App\core\controller\httpErrorHandler::E500($model);
 				exit;
 			}
 		}
 	}
 
 	protected static function callHooks($hookName,$variable){
-		$files = file::get_files_by_pattern(payment_path.'plugins'.DIRECTORY_SEPARATOR,'*'.DIRECTORY_SEPARATOR.'hook.php');
+		$files = [];
+		$appsActives = cache::get('appStatus', null  ,'paymentCms');
+		if ( is_array($appsActives) and ! empty($appsActives) ) {
+			foreach ($appsActives as $appName => $appStatus) {
+				if ($appStatus == 'active') {
+					if ( is_file(payment_path . 'app' . DIRECTORY_SEPARATOR.$appName. DIRECTORY_SEPARATOR . 'hook.php') ) {
+						$files[] = [ 'aria' => 'app' , 'controller' => $appName ];
+					}
+				}
+			}
+		}
+		$pluginSActives = cache::get('pluginStatus', null  ,'paymentCms');
+		if ( is_array($pluginSActives) and ! empty($pluginSActives) ) {
+			foreach ($pluginSActives as $pluginName => $pluginStatus) {
+				if ($pluginStatus == 'active') {
+					if ( is_file(payment_path . 'plugins' . DIRECTORY_SEPARATOR.$pluginName. DIRECTORY_SEPARATOR . 'hook.php') ) {
+						$files[] = [ 'aria' => 'plugin' , 'controller' => $pluginName ];
+					}
+				}
+			}
+		}
 		foreach ($files as $file) {
-			$temp = explode(DIRECTORY_SEPARATOR, strings::deleteWordLastString($file,DIRECTORY_SEPARATOR.'hook.php')) ;
-			$class = 'plugin\\'.end($temp).'\hook';
+			$controller = $file['controller'];
+			$aria = $file['aria'] ;
+			$class = $aria.'\\'.$controller.'\hook';
 			$method = '_'.$hookName;
 			if ( method_exists($class,$method) ){
-				$Object = new $class(self::$mold);
+				/* @var \paymentCms\component\mold\Mold $mold */
+				$mold = self::$mold;
+				if ( $aria == 'plugin')
+					$mold->path(null,$controller.':plugin');
+				else
+					$mold->path(null,$controller);
+				$Object = new $class($mold);
 				call_user_func_array([$Object,$method],$variable);
 			}
 		}
