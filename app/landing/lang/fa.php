@@ -18,5 +18,8 @@ return [
 	'landingPageApp' => 'طراحی صفحات landing',
 	'landingPageAppDescription' => 'توسط این پلاگین شما می توانید صفحات لندیگ مختلفی ایجاد نمایید و حتی از قالب های مختلفی استفاده کنید.',
 	'pages' => 'برگه ها',
+	'page' => 'برگه',
+	'content' => 'محتوا',
+	'setAsDefault' => 'پیشفرض',
 	'' => '',
 ];

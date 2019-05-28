@@ -34,7 +34,7 @@ class landingPage extends \controller {
 		$this->lists();
 	}
 	public function lists() {
-		$get = request::post('page=1,perEachPage=25,name,default' ,null);
+		$get = request::post('page=1,perEachPage=25,content,default' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
 			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
@@ -46,18 +46,19 @@ class landingPage extends \controller {
 			//TODO:: add error is not valid data
 
 		} else {
-			if ( $get['name'] != null ) {
-				$value[] = '%'.$get['fname'].'%' ;
-				$value[] = '%'.$get['fname'].'%' ;
-				$value[] = '%'.$get['fname'].'%' ;
-				$variable[] = 'name LIKE ? or metaDescription LIKE ? or template LIKE ?' ;
+			if ( $get['content'] != null ) {
+				$value[] = '%'.$get['content'].'%' ;
+				$value[] = '%'.$get['content'].'%' ;
+				$value[] = '%'.$get['content'].'%' ;
+				$variable[] = ' ( name LIKE ? or metaDescription LIKE ? or template LIKE ? ) ' ;
 			}
-
+			if ( $get['default'] == 'active')
+				$variable[] = ' useAsDefault = 1 ' ;
 		}
 		$model = parent::model('landingpage');
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' or ' , $variable) , null, 'COUNT(landingPageId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode('or' , $variable) )  , null, '*'  , ['column' => 'landingPageId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' or ' , $variable) )  , null, '*'  , ['column' => 'landingPageId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
 		$this->mold->path('default', 'landing');
 		$this->mold->view('landingPageList.mold.html');
 		$this->mold->setPageTitle(rlang('pages'));
