@@ -58,7 +58,7 @@ abstract class model {
 
 	public static function __init() {
 		if ( self::$db == null ) {
-			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+			$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			self::$db = new \database($configDataBase['_dbHost'], $configDataBase['_dbUsername'], $configDataBase['_dbPassword'], $configDataBase['_dbName']);
 			self::$db->setPrefix($configDataBase['_dbTableStartWith']);
 		}
@@ -74,9 +74,10 @@ abstract class model {
 	public static function transaction(){
 		if ( self::$transactionCounter >= 0 )
 			self::$transactionCounter ++;
-		else
-			self::$transactionCounter = 1 ;
-		self::$db->startTransaction();
+		else {
+			self::$transactionCounter = 1;
+			self::$db->startTransaction();
+		}
 	}
 
 	public static function commit(){
