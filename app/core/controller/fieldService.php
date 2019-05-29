@@ -20,7 +20,7 @@ namespace App\core\controller;
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
-class fieldService extends \controller {
+class fieldService  {
 
 	public static function getFieldsToEdit($serviceId,$serviceType , &$mold = null ) {
 		$return = \App\core\app_provider\api\fields::getFieldsToEdit($serviceId,$serviceType);
