@@ -13,7 +13,7 @@
                                             <div class="card-icon" >
                                                 <i class="fa fa-file"></i>
                                             </div>
-                                            <h4 class="card-title float-{$float} m-3">{_ "add"} {_ "page"}</h4>
+                                            <h4 class="card-title float-{$float} m-3">{if isset($page)}{_ "edit"}{else}{_ "add"}{/if} {_ "page"}</h4>
                                         </div>
                                         <form class="form-horizontal" method="post" action="{url current}">
                                             <div class="card-body">
@@ -79,9 +79,9 @@
                                                 <button class="btn btn-link" type="reset">{_ "refresh"}</button>
                                                 <button type="submit" class="btn btn-fill btn-rose">
                                                  <span class="btn-label">
-                                                    <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
+                                                    <i class="material-icons">edit</i>
                                                  </span>
-                                                    {if isset($newUser)}{_ "add"}{else}{_ "edit"}{/if} {_ "page"}
+                                                    {if isset($page)}{_ "edit"}{else}{_ "add"}{/if} {_ "page"}
                                                 </button>
                                             </div>
                                         </form>
