@@ -69,14 +69,10 @@ class landingPage extends \controller {
 		if ( request::isPost() ) {
 			$this->checkData();
 		}
-		/* @var \App\user\model\user_group $model */
-		$model = $this->model('user_group');
-		$access = $model->search(null,null);
-		$this->mold->set('access',$access);
-		$this->mold->set('newUser',true);
-		$this->mold->path('default', 'user');
-		$this->mold->view('userProfile.mold.html');
-		$this->mold->setPageTitle(rlang(['add','user']));
+		$this->mold->path('default', 'landing');
+		$this->mold->view('landingPageEditor.mold.html');
+		$this->mold->path('default');
+		$this->mold->setPageTitle(rlang(['add','page']));
 	}
 	public function profile($userId,$updateStatus = null){
 		if ( request::isPost() ) {

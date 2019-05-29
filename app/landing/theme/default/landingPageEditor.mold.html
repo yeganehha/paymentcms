@@ -1,0 +1,120 @@
+<div class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12 ml-auto mr-auto">
+                <div class="page-categories">
+                    <div class="tab-content tab-space tab-subcategories">
+                        <div class="tab-pane active" id="link8">
+                                <div class="row">
+                                <div class="col-md-8 col-sm-12">
+                                    <div class="card">
+                                        <div class="card-header card-header-rose card-header-icon" >
+                                            <div class="card-icon" >
+                                                <i class="material-icons">file</i>
+                                            </div>
+                                            <h4 class="card-title float-{$float} m-3">{_ "add"} {_ "page"}</h4>
+                                        </div>
+                                        <form class="form-horizontal" method="post" action="{url current}">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="name" value="{if isset($Mold.post.name)}{$Mold.post.name}{else}{if isset($page)}{$page->getName()}{/if}{/if}" name="name" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "metaDescription"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="metaDescription" value="{if isset($Mold.post.metaDescription)}{$Mold.post.metaDescription}{else}{if isset($page)}{$page->getMetaDescription()}{/if}{/if}" name="metaDescription" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <label class="col-md-3 col-form-label">{_ "email"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <textarea name="email" dir="ltr" class="form-control tinymce" >{if isset($Mold.post.email)}{$Mold.post.email}{else}{if isset($page)}{$page->getEmail()}{/if}{/if}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="col-md-3 col-form-label">{_ "phone"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="text" id="phoneInput" value="{if isset($Mold.post.phone)}{$Mold.post.phone}{else}{if isset($page)}{$page->getPhone()}{/if}{/if}" name="phone" dir="ltr" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="col-md-3 col-form-label">{_ "password"}</label>
+                                                        <div class="col-md-9">
+                                                            <div class="form-group has-default">
+                                                                <input type="password" id="passwordInput" name="password" dir="ltr" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center mt-2">
+                                                        <div class="form-check">
+                                                            <label class="form-check-label">
+                                                                <input class="form-check-input" id="activeInput" name="block" type="checkbox"  {if isset($Mold.post.active)}{if $Mold.post.active == 'active' }checked{/if}{else}{if isset($page)}{if $page->getBlock()}checked{/if}{else}checked{/if}{/if} value="1"> {_ "block"}
+                                                                <span class="form-check-sign">
+                                                  <span class="check"></span>
+                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button class="btn btn-link" type="reset">{_ "refresh"}</button>
+                                                <button type="submit" class="btn btn-fill btn-rose">
+                                                 <span class="btn-label">
+                                                    <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
+                                                 </span>
+                                                    {if isset($newUser)}{_ "add"}{else}{_ "edit"}{/if} {_ "page"}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-sm col-md-4">
+                                    <div class="card">
+                                        <div class="card-header card-header-info card-header-icon " >
+                                            <div class="card-icon" >
+                                                <i class="material-icons">info</i>
+                                            </div>
+                                            <h4 class="card-title float-{$float} m-3">{_ "help"}</h4>
+                                        </div>
+                                        <div class="card-body text-{$text_align} text-secondary">
+                                            <strong class="text-info">{_ "name"} :</strong> {_ "service_add_helper_name"}<br>
+                                            {call addUserFormHelp}
+                                        </div>
+                                        <div class="card-footer">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{map footerjs}
+<script src="{url theme}assets/js/plugins/tinymce/tinymce.min.js"></script>
+<script type="text/javascript">
+    tinymce.init({
+        selector: '.tinymce',
+        language: 'zh_CN',
+        directionality: 'rtl'
+    });
+</script>
+{/map}

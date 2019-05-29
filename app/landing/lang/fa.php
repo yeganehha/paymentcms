@@ -21,5 +21,6 @@ return [
 	'page' => 'برگه',
 	'content' => 'محتوا',
 	'setAsDefault' => 'پیشفرض',
+	'metaDescription' => 'توضیحات مختصر',
 	'' => '',
 ];

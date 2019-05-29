@@ -62,12 +62,19 @@ class controller {
 	 * @return \App\model\model
 	 */
 	protected function model($modelName = null , $searchVariable = null , $searchWhereClaus = null) {
+		if ( is_array($modelName) and count($modelName) == 2 ) {
+			$app = $modelName[0];
+			$modelName = $modelName[1];
+		}
 		if ( $modelName == null )
 			$modelName = $this->model;
-		if ( empty(\app::getAppProvider()) )
+		if ( empty(\app::getAppProvider()) and ! isset($app))
 			$model = 'App\\'.\app::getApp().'\model\\'.$modelName ;
-		else
+		elseif ( ! isset($app) )
 			$model = 'App\\'.\app::getAppProvider().'\model\\'.$modelName ;
+		elseif ( isset($app))
+			$model = 'App\\'.$app.'\model\\'.$modelName ;
+
 		if (class_exists($model)) {
 			if ( $searchWhereClaus == null )
 				return new $model($searchVariable) ;
