@@ -14,6 +14,7 @@
 use paymentCms\component\cache;
 use paymentCms\component\file;
 use paymentCms\component\model;
+use paymentCms\component\request;
 use paymentCms\component\strings;
 
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
@@ -371,6 +372,17 @@ class App {
 		if ( $app == null)
 			$app = self::$app ;
 		$baseUrl = self::getAppLinkFromAppsLink($app);
+		$path = str_replace(['\\','/','>'],'/',$path);
+		$path = str_replace('//','/',$path);
+		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;
+		return $baseUrl.'/'.(( ! is_null($path) ) ? $path : '' );
+	}
+
+	public static function getCurrentBaseLink($path = null ){
+		$server = request::server('HTTPS,HTTP_HOST,SCRIPT_NAME');
+		$httpProtocol = $server['HTTPS'] == 'on' ? 'https://':'http://' ;
+		$domain = $httpProtocol . $server['HTTP_HOST'].$server['SCRIPT_NAME'];
+		$baseUrl = strings::deleteWordLastString($domain,'/index.php' );
 		$path = str_replace(['\\','/','>'],'/',$path);
 		$path = str_replace('//','/',$path);
 		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;

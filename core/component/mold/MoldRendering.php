@@ -598,6 +598,10 @@ class MoldRendering {
 				$link = \app::getAppLink('theme/' . $this->fileInfo['folder'], $this->fileInfo['app']);
 				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
+			case 'themebase':
+				$link = \app::getCurrentBaseLink('theme/' . $this->fileInfo['folder']);
+				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
+				break;
 			case 'patch':
 				$listDirToFile = explode(DIRECTORY_SEPARATOR, $this->fileInfo['path']);
 				$fileName = array_pop($listDirToFile);
