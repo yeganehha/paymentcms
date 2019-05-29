@@ -22,5 +22,10 @@ return [
 	'content' => 'محتوا',
 	'setAsDefault' => 'پیشفرض',
 	'metaDescription' => 'توضیحات مختصر',
+	'template' => 'قالب نمایش',
+	'justContent_templateFile' => 'صرفا نمایش قالب فوق',
+	'default_templateFile' => 'قالب پیشفرض',
+	'editPageSuccessFully' => 'ویرایش برگه با موفقیت انجام شد.',
+	'insertPageSuccessFully' => 'برگه جدید با موفقیت ایجاد شد!',
 	'' => '',
 ];

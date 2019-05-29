@@ -150,4 +150,15 @@ class landingpage extends model implements modelInterFace {
 		$this->useAsDefault = $useAsDefault;
 	}
 
+
+	public function deActiveAllDefault() {
+		try {
+			if (self::$db->update($this->modelName, ['useAsDefault' => 0]))
+				return $this->returning();
+		} catch (\Exception $e) {
+			return $this->returning(null,false,$this->modelName.'2') ;
+		}
+		return $this->returning(null,false,$this->modelName.'2') ;
+	}
+
 }

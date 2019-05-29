@@ -5,6 +5,7 @@ namespace App\landing\app_provider\admin;
 
 
 use App\core\controller\httpErrorHandler;
+use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -52,13 +53,15 @@ class landingPage extends \controller {
 				$value[] = '%'.$get['content'].'%' ;
 				$variable[] = ' ( name LIKE ? or metaDescription LIKE ? or template LIKE ? ) ' ;
 			}
-			if ( $get['default'] == 'active')
-				$variable[] = ' useAsDefault = 1 ' ;
+			if ( $get['default'] == 'active') {
+				$value[] = 1 ;
+				$variable[] = ' useAsDefault = ? ';
+			}
 		}
 		$model = parent::model('landingpage');
-		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' or ' , $variable) , null, 'COUNT(landingPageId) as co' )) [0]['co'];
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(landingPageId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' or ' , $variable) )  , null, '*'  , ['column' => 'landingPageId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'landingPageId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
 		$this->mold->path('default', 'landing');
 		$this->mold->view('landingPageList.mold.html');
 		$this->mold->setPageTitle(rlang('pages'));
@@ -69,38 +72,58 @@ class landingPage extends \controller {
 		if ( request::isPost() ) {
 			$this->checkData();
 		}
+		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.content.mold.html');
+		$template = [];
+		for ( $i = 0 ; $i < count($files) ; $i++){
+			$files[$i] = strings::deleteWordLastString($files[$i],'.content.mold.html');
+			$files[$i] = strings::deleteWordFirstString($files[$i],__DIR__.'/../../theme/'.'default'.'/');
+			$template[$files[$i]] = rlang($files[$i].'_templateFile');
+			if ( $template[$files[$i]] == null)
+				$template[$files[$i]] = $files[$i] ;
+		}
+		unset($files);
+		$this->mold->set('template',$template);
 		$this->mold->path('default', 'landing');
 		$this->mold->view('landingPageEditor.mold.html');
 		$this->mold->path('default');
 		$this->mold->setPageTitle(rlang(['add','page']));
 	}
-	public function profile($userId,$updateStatus = null){
+	public function edit($pageId,$updateStatus = null){
 		if ( request::isPost() ) {
-			$this->checkData($userId);
+			$this->checkData($pageId);
 		}
-		/* @var \paymentCms\model\user $user */
-		$user = $this->model('user' , $userId );
-		if ( $user->getUserId() != $userId ){
+		/* @var \App\landing\model\landingpage $page */
+		$page = $this->model('landingpage' , $pageId );
+		if ( $page->getLandingPageId() != $pageId ){
 			httpErrorHandler::E404();
 			return false ;
 		}
 		if ( $updateStatus == 'updateDone') {
-			$this->alert('success' , '',rlang('editUserSuccessFully'));
+			$this->alert('success' , '',rlang('editPageSuccessFully'));
 			$this->mold->set('activeTab','edit');
-		}elseif ( $updateStatus == 'insertDone') {
-			$this->alert('success' , '',rlang('insertUserSuccessFully'));
+		} elseif ( $updateStatus == 'insertDone') {
+			$this->alert('success' , '',rlang('insertPageSuccessFully'));
 		}
 
-		/* @var \App\user\model\user_group $model */
-		$model = $this->model('user_group');
-		$access = $model->search(null,null);
 
-		$this->mold->set('access',$access);
-		$this->mold->set('user',$user);
-		$this->mold->path('default', 'user');
-		$this->mold->view('userProfile.mold.html');
-		$this->mold->setPageTitle(rlang(['profile','user']));
-		return $user;
+		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.content.mold.html');
+		$template = [];
+		for ( $i = 0 ; $i < count($files) ; $i++){
+			$files[$i] = strings::deleteWordLastString($files[$i],'.content.mold.html');
+			$files[$i] = strings::deleteWordFirstString($files[$i],__DIR__.'/../../theme/'.'default'.'/');
+			$template[$files[$i]] = rlang($files[$i].'_templateFile');
+			if ( $template[$files[$i]] == null)
+				$template[$files[$i]] = $files[$i] ;
+		}
+		unset($files);
+		$this->mold->set('template',$template);
+
+
+		$this->mold->set('page',$page);
+		$this->mold->path('default', 'landing');
+		$this->mold->view('landingPageEditor.mold.html');
+		$this->mold->setPageTitle(rlang(['profile','page']));
+		return $page;
 	}
 
 	/**
@@ -109,19 +132,57 @@ class landingPage extends \controller {
 	 * @return bool
 	 * [no-access]
 	 */
-	public function checkData($userId = null){
-		$result = \App\user\app_provider\api\user::editUser($userId,$_POST);
-		if ( $result['status'] ){
-			if ($userId == null) {
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $result['result'] . '/insertDone', 'admin'));
-			} else {
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $result['result'] . '/updateDone', 'admin'));
-			}
-			exit;
-		} else {
-			$this->alert('danger', '', $result['massage'] );
-			$this->mold->set('activeTab','edit');
+	public function checkData($pageId = null){
+		$form = request::post('id=0,name,metaDescription,content,template,default');
+		$rules = [
+			'id' => ['int|match:>=0'	, rlang('id')],
+			'name' => ['required'	, rlang('name')],
+			'content' => ['required'	, rlang('content')],
+			'template' => ['required'	, rlang('template')],
+		];
+		$valid = validate::check($form, $rules);
+		if ($valid->isFail()){
+			$this->alert('warning' , null,$valid->errorsIn(),'error');
 			return false;
+		} else {
+			model::transaction();
+			/* @var \App\landing\model\landingpage $page */
+			if ( $pageId != null )
+				$page = $this->model('landingpage' , $pageId );
+			else
+				$page = $this->model('landingpage' );
+
+			$page->setName($form['name']);
+			$page->setMetaDescription($form['metaDescription']);
+			$page->setTemplate($form['content']);
+			$page->setTemplateName($form['template']);
+			if ( $form['default'] == 'active') {
+				$resultUpdateDeActive = $page->deActiveAllDefault();
+				if ( $resultUpdateDeActive == false){
+					model::rollback();
+					$this->alert('warning' , null,rlang('pleaseTryAGain'),'error');
+					return false;
+				}
+				$page->setUseAsDefault(1);
+			} else {
+				$page->setUseAsDefault(0);
+			}
+			if ( $pageId != null )
+				$result = $page->upDateDataBase();
+			else
+				$result = $page->insertToDataBase();
+
+			if ( $result === false ) {
+				model::rollback();
+				$this->alert('warning' , null,rlang('pleaseTryAGain'),'error');
+				return false;
+			}
+			model::commit();
+			if ( $pageId != null )
+				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $pageId . '/updateDone', 'admin'));
+			else
+				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $result['result'] . '/insertDone', 'admin'));
+			return true;
 		}
 	}
 }

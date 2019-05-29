@@ -9,20 +9,29 @@
                                 <div class="row">
                                 <div class="col-md-8 col-sm-12">
                                     <div class="card">
-                                        <div class="card-header card-header-rose card-header-icon" >
+                                        <div class="card-header card-header-info card-header-icon" >
                                             <div class="card-icon" >
-                                                <i class="material-icons">file</i>
+                                                <i class="fa fa-file"></i>
                                             </div>
                                             <h4 class="card-title float-{$float} m-3">{_ "add"} {_ "page"}</h4>
                                         </div>
                                         <form class="form-horizontal" method="post" action="{url current}">
                                             <div class="card-body">
                                                 <div class="row">
+                                                    {if isset($page)}
+                                                    <div class="col-md-12 text-left ltr">
+                                                    {if $page->getUseAsDefault()}
+                                                    <a class="text-info text-left" target="_blank" href="{url landing}" >{url landing}</a>
+                                                    {else}
+                                                    <a class="text-info text-left" target="_blank" href="{url landing}{$page->getLandingPageId()}/{$page->getName()|str_replace:' ':'_'}" >{url landing}{$page->getLandingPageId()}/{$page->getName()|str_replace:' ':'_'}</a>
+                                                    {/if}
+                                                    </div>
+                                                    {/if}
                                                     <div class="col-md-12">
                                                         <label class="col-md-3 col-form-label">{_ "name"}</label>
                                                         <div class="col-md-9">
                                                             <div class="form-group has-default">
-                                                                <input type="text" id="name" value="{if isset($Mold.post.name)}{$Mold.post.name}{else}{if isset($page)}{$page->getName()}{/if}{/if}" name="name" class="form-control">
+                                                                <input type="text" id="name" required value="{if isset($Mold.post.name)}{$Mold.post.name}{else}{if isset($page)}{$page->getName()}{/if}{/if}" name="name" class="form-control">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -35,35 +44,29 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <label class="col-md-3 col-form-label">{_ "email"}</label>
-                                                        <div class="col-md-9">
+                                                        <label class="col-md-12 col-form-label">{_ "content"}</label>
+                                                        <div class="col-md-12">
                                                             <div class="form-group has-default">
-                                                                <textarea name="email" dir="ltr" class="form-control tinymce" >{if isset($Mold.post.email)}{$Mold.post.email}{else}{if isset($page)}{$page->getEmail()}{/if}{/if}</textarea>
+                                                                <textarea name="content" dir="ltr" class="form-control tinymce" >{if isset($Mold.post.content)}{$Mold.post.content}{else}{if isset($page)}{$page->getTemplate()}{/if}{/if}</textarea>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="col-md-3 col-form-label">{_ "phone"}</label>
+                                                        <label class="col-md-3 col-form-label">{_ "template"}</label>
                                                         <div class="col-md-9">
                                                             <div class="form-group has-default">
-                                                                <input type="text" id="phoneInput" value="{if isset($Mold.post.phone)}{$Mold.post.phone}{else}{if isset($page)}{$page->getPhone()}{/if}{/if}" name="phone" dir="ltr" class="form-control">
+                                                                <select class="selectpicker" name="template" data-size="7" data-style="btn btn-outline-info btn-round text-{$float}" title="{_ 'template'}" required>
+                                                                    {foreach from=$template key=key value=name }
+                                                                    <option value="{$key}" {if isset($Mold.post.template) and $Mold.post.template == $key } selected {elseif isset($page) and $page->getTemplateName() == $key}selected{/if} >{$name}</option>
+                                                                    {/foreach}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <label class="col-md-3 col-form-label">{_ "password"}</label>
-                                                        <div class="col-md-9">
-                                                            <div class="form-group has-default">
-                                                                <input type="password" id="passwordInput" name="password" dir="ltr" class="form-control">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12 text-center mt-2">
+                                                    <div class="col-md-6 text-center mt-2">
                                                         <div class="form-check">
                                                             <label class="form-check-label">
-                                                                <input class="form-check-input" id="activeInput" name="block" type="checkbox"  {if isset($Mold.post.active)}{if $Mold.post.active == 'active' }checked{/if}{else}{if isset($page)}{if $page->getBlock()}checked{/if}{else}checked{/if}{/if} value="1"> {_ "block"}
+                                                                <input class="form-check-input" id="activeInput" name="default" type="checkbox"  {if isset($Mold.post.default)}{if $Mold.post.default == 'active' }checked{/if}{else}{if isset($page)}{if $page->getUseAsDefault()}checked{/if}{else}checked{/if}{/if} value="active"> {_ "setAsDefault"}
                                                                 <span class="form-check-sign">
                                                   <span class="check"></span>
                                                 </span>
@@ -113,8 +116,62 @@
 <script type="text/javascript">
     tinymce.init({
         selector: '.tinymce',
-        language: 'zh_CN',
-        directionality: 'rtl'
+        language: 'fa',
+        directionality: 'rtl',
+        plugins: 'code visualblocks print preview powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
+        toolbar: 'code formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
+        image_advtab: true,
+        content_css: [
+        ],
+        link_list: [
+            { title: 'My page 1', value: 'http://www.tinymce.com' },
+            { title: 'My page 2', value: 'http://www.moxiecode.com' }
+        ],
+        image_list: [
+            { title: 'My page 1', value: 'http://www.tinymce.com' },
+            { title: 'My page 2', value: 'http://www.moxiecode.com' }
+        ],
+        image_class_list: [
+            { title: 'None', value: '' },
+            { title: 'Some class', value: 'class-name' }
+        ],
+        importcss_append: true,
+        height: 400,
+        file_picker_callback: function (callback, value, meta) {
+            /* Provide file and text for the link dialog */
+            if (meta.filetype === 'file') {
+                callback('https://www.google.com/logos/google.jpg', { text: 'My text' });
+            }
+
+            /* Provide image and alt text for the image dialog */
+            if (meta.filetype === 'image') {
+                callback('https://www.google.com/logos/google.jpg', { alt: 'My alt text' });
+            }
+
+            /* Provide alternative source and posted for the media dialog */
+            if (meta.filetype === 'media') {
+                callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
+            }
+        },
+        templates: [
+            { title: 'Some title 1', description: 'Some desc 1', content: 'My content' },
+            { title: 'Some title 2', description: 'Some desc 2', content: '<div class="mceTmpl"><span class="cdate">cdate</span><span class="mdate">mdate</span>My content2</div>' }
+        ],
+        template_cdate_format: '[CDATE: %m/%d/%Y : %H:%M:%S]',
+        template_mdate_format: '[MDATE: %m/%d/%Y : %H:%M:%S]',
+        image_caption: true,
+        spellchecker_dialog: true,
+        spellchecker_whitelist: [],
+        tinycomments_mode: 'embedded',
+        content_style: ''
     });
 </script>
+<style>
+    .tox-statusbar__branding{
+        display: none;
+    }
+    .tox-dialog__body-nav{
+        display: none !important;
+    }
+</style>
 {/map}
