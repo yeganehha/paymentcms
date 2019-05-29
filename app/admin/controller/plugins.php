@@ -68,13 +68,23 @@ class plugins extends \controller {
 			if ( file_exists($file_name) ) {
 				$appData = require_once $file_name;
 				if ( isset($appData['db']) and !  is_null($appData['db'])) {
-					$query = $this->generateQueryCreatTable($appData['db']);
+					$querys = $this->generateQueryCreatTable($appData['db']);
 					model::transaction();
 					try {
-						if ( model::queryUnprepared($query) ) {
+						$hasError = false ;
+						foreach ( $querys as $tabelName => $query){
+							if ( model::queryUnprepared($query) === false) {
+								$hasError = true ;
+							}
+						}
+						if ( $hasError === false ){
 							model::commit();
 							$this->changeCacheOfAppStatus($app,'deActive');
 							Response::redirect(\app::getBaseAppLink('plugins/lists/appInstalled#app_'.$app));
+							return true;
+						} else {
+							model::rollback();
+							Response::redirect(\app::getBaseAppLink('plugins/lists/pleaseTryAGain#app_'.$app));
 							return true;
 						}
 					} catch (Exception $exception){
@@ -250,31 +260,31 @@ class plugins extends \controller {
 
 
 	private function generateQueryCreatTable($tables){
-		$query = '';
+		$query = [];
 		if ( is_array($tables) ) {
 			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			foreach ( $tables as $tableName => $tableData) {
-				$query .= 'CREATE TABLE IF NOT EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ('.chr(10) ;
+				$query[$tableName] = 'CREATE TABLE IF NOT EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ('.chr(10) ;
 				foreach ( $tableData['fields'] as $fieldName => $fieldData) {
-					$query .= '  `'.$fieldName.'` '.$fieldData.','.chr(10) ;
+					$query[$tableName] .= '  `'.$fieldName.'` '.$fieldData.','.chr(10) ;
 				}
 				if ( isset($tableData['PRIMARY KEY']) and is_array($tableData['PRIMARY KEY']) and ! is_null($tableData['PRIMARY KEY'])) {
 					foreach ($tableData['PRIMARY KEY'] as $fieldName) {
-						$query .= ' PRIMARY KEY (`'.$fieldName.'`) USING BTREE,'.chr(10);
+						$query[$tableName] .= ' PRIMARY KEY (`'.$fieldName.'`) USING BTREE,'.chr(10);
 					}
 				}
 				if ( isset($tableData['KEY']) and is_array($tableData['KEY']) and ! is_null($tableData['KEY'])) {
 					foreach ($tableData['KEY'] as $fieldName) {
-						$query .= ' KEY `'.$fieldName.'` (`'.$fieldName.'`),'.chr(10);
+						$query[$tableName] .= ' KEY `'.$fieldName.'` (`'.$fieldName.'`),'.chr(10);
 					}
 				}
 				if ( isset($tableData['REFERENCES']) and is_array($tableData['REFERENCES']) and ! is_null($tableData['REFERENCES'])) {
 					foreach ($tableData['REFERENCES'] as $fieldName => $fieldData) {
-						$query .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
+						$query[$tableName] .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
 					}
 				}
-				$query = strings::deleteWordLastString($query,','.chr(10) ).chr(10);
-				$query .= ') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;'.chr(10).chr(10);
+				$query[$tableName] = strings::deleteWordLastString($query[$tableName],','.chr(10) ).chr(10);
+				$query[$tableName] .= ') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;'.chr(10).chr(10);
 
 			}
 		}
