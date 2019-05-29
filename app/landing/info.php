@@ -16,7 +16,7 @@ return [
 				'name' => 'VARCHAR(65) NOT NULL',
 				'metaDescription' => 'TEXT NULL DEFAULT NULL',
 				'template' => 'TEXT NULL DEFAULT NULL',
-				'templateName' => "VARCHAR(65) NULL DEFAULT 'defaults'",
+				'templateName' => "VARCHAR(65) NULL DEFAULT 'default'",
 				'useAsDefault' => "BOOLEAN NOT NULL DEFAULT FALSE",
 			],
 			'KEY' => [

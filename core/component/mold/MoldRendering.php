@@ -673,6 +673,12 @@ class MoldRendering {
 		return 'str_replace('.$search.' ,'.$replace.','.$value.' )' ;
 	}
 
+	private function ___url_encode($value ){
+		if ( !$this->engineStatus )
+			return ;
+		return 'urlencode('.$value.' )' ;
+	}
+
 	private function ___date_format($value,$format){
 		if ( !$this->engineStatus )
 			return ;
