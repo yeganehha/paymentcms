@@ -147,9 +147,13 @@ class landingPage extends \controller {
 		} else {
 			model::transaction();
 			/* @var \App\landing\model\landingpage $page */
-			if ( $pageId != null )
+			if ( $pageId != null ) {
 				$page = $this->model('landingpage' , $pageId );
-			else
+				if ( $eForm->getFormId() != $eFormId){
+					httpErrorHandler::E404();
+					return false;
+				}
+			} else
 				$page = $this->model('landingpage' );
 
 			$page->setName($form['name']);

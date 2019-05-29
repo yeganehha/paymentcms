@@ -36,7 +36,6 @@ class eform extends model implements modelInterFace {
 	private $published ;
 	private $public ;
 	private $showHistory ;
-	private $password ;
 
 	public function setFromArray($result) {
 		$this->formId = $result['formId'] ;
@@ -49,7 +48,6 @@ class eform extends model implements modelInterFace {
 		$this->published = $result['published'] ;
 		$this->public = $result['public'] ;
 		$this->showHistory = $result['showHistory'] ;
-		$this->password = $result['password'] ;
 	}
 
 	public function returnAsArray( ) {
@@ -63,7 +61,6 @@ class eform extends model implements modelInterFace {
 		$array['published'] = $this->published ;
 		$array['public'] = $this->public ;
 		$array['showHistory'] = $this->showHistory ;
-		$array['password'] = $this->password ;
 		return $array ;
 	}
 
@@ -221,19 +218,6 @@ class eform extends model implements modelInterFace {
 		$this->showHistory = $showHistory;
 	}
 
-	/**
-	 * @return mixed
-	 */
-	public function getPassword() {
-		return $this->password;
-	}
-
-	/**
-	 * @param mixed $password
-	 */
-	public function setPassword($password) {
-		$this->password = $password;
-	}
 
 
 }

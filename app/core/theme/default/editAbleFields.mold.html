@@ -28,7 +28,7 @@
                                     <option value="textarea" {if $field.type == 'textarea'}selected{/if}>{_ "textareaField"}</option>
                                     <option value="date" {if $field.type == 'date'}selected{/if}>{_ "dateField"}</option>
                                     <option value="number" {if $field.type == 'number'}selected{/if}>{_ "numberField"}</option>
-                                    <option value="file" {if $field.type == 'file'}selected{/if}>{_ "fileField"}</option>
+                                    <!--<option value="file" {if $field.type == 'file'}selected{/if}>{_ "fileField"}</option>-->
                                 </select>
                             </div>
                         </div>
@@ -45,8 +45,8 @@
                                     <select class="selectpicker"  name="moreField[{$key}][status]" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'field'}">
                                         <option value="required" {if $field.status == 'required'}selected{/if}>{_ "visible"} {_ "and"} {_ "required"}</option>
                                         <option value="visible" {if $field.status  == 'visible'}selected{/if}>{_ "visible"}</option>
-                                        <option value="invisible" {if $field.status  == 'invisible'}selected{/if}>{_ "invisible"}</option>
-                                        <option value="admin" {if $field.status  == 'admin'}selected{/if}>{_ "adminField"}</option>
+                                        <!--<option value="invisible" {if $field.status  == 'invisible'}selected{/if}>{_ "invisible"}</option>-->
+                                        <!--<option value="admin" {if $field.status  == 'admin'}selected{/if}>{_ "adminField"}</option>-->
                                     </select>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                                     <option value="textarea" {if $field.type == 'textarea'}selected{/if}>{_ "textareaField"}</option>
                                     <option value="date" {if $field.type == 'date'}selected{/if}>{_ "dateField"}</option>
                                     <option value="number" {if $field.type == 'number'}selected{/if}>{_ "numberField"}</option>
-                                    <option value="file" {if $field.type == 'file'}selected{/if}>{_ "fileField"}</option>
+                                    <!--<option value="file" {if $field.type == 'file'}selected{/if}>{_ "fileField"}</option>-->
                                 </select>
                             </div>
                         </div>
@@ -138,8 +138,8 @@
                                     <select class="selectpicker"  name="moreField[{$key}][status]" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'field'}">
                                         <option value="required" {if $field.status == 'required'}selected{/if}>{_ "visible"} {_ "and"} {_ "required"}</option>
                                         <option value="visible" {if $field.status == 'visible'}selected{/if}>{_ "visible"}</option>
-                                        <option value="invisible" {if $field.status == 'invisible'}selected{/if}>{_ "invisible"}</option>
-                                        <option value="admin" {if $field.status == 'admin'}selected{/if}>{_ "adminField"}</option>
+                                        <!--<option value="invisible" {if $field.status == 'invisible'}selected{/if}>{_ "invisible"}</option>-->
+                                        <!--<option value="admin" {if $field.status == 'admin'}selected{/if}>{_ "adminField"}</option>-->
                                     </select>
                                 </div>
                             </div>
@@ -227,7 +227,7 @@
                                     <option value="textarea">{_ "textareaField"}</option>
                                     <option value="date">{_ "dateField"}</option>
                                     <option value="number">{_ "numberField"}</option>
-                                    <option value="file">{_ "fileField"}</option>
+                                    <!--<option value="file">{_ "fileField"}</option>-->
                                 </select>
                             </div>
                         </div>
@@ -244,8 +244,8 @@
                                     <select class="selectpickerTemp" name="moreField[__IIDD__][status]" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'status'} {_ 'field'}">
                                         <option value="required">{_ "visible"} {_ "and"} {_ "required"}</option>
                                         <option value="visible" selected>{_ "visible"}</option>
-                                        <option value="invisible">{_ "invisible"}</option>
-                                        <option value="admin">{_ "adminField"}</option>
+                                        <!--<option value="invisible">{_ "invisible"}</option>-->
+                                        <!--<option value="admin">{_ "adminField"}</option>-->
                                     </select>
                                 </div>
                             </div>
@@ -297,6 +297,9 @@
     var numberOfElement = {if isset($numberOfFields)}{$numberOfFields}{else}0{/if} ;
 </script>
 <script src="{url theme}/assets/js/fieldService.js"></script>
+<script>
+    {if !isset($numberOfFields) or ( isset($numberOfFields) and $numberOfFields == 0 ) }add();{/if}
+</script>
 <style>
     .bootstrap-tagsinput .badge {
         background-color: #00bcd4 !important;

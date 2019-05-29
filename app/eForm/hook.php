@@ -32,7 +32,8 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class hook extends pluginController {
 
 	public function _adminHeaderNavbar($vars2){
-		$this->menu->after('dashboard','eForms' , rlang('eForms') , \app::getBaseAppLink('eForms/lists','admin') , 'fa fa-question-circle' );
+		show($this->menu);
+		$this->menu->after('dashboard','eForms' , rlang('eForms') , \app::getBaseAppLink('eForms/lists','admin') , 'fa fa-wpforms' );
 		$this->menu->addChild('eForms','allFormsNotAnswer' , rlang(['eForms','pending'] ) , \app::getBaseAppLink('eForms/lists','admin')  );
 		$this->menu->add('allForms' , rlang(['list','eForms']) , \app::getBaseAppLink('eForms/all' ,'admin') ,null,null,'eForms' );
 		$this->menu->add('newForms' , rlang(['eForm','new'] ) , \app::getBaseAppLink('eForms/insert' ,'admin') ,null,null,'eForms' );

@@ -4,7 +4,9 @@
 namespace App\eForm\app_provider\admin;
 
 
+use App\core\controller\fieldService;
 use App\core\controller\httpErrorHandler;
+use App\eForm\model\eform;
 use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\request;
@@ -107,58 +109,69 @@ class eForms extends \controller {
 		if ( request::isPost() ) {
 			$this->checkData();
 		}
-		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.content.mold.html');
+		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.form.mold.html');
 		$template = [];
 		for ( $i = 0 ; $i < count($files) ; $i++){
-			$files[$i] = strings::deleteWordLastString($files[$i],'.content.mold.html');
+			$files[$i] = strings::deleteWordLastString($files[$i],'.form.mold.html');
 			$files[$i] = strings::deleteWordFirstString($files[$i],__DIR__.'/../../theme/'.'default'.'/');
 			$template[$files[$i]] = rlang($files[$i].'_templateFile');
 			if ( $template[$files[$i]] == null)
 				$template[$files[$i]] = $files[$i] ;
 		}
 		unset($files);
+		/* @var \App\user\model\user_group $model */
+		$model = $this->model(['user','user_group']);
+		$access = $model->search(null,null);
+		$this->mold->set('access',$access);
 		$this->mold->set('template',$template);
-		$this->mold->path('default', 'landing');
-		$this->mold->view('landingPageEditor.mold.html');
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('formEditor.mold.html');
 		$this->mold->path('default');
-		$this->mold->setPageTitle(rlang(['add','page']));
+		$this->mold->setPageTitle(rlang(['add','eForm']));
 	}
-	public function edit($pageId,$updateStatus = null){
+	public function edit($formId,$updateStatus = null){
 		if ( request::isPost() ) {
-			$this->checkData($pageId);
+			$this->checkData($formId);
 		}
-		/* @var \App\landing\model\landingpage $page */
-		$page = $this->model('landingpage' , $pageId );
-		if ( $page->getLandingPageId() != $pageId ){
+
+		/* @var \App\eForm\model\eform $form */
+		$form = $this->model('eform' , $formId );
+		if ( $form->getFormId() != $formId ){
 			httpErrorHandler::E404();
 			return false ;
 		}
 		if ( $updateStatus == 'updateDone') {
-			$this->alert('success' , '',rlang('editPageSuccessFully'));
+			$this->alert('success' , '',rlang('editEFormSuccessFully'));
 			$this->mold->set('activeTab','edit');
 		} elseif ( $updateStatus == 'insertDone') {
-			$this->alert('success' , '',rlang('insertPageSuccessFully'));
+			$this->alert('success' , '',rlang('insertEFromSuccessFully'));
 		}
 
-
-		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.content.mold.html');
+		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.form.mold.html');
 		$template = [];
 		for ( $i = 0 ; $i < count($files) ; $i++){
-			$files[$i] = strings::deleteWordLastString($files[$i],'.content.mold.html');
+			$files[$i] = strings::deleteWordLastString($files[$i],'.form.mold.html');
 			$files[$i] = strings::deleteWordFirstString($files[$i],__DIR__.'/../../theme/'.'default'.'/');
 			$template[$files[$i]] = rlang($files[$i].'_templateFile');
 			if ( $template[$files[$i]] == null)
 				$template[$files[$i]] = $files[$i] ;
 		}
 		unset($files);
+		/* @var \App\user\model\user_group $model */
+		$model = $this->model(['user','user_group']);
+		$access = $model->search(null,null);
+
+		$accessSelect = array_filter((array) explode(',' , $form->getAccess()));
+
+		fieldService::getFieldsToEdit($form->getFormId(),'eForm',$this->mold);
+		$this->mold->set('access',$access);
+		$this->mold->set('accessSelect',$accessSelect);
 		$this->mold->set('template',$template);
-
-
-		$this->mold->set('page',$page);
-		$this->mold->path('default', 'landing');
-		$this->mold->view('landingPageEditor.mold.html');
-		$this->mold->setPageTitle(rlang(['profile','page']));
-		return $page;
+		$this->mold->set('form',$form);
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('formEditor.mold.html');
+		$this->mold->setPageTitle(rlang(['edit','eForm']));
+		return $form;
 	}
 
 	/**
@@ -167,13 +180,13 @@ class eForms extends \controller {
 	 * @return bool
 	 * [no-access]
 	 */
-	public function checkData($pageId = null){
-		$form = request::post('id=0,name,metaDescription,content,template,default');
+	public function checkData($eFormId = null){
+		$form = request::post('id=0,name,description,lastNote,templateName,access,published,oneTime,public,showHistory,moreField,deleteField');
 		$rules = [
 			'id' => ['int|match:>=0'	, rlang('id')],
 			'name' => ['required'	, rlang('name')],
-			'content' => ['required'	, rlang('content')],
-			'template' => ['required'	, rlang('template')],
+			'access' => ['required'	, rlang('access')],
+			'templateName' => ['required'	, rlang('template')],
 		];
 		$valid = validate::check($form, $rules);
 		if ($valid->isFail()){
@@ -181,42 +194,63 @@ class eForms extends \controller {
 			return false;
 		} else {
 			model::transaction();
-			/* @var \App\landing\model\landingpage $page */
-			if ( $pageId != null )
-				$page = $this->model('landingpage' , $pageId );
-			else
-				$page = $this->model('landingpage' );
-
-			$page->setName($form['name']);
-			$page->setMetaDescription($form['metaDescription']);
-			$page->setTemplate($form['content']);
-			$page->setTemplateName($form['template']);
-			if ( $form['default'] == 'active') {
-				$resultUpdateDeActive = $page->deActiveAllDefault();
-				if ( $resultUpdateDeActive == false){
-					model::rollback();
-					$this->alert('warning' , null,rlang('pleaseTryAGain'),'error');
+			/* @var \App\eForm\model\eform $eForm */
+			if ( $eFormId != null ) {
+				$eForm = $this->model('eform', $eFormId);
+				if ( $eForm->getFormId() != $eFormId){
+					httpErrorHandler::E404();
 					return false;
 				}
-				$page->setUseAsDefault(1);
+			} else
+				$eForm = $this->model('eform' );
+
+			$eForm->setName($form['name']);
+			$eForm->setLastNote($form['lastNote']);
+			$eForm->setDescription($form['description']);
+			$eForm->setTemplateName($form['templateName']);
+			$eForm->setAccess(','.implode(',',$form['access']).',');
+			if ( $form['published'] == 'active') {
+				$eForm->setPublished(1);
 			} else {
-				$page->setUseAsDefault(0);
+				$eForm->setPublished(0);
 			}
-			if ( $pageId != null )
-				$result = $page->upDateDataBase();
+			if ( $form['oneTime'] == 'active') {
+				$eForm->setOneTime(1);
+			} else {
+				$eForm->setOneTime(0);
+			}
+			if ( $form['public'] == 'active') {
+				$eForm->setPublic(1);
+			} else {
+				$eForm->setPublic(0);
+			}
+			if ( $form['showHistory'] == 'active') {
+				$eForm->setShowHistory(1);
+			} else {
+				$eForm->setShowHistory(0);
+			}
+			if ( $eFormId != null )
+				$result = $eForm->upDateDataBase();
 			else
-				$result = $page->insertToDataBase();
+				$result = $eForm->insertToDataBase();
 
 			if ( $result === false ) {
-				model::rollback();
 				$this->alert('warning' , null,rlang('pleaseTryAGain'),'error');
 				return false;
 			}
-			model::commit();
-			if ( $pageId != null )
-				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $pageId . '/updateDone', 'admin'));
-			else
-				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $result['result'] . '/insertDone', 'admin'));
+			if ( $eFormId != null ) {
+				$resultUpdateField = fieldService::updateFields($eForm->getFormId(),'eForm' ,$form['moreField'],$form['deleteField']);
+				if ( ! $resultUpdateField['status'] ) {
+					model::rollback();
+					$this->alert('warning' , null, rlang('pleaseTryAGain').'<br>'.$resultUpdateField['massage'],'error');
+					return false;
+				}
+				model::commit();
+				Response::redirect(\App::getBaseAppLink('eForms/edit/' . $eFormId . '/updateDone', 'admin'));
+			} else {
+				model::commit();
+				Response::redirect(\App::getBaseAppLink('eForms/edit/' . $result['result'] . '/insertDone', 'admin'));
+			}
 			return true;
 		}
 	}
