@@ -32,7 +32,7 @@ class eForms extends \controller {
 		$this->lists();
 	}
 	public function all() {
-		$get = request::post('page=1,perEachPage=25,content,default' ,null);
+		$get = request::post('page=1,perEachPage=25,content,published,public' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
 			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
@@ -46,24 +46,62 @@ class eForms extends \controller {
 		} else {
 			if ( $get['content'] != null ) {
 				$value[] = '%'.$get['content'].'%' ;
-				$value[] = '%'.$get['content'].'%' ;
-				$value[] = '%'.$get['content'].'%' ;
-				$variable[] = ' ( name LIKE ? or metaDescription LIKE ? or template LIKE ? ) ' ;
+				$variable[] = ' name LIKE ? ' ;
 			}
-			if ( $get['default'] == 'active') {
+			if ( $get['published'] == 'active') {
 				$value[] = 1 ;
-				$variable[] = ' useAsDefault = ? ';
+				$variable[] = ' published = ? ';
+			}
+			if ( $get['public'] == 'active') {
+				$value[] = 1 ;
+				$variable[] = ' public = ? ';
 			}
 		}
 		$model = parent::model('eform');
-		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(landingPageId) as co' )) [0]['co'];
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(formId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'landingPageId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
-		$this->mold->path('default', 'landing');
-		$this->mold->view('landingPageList.mold.html');
-		$this->mold->setPageTitle(rlang('pages'));
-		$this->mold->set('activeMenu' , 'landingPages');
-		$this->mold->set('pages' , $search);
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('eFormAdminList.mold.html');
+		$this->mold->setPageTitle(rlang('eForms'));
+		$this->mold->set('activeMenu' , 'allForms');
+		$this->mold->set('forms' , $search);
+	}
+	public function lists() {
+		$get = request::post('page=1,perEachPage=25,content,published,public' ,null);
+		$rules = [
+			"page" => ["required|match:>0", rlang('page')],
+			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
+		];
+		$valid = validate::check($get, $rules);
+		$value = array( );
+		$variable = array( );
+		if ($valid->isFail()){
+			//TODO:: add error is not valid data
+
+		} else {
+			if ( $get['content'] != null ) {
+				$value[] = '%'.$get['content'].'%' ;
+				$variable[] = ' name LIKE ? ' ;
+			}
+			if ( $get['published'] == 'active') {
+				$value[] = 1 ;
+				$variable[] = ' published = ? ';
+			}
+			if ( $get['public'] == 'active') {
+				$value[] = 1 ;
+				$variable[] = ' public = ? ';
+			}
+		}
+		$model = parent::model('eform');
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(formId) as co' )) [0]['co'];
+		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('eFormAdminList.mold.html');
+		$this->mold->setPageTitle(rlang('eForms'));
+		$this->mold->set('activeMenu' , 'allForms');
+		$this->mold->set('forms' , $search);
 	}
 	public function insert(){
 		if ( request::isPost() ) {
