@@ -105,7 +105,7 @@ class eForms extends \controller {
 		$value[] = '%,'.session::get('userAppLoginInformation')['user_group_id'].',%' ;
 //		$variable[] = ' ( e.oneTime = 1 and ( ( e.showHistory = 1 and f.fillId > 0 ) or f.fillId IS NULL ) ) and published = 1 and public = 1 and access LIKE ? ';
 		$variable[] = ' ( ( e.oneTime = 1 and f.fillId IS NULL ) or e.oneTime = 0 ) and published = 1 and public = 1 and access LIKE ? ';
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eform e', 'e.formId,e.name,e.oneTime,f.fillStart,f.fillId'  , ['column' => 'e.formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eform e', 'e.formId,e.name,e.oneTime,f.fillStart,f.fillId'  , ['column' => 'e.formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] ,'e.formId' );
 		$this->mold->path('default', 'eForm');
 		$this->mold->view('eFormUserList.mold.html');
 		$this->mold->setPageTitle(rlang(['eForms' , 'pending']));

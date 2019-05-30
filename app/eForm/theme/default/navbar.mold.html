@@ -62,19 +62,4 @@
     </nav>
     <!-- End Navbar -->
     <div class="content">
-        {foreach from=$alert key=key value=alert}
-        <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
-            {if isset($alert.icon)}
-            <i class="material-icons" data-notify="icon">{$alert.icon}</i>
-            {/if}
-            {if $alert.canClose}
-            <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
-                <i class="material-icons">close</i>
-            </button>
-            {/if}
-            <span  class="text-{$text_align}">
-                      {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}</span>
-        </div>
-        {/foreach}
-        {call alertHeader}
         {call adminHeaderNavbar}
