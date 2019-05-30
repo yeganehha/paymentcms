@@ -10,8 +10,8 @@ return [
 	'db' => [
 		'test1' => [
 			'fields' => [
-				'testId' => 'INT NOT NULL AUTO_INCREMENT',
-				'factorId' => 'INT NOT NULL',
+				'testId' => 'INT(11) NOT NULL AUTO_INCREMENT',
+				'factorId' => 'INT(11) NOT NULL',
 				'name' => 'TEXT NULL DEFAULT NULL',
 				'chart' => "VARCHAR(65) NULL DEFAULT 'test'",
 			],

@@ -184,7 +184,7 @@ class plugins extends \controller {
 				try {
 					if ( model::queryUnprepared($query) ) {
 						model::commit();
-						file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
+//						file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
 						$this->changeCacheOfAppStatus($app,null);
 						Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
 						return true;
@@ -195,7 +195,7 @@ class plugins extends \controller {
 					return true;
 				}
 			} else {
-				file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
+//				file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
 				$this->changeCacheOfAppStatus($app,null);
 				Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
 				return true;
@@ -213,7 +213,7 @@ class plugins extends \controller {
 		}
 		$file_name = payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.$plugin.DIRECTORY_SEPARATOR.'info.php';
 		if ( file_exists($file_name) ) {
-			file::removedir(payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.$plugin);
+//			file::removedir(payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.$plugin);
 			$this->changeCacheOfAppStatus($plugin,null,'pluginStatus');
 			Response::redirect(\app::getBaseAppLink('plugins/pLists/appUninstalled#app_'.$plugin));
 			return true;
