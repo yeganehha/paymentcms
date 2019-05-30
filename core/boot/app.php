@@ -421,6 +421,6 @@ class App {
 	}
 
 	private static function sortArrayByLength($a,$b){
-		return strlen($b['link'])-strlen($a['link']);
+		return strlen($a['link'])-strlen($b['link']);
 	}
 }

@@ -149,7 +149,7 @@ class landingPage extends \controller {
 			/* @var \App\landing\model\landingpage $page */
 			if ( $pageId != null ) {
 				$page = $this->model('landingpage' , $pageId );
-				if ( $eForm->getFormId() != $eFormId){
+				if ( $page->getLandingPageId() != $pageId){
 					httpErrorHandler::E404();
 					return false;
 				}
