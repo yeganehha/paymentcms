@@ -15,7 +15,7 @@
                             {set loadDivIDInHtml,"listToGetFromServer"}
                             <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
                                 <div class="row">
-                                   <div class="col-md-4">
+                                   <div class="col-md-8">
                                        <label class="col-md-3 col-form-label">{_ "name"}</label>
                                        <div class="col-md-9">
                                            <div class="form-group has-default">
@@ -23,26 +23,6 @@
                                            </div>
                                        </div>
                                    </div>
-                                    <div class="col-md-2 text-center mt-3">
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" name="published" type="checkbox" value="active"> {_ "published"}
-                                                <span class="form-check-sign">
-                                                  <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 text-center mt-3">
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" name="public" type="checkbox" value="active"> {_ "public"}
-                                                <span class="form-check-sign">
-                                                  <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
                                    <div class="col-md-4">
                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
                                        <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>

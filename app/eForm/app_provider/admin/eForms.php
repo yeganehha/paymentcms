@@ -7,7 +7,6 @@ namespace App\eForm\app_provider\admin;
 use App\core\controller\fieldService;
 use App\core\controller\httpErrorHandler;
 use App\eForm\model\eform;
-use App\user\app_provider\api\user;
 use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\request;
@@ -72,7 +71,7 @@ class eForms extends \controller {
 		$this->mold->set('forms' , $search);
 	}
 	public function lists() {
-		$get = request::post('page=1,perEachPage=25,content,published,public' ,null);
+		$get = request::post('page=1,perEachPage=25,content' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
 			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
@@ -88,22 +87,51 @@ class eForms extends \controller {
 				$value[] = '%'.$get['content'].'%' ;
 				$variable[] = ' name LIKE ? ' ;
 			}
-			if ( $get['published'] == 'active') {
-				$value[] = 1 ;
-				$variable[] = ' published = ? ';
-			}
-			if ( $get['public'] == 'active') {
-				$value[] = 1 ;
-				$variable[] = ' public = ? ';
+		}
+		/* @var eform $model */
+		$model = parent::model('eform');
+		model::join('eformfilled f' , 'f.formId = e.formId and f.userId = '.session::get('userAppLoginInformation')['userId'], "left" );
+		$value[] = '%,'.session::get('userAppLoginInformation')['user_group_id'].',%' ;
+		$variable[] = ' ( ( e.oneTime = 1 and f.fillId IS NULL ) or e.oneTime = 0 ) and published = 1 and public = 1 and access LIKE ? ';
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , 'eform e', 'COUNT(f.formId) as co' , null,null,'e.formId')) [0]['co'];
+		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
+		model::join('eformfilled f' , 'f.formId = e.formId and f.userId = '.session::get('userAppLoginInformation')['userId'], "left" );
+		$value[] = '%,'.session::get('userAppLoginInformation')['user_group_id'].',%' ;
+		$variable[] = ' ( ( e.oneTime = 1 and f.fillId IS NULL ) or e.oneTime = 0 ) and published = 1 and public = 1 and access LIKE ? ';
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eform e', 'e.formId,e.name,e.oneTime,f.fillStart,f.fillId'  , ['column' => 'e.formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] ,'e.formId' );
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('eFormUserList.mold.html');
+		$this->mold->setPageTitle(rlang(['eForms' , 'pending']));
+		$this->mold->set('activeMenu' , 'allFormsNotAnswer');
+		$this->mold->set('forms' , $search);
+	}
+	public function yourAnswer() {
+		$get = request::post('page=1,perEachPage=25,content' ,null);
+		$rules = [
+			"page" => ["required|match:>0", rlang('page')],
+			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
+		];
+		$valid = validate::check($get, $rules);
+		$value = array( );
+		$variable = array( );
+		if ($valid->isFail()){
+			//TODO:: add error is not valid data
+
+		} else {
+			if ( $get['content'] != null ) {
+				$value[] = '%'.$get['content'].'%' ;
+				$variable[] = ' name LIKE ? ' ;
 			}
 		}
 		/* @var eform $model */
 		$model = parent::model('eform');
-		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(formId) as co' )) [0]['co'];
+		model::join('eformfilled f' , 'f.formId = e.formId and f.userId = '.session::get('userAppLoginInformation')['userId'], "left" );
+		$value[] = '%,'.session::get('userAppLoginInformation')['user_group_id'].',%' ;
+		$variable[] = ' ( ( e.oneTime = 1 and f.fillId IS NULL ) or e.oneTime = 0 ) and published = 1 and public = 1 and access LIKE ? ';
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , 'eform e', 'COUNT(f.formId) as co' , null,null,'e.formId')) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		model::join('eformfilled f' , 'f.formId = e.formId and f.userId = '.session::get('userAppLoginInformation')['userId'], "left" );
 		$value[] = '%,'.session::get('userAppLoginInformation')['user_group_id'].',%' ;
-//		$variable[] = ' ( e.oneTime = 1 and ( ( e.showHistory = 1 and f.fillId > 0 ) or f.fillId IS NULL ) ) and published = 1 and public = 1 and access LIKE ? ';
 		$variable[] = ' ( ( e.oneTime = 1 and f.fillId IS NULL ) or e.oneTime = 0 ) and published = 1 and public = 1 and access LIKE ? ';
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eform e', 'e.formId,e.name,e.oneTime,f.fillStart,f.fillId'  , ['column' => 'e.formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] ,'e.formId' );
 		$this->mold->path('default', 'eForm');
