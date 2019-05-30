@@ -92,7 +92,8 @@ class App {
 		if ( !isset($app))
 			return false ;
 		if ( !empty($app)) {
-			$app = trim(strtolower($app));
+//			$app = trim(strtolower($app));
+			$app = trim($app);
 			$appPatch = self::$appPatch.$app;
 			if (is_dir($appPatch)) {
 //				array_shift(self::$url);

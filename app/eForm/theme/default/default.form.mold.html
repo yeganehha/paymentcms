@@ -1,11 +1,19 @@
 {view "[url patch]header.mold.html"}
+{view "[url patch]menue.mold.html"}
+{view "[url patch]navbar.mold.html"}
 <div class="content mt-5  mb-5">
     <div class="container-fluid mt-5 mb-5">
         <div class="row mt-5">
             <div class="col-md-8 ml-auto mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
-                <div class="card img-fluid">
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon">
+                        <div class="card-icon">
+                            <i class="fa fa-wpforms fa-2x"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "eForm"} : {$form->getName()}</h4>
+                    </div>
                     <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
-                    {$page->getTemplate()}
+                    {$form->getDescription()}
                     </div>
                 </div>
             </div>

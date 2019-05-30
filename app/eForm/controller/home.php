@@ -1,5 +1,8 @@
 <?php
-namespace App\landing\controller ;
+namespace App\eForm\controller ;
+
+use paymentCms\component\session;
+use paymentCms\component\strings;
 
 /**
  * Created by Yeganehha .
@@ -18,29 +21,42 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class home extends \controller {
 
-	/**
-	 * @param null $id
-	 * @param null $name
-	 *                  [global-access]
-	 */
 	public function index($id = null , $name = null ){
-		/* @var \App\landing\model\landingpage $page */
+		if ( ! session::has('userAppLoginInformation') ) {
+			\App\core\controller\httpErrorHandler::E403();
+		}
+
+		$user = session::get('userAppLoginInformation');
+
+		/* @var \App\eForm\model\eform $form */
 		if ( $id != null ){
-			$page = $this->model('landingpage' , $id );
-			if ( $page->getLandingPageId() != $id )
+			$form = $this->model('eform' , $id );
+			if ( $form->getFormId() != $id )
 				\App\core\controller\httpErrorHandler::E404();
 		} else {
-			$page = $this->model('landingpage' , ' 1 ' , ' useAsDefault = ? ' );
-			if ( $page->getLandingPageId() == null)
-				\App\core\controller\httpErrorHandler::E404();
+			\App\core\controller\httpErrorHandler::E404();
 		}
-		if ( is_file(__DIR__.'/../theme/default/'.$page->getTemplateName().'.content.mold.html') )
-			$this->mold->view($page->getTemplateName().'.content.mold.html');
+
+		if ( ! $form->getPublished() )
+			\App\core\controller\httpErrorHandler::E404();
+
+		if ( ! strings::strhas($form->getAccess() , ','.$user['user_group_id'].','))
+			\App\core\controller\httpErrorHandler::E403();
+
+		if ( $form->getOneTime() ){
+			/* @var \App\eForm\model\eformfilled $fill */
+			$fill = $this->model('eformfilled' , [ $form->getFormId() ,$user['userId'] ] , ' formId = ? and userId = ?' );
+			if ( $fill->getFillId() > 0 )
+				\App\core\controller\httpErrorHandler::E403();
+		}
+
+		if ( is_file(__DIR__.'/../theme/default/'.$form->getTemplateName().'.form.mold.html') )
+			$this->mold->view($form->getTemplateName().'.form.mold.html');
 		else
-			$this->mold->view('default.content.mold.html');
-		$this->mold->setPageTitle($page->getName());
-		$page->setTemplate(html_entity_decode($page->getTemplate()));
-		$this->mold->set('page' , $page);
+			$this->mold->view('default.form.mold.html');
+		$this->mold->setPageTitle($form->getName());
+		$form->setDescription(html_entity_decode($form->getDescription()));
+		$this->mold->set('form' , $form);
 		$this->mold->unshow('footer.mold.html' ,'header.mold.html');
 	}
 }

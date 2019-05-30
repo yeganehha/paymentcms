@@ -7,10 +7,12 @@ namespace App\eForm\app_provider\admin;
 use App\core\controller\fieldService;
 use App\core\controller\httpErrorHandler;
 use App\eForm\model\eform;
+use App\user\app_provider\api\user;
 use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
+use paymentCms\component\session;
 use paymentCms\component\strings;
 use paymentCms\component\validate;
 
@@ -62,7 +64,7 @@ class eForms extends \controller {
 		$model = parent::model('eform');
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(formId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, 'formId,name,published,public'  , ['column' => 'formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
 		$this->mold->path('default', 'eForm');
 		$this->mold->view('eFormAdminList.mold.html');
 		$this->mold->setPageTitle(rlang('eForms'));
@@ -95,14 +97,19 @@ class eForms extends \controller {
 				$variable[] = ' public = ? ';
 			}
 		}
+		/* @var eform $model */
 		$model = parent::model('eform');
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(formId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
-		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		model::join('eformfilled f' , 'f.formId = e.formId and f.userId = '.session::get('userAppLoginInformation')['userId'], "left" );
+		$value[] = '%,'.session::get('userAppLoginInformation')['user_group_id'].',%' ;
+//		$variable[] = ' ( e.oneTime = 1 and ( ( e.showHistory = 1 and f.fillId > 0 ) or f.fillId IS NULL ) ) and published = 1 and public = 1 and access LIKE ? ';
+		$variable[] = ' ( ( e.oneTime = 1 and f.fillId IS NULL ) or e.oneTime = 0 ) and published = 1 and public = 1 and access LIKE ? ';
+		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eform e', 'e.formId,e.name,e.oneTime,f.fillStart,f.fillId'  , ['column' => 'e.formId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
 		$this->mold->path('default', 'eForm');
-		$this->mold->view('eFormAdminList.mold.html');
-		$this->mold->setPageTitle(rlang('eForms'));
-		$this->mold->set('activeMenu' , 'allForms');
+		$this->mold->view('eFormUserList.mold.html');
+		$this->mold->setPageTitle(rlang(['eForms' , 'pending']));
+		$this->mold->set('activeMenu' , 'allFormsNotAnswer');
 		$this->mold->set('forms' , $search);
 	}
 	public function insert(){
@@ -128,6 +135,7 @@ class eForms extends \controller {
 		$this->mold->view('formEditor.mold.html');
 		$this->mold->path('default');
 		$this->mold->setPageTitle(rlang(['add','eForm']));
+		$this->mold->set('activeMenu' , 'newForms');
 	}
 	public function edit($formId,$updateStatus = null){
 		if ( request::isPost() ) {
@@ -180,7 +188,7 @@ class eForms extends \controller {
 	 * @return bool
 	 * [no-access]
 	 */
-	public function checkData($eFormId = null){
+	private function checkData($eFormId = null){
 		$form = request::post('id=0,name,description,lastNote,templateName,access,published,oneTime,public,showHistory,moreField,deleteField');
 		$rules = [
 			'id' => ['int|match:>=0'	, rlang('id')],
