@@ -9,9 +9,9 @@
                     <div class="card">
                         <div class="card-header card-header-info card-header-icon">
                             <div class="card-icon">
-                                <i class="fa fa-floppy-o fa-2x"></i>
+                                <i class="fa fa-user-secret fa-2x"></i>
                             </div>
-                            <h4 class="card-title float-{$float} m-3">{_ "install"} {_ "DB"}</h4>
+                            <h4 class="card-title float-{$float} m-3">{_ "admin"}</h4>
                         </div>
                         <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
                             {foreach from=$alert key=key value=alert}
@@ -31,50 +31,51 @@
                             {/foreach}
                             {call alertHeader}
 
+
                             <div class="col-md-12">
-                                <label class="col-md-3 col-form-label">{_ "DBHost"}</label>
+                                <label class="col-md-3 col-form-label">{_ "firstName"}</label>
                                 <div class="col-md-9">
                                     <div class="form-group has-default bmd-form-group is-filled">
-                                        <input type="text" dir="ltr" required="" value="{if isset($Mold.post.host)}{$Mold.post.host}{/if}" name="host" class="form-control">
+                                        <input type="text" required="" value="{if isset($Mold.post.fname)}{$Mold.post.fname}{/if}" name="fname" class="form-control">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <label class="col-md-3 col-form-label">{_ "DBName"}</label>
+                                <label class="col-md-3 col-form-label">{_ "lastName"}</label>
                                 <div class="col-md-9">
                                     <div class="form-group has-default bmd-form-group is-filled">
-                                        <input type="text" dir="ltr" required="" value="{if isset($Mold.post.name)}{$Mold.post.name}{/if}" name="name" class="form-control">
+                                        <input type="text" required="" value="{if isset($Mold.post.lname)}{$Mold.post.lname}{/if}" name="lname" class="form-control">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <label class="col-md-3 col-form-label">{_ "DBUser"}</label>
+                                <label class="col-md-3 col-form-label">{_ "email"}</label>
                                 <div class="col-md-9">
                                     <div class="form-group has-default bmd-form-group is-filled">
-                                        <input type="text" dir="ltr" required="" value="{if isset($Mold.post.user)}{$Mold.post.user}{/if}" name="user" class="form-control">
+                                        <input type="email" dir="ltr" required="" value="{if isset($Mold.post.email)}{$Mold.post.email}{/if}" name="email" class="form-control">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <label class="col-md-3 col-form-label">{_ "DBPassword"}</label>
+                                <label class="col-md-3 col-form-label">{_ "password"}</label>
                                 <div class="col-md-9">
                                     <div class="form-group has-default bmd-form-group is-filled">
-                                        <input type="text"  dir="ltr"  value="{if isset($Mold.post.pass)}{$Mold.post.pass}{/if}" name="pass" class="form-control">
+                                        <input type="password"  dir="ltr" required  value="{if isset($Mold.post.pass)}{$Mold.post.pass}{/if}" name="pass" class="form-control">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <label class="col-md-3 col-form-label">{_ "DBPrefix"}</label>
+                                <label class="col-md-3 col-form-label">{_ "phone"}</label>
                                 <div class="col-md-9">
                                     <div class="form-group has-default bmd-form-group is-filled">
-                                        <input type="text" dir="ltr" required="" value="{if isset($Mold.post.prefix)}{$Mold.post.prefix}{else}per_{/if}" name="prefix" class="form-control">
+                                        <input type="text" dir="ltr" required="" value="{if isset($Mold.post.phone)}{$Mold.post.phone}{/if}" name="phone" class="form-control">
                                     </div>
                                 </div>
                             </div>
 
                         </div>
                         <div class="card-footer">
-                            <input type="hidden" value="step1" name="step1">
+                            <input type="hidden" value="step2" name="step2">
                             <input type="submit" class="btn btn-fill btn-info w-100" value="{_ 'installDB'}" >
                         </div>
                     </div>
@@ -88,11 +89,8 @@
                             <h4 class="card-title float-{$float} m-3">{_ "help"}</h4>
                         </div>
                         <div class="card-body text-{$text_align} text-secondary">
-                            <strong class="text-info">{_ "DBHost"} :</strong> {_ "DBHost_help"}<br><br>
-                            <strong class="text-info">{_ "DBName"} :</strong> {_ "DBName_help"}<br><br>
-                            <strong class="text-info">{_ "DBUser"} :</strong> {_ "DBUser_help"}<br><br>
-                            <strong class="text-info">{_ "DBPassword"} :</strong> {_ "DBPassword_help"}<br><br>
-                            <strong class="text-info">{_ "DBPrefix"} :</strong> {_ "DBPrefix_help"}<br><br>
+                            {_ "admin_help"}<br><br>
+                            <strong class="text-info">{_ "phone"} :</strong> {_ "phone_help"}<br><br>
                         </div>
                     </div>
                 </div>
