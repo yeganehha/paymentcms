@@ -177,6 +177,8 @@ class home {
 			self::$mold->view('step4.mold.html');
 			self::$mold->set('user',session::get('installInfo')['userInfo']);
 			self::$mold->set('adminLink',\App::getCurrentBaseLink().'admin');
+			self::$mold->offAutoCompile();
+			echo self::$mold->render();
 			file::removedir( payment_path.'app'.DIRECTORY_SEPARATOR.'install');
 		} else {
 			self::checkPhp();

@@ -83,17 +83,19 @@ class hook extends pluginController {
 
 	private function getPermissionOfGroupId($page , $groupId = null){
 		if ( ! cache::hasLifeTime('userPermissions' , 'user')) {
-			model::join('user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
+			model::join('user_group as user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
 			if ( $groupId == null )
-				return model::searching($page, 'user_group_permission.accessPage = ? and user_group.loginRequired = 0 ', 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
+				return model::searching($page, 'user_group_permission.accessPage = ? and user_group.loginRequired = 0 ', 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
 			else
-				return model::searching([$page,$groupId], 'user_group_permission.accessPage = ? and user_group_permission.user_groupId = ? ' , 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
+				return model::searching([$page,'--FULL-ACCESS--',$groupId], '( user_group_permission.accessPage = ? or user_group_permission.accessPage = ?  )and user_group_permission.user_groupId = ? ' , 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
 
 		} else {
 			$permission = cache::get('userPermissions',null , 'user');
 			$result = null ;
 			for ( $i = 0 ; $i < count($permission) ; $i ++ ){
 				if ( $groupId != null and $permission[$i]['user_groupId'] == $groupId and $permission[$i]['accessPage']  == $page )
+						return $permission[$i];
+				elseif ( $groupId != null and $permission[$i]['user_groupId'] == $groupId and $permission[$i]['accessPage']  == '--FULL-ACCESS--' )
 						return $permission[$i];
 				elseif ( $groupId == null and $permission[$i]['accessPage']  == $page ) {
 					$result[$permission[$i]['loginRequired']] = $permission[$i];

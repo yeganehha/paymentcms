@@ -2,7 +2,7 @@
 <div class="content mt-5  mb-5">
     <div class="container-fluid mt-5 mb-5">
             <div class="row mt-5" id="listToGetFromServer">
-                <div class="col-md-8 mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                <div class="col-md-8 ml-auto mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
                     <div class="card">
                         <div class="card-header card-header-info card-header-icon">
                             <div class="card-icon">
@@ -32,7 +32,7 @@
                             {_ "yourAccount"} <strong class="text-info">{$user.email}</strong> {_ "yourPhone"} <strong class="text-info">{$user.phone}</strong> {_ "andPassword"} <strong class="text-info">{$user.pass}</strong><br><br>
                         </div>
                         <div class="card-footer">
-                             <a href="{$adminLink}" class="btn btn-fill btn-danger w-100">{_ "login"}</a>
+                             <a href="{$adminLink}" class="btn btn-fill btn-success w-100">{_ "login"}</a>
                         </div>
                     </div>
                 </div>
