@@ -35,33 +35,36 @@ class App {
 	private static $pluginPatch = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR;
 
 	public static function init() {
+		if ( is_file(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config.php')) {
+			self::generateUrlPrams();
+			$appName = self::$app;
 
-		self::generateUrlPrams();
-		$appName = self::$app ;
-
-		$links = self::generateAllLinks();
-		if ( is_array($links) ) {
-			usort($links, ['App', 'sortArrayByLength']);
-			$fullAddress = self::getFullRequestUrl();
-			foreach ( $links as $link ){
-				if ( strings::strFirstHas($fullAddress,$link['link']) ){
-					if (  isset(self::$url[0])  and  strings::strLastHas($link['link'],'/'.self::$url[0]) ){
-						$appName =  $link['app'];
-						array_shift(self::$url);
+			$links = self::generateAllLinks();
+			if (is_array($links)) {
+				usort($links, ['App', 'sortArrayByLength']);
+				$fullAddress = self::getFullRequestUrl();
+				foreach ($links as $link) {
+					if (strings::strFirstHas($fullAddress, $link['link'])) {
+						if (isset(self::$url[0]) and strings::strLastHas($link['link'], '/' . self::$url[0])) {
+							$appName = $link['app'];
+							array_shift(self::$url);
+						}
 					}
 				}
+			} else {
+				if (isset(self::$url[0])) {
+					$appName = self::$url[0];
+					array_shift(self::$url);
+				}
 			}
-		} else {
-			if (  isset(self::$url[0]) ) {
-				$appName = self::$url[0];
-				array_shift(self::$url);
-			}
-		}
 
-		self::checkAppIsExist($appName);
-		self::checkControllerIsExist();
-		self::checkMethodIsExist();
-		self::getParamsFromUrl();
+			self::checkAppIsExist($appName);
+			self::checkControllerIsExist();
+			self::checkMethodIsExist();
+			self::getParamsFromUrl();
+		} else {
+			self::$app = 'install';
+		}
 
 		if ( self::$appProvider == null )
 			$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
