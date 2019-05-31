@@ -184,11 +184,11 @@ class permissions extends \controller {
 
 	private function getPermissionOfGroupId($groupId = null){
 		if ( ! cache::hasLifeTime('userPermissions' , 'user')) {
-			model::join('user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
+			model::join('user_group as user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
 			if ( $groupId == null )
-				return model::searching(null, null, 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
+				return model::searching(null, null, 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
 			else
-				return model::searching($groupId, 'user_group_permission.user_groupId = ? ' , 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
+				return model::searching($groupId, 'user_group_permission.user_groupId = ? ' , 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
 
 		} else {
 			$permission = cache::get('userPermissions',null , 'user');
@@ -206,8 +206,8 @@ class permissions extends \controller {
 	}
 
 	private function savePermissionOfGroupId(){
-		model::join('user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
-		$permission = model::searching(null, null, 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
+		model::join('user_group as user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
+		$permission = model::searching(null, null, 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
 		return cache::save($permission, 'userPermissions', PHP_INT_MAX , 'user');
 	}
 }
