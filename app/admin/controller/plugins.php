@@ -290,7 +290,7 @@ class plugins extends \controller {
 				}
 				if ( isset($tableData['REFERENCES']) and is_array($tableData['REFERENCES']) and ! is_null($tableData['REFERENCES'])) {
 					foreach ($tableData['REFERENCES'] as $fieldName => $fieldData) {
-						$query[$tableName] .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
+						$query[$tableName] .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$configDataBase['_dbTableStartWith'].$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
 					}
 				}
 				$query[$tableName] = strings::deleteWordLastString($query[$tableName],','.chr(10) ).chr(10);

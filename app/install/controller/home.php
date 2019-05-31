@@ -35,6 +35,11 @@ class home {
 		self::$mold ->unshow('footer.mold.html' ,'header.mold.html');
 	}
 	public static function index() {
+		if ( request::isGet('refresh') ){
+			session::set('installInfo',null);
+			Response::redirect(\App::getCurrentBaseLink());
+			exit;
+		}
 		if ( ! session::has('installInfo') )
 			self::step1();
 		else {
