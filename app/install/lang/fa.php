@@ -46,5 +46,7 @@ return [
 	'Administer' => 'مدیر ارشد',
 	'Guest' => 'مهمان',
 	'Internal' => 'داخلی - Internal',
+	'installed' => 'نصب شد!',
+	'login' => 'ورود به ناحیه مدیریت',
 
 ];

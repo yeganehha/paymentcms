@@ -1,6 +1,7 @@
 <?php
 namespace App\install\controller;
 
+use paymentCms\component\file;
 use paymentCms\component\model;
 use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
@@ -103,6 +104,9 @@ class home {
 			self::$mold ->view('step2.mold.html');
 	}
 
+	/**
+	 *
+	 */
 	public static function step3(){
 		self::__init();
 		if ( request::isPost('step3') ){
@@ -169,7 +173,11 @@ class home {
 					$resultInsertUser = $model->insertToDataBase();
 				}
 			}
-			Response::redirect(\App::getCurrentBaseLink().'admin');
+			self::creatConfigFile();
+			self::$mold->view('step4.mold.html');
+			self::$mold->set('user',session::get('installInfo')['userInfo']);
+			self::$mold->set('adminLink',\App::getCurrentBaseLink().'admin');
+			file::removedir( payment_path.'app'.DIRECTORY_SEPARATOR.'install');
 		} else {
 			self::checkPhp();
 			self::$mold->view('step3.mold.html');
@@ -190,6 +198,22 @@ class home {
 		$temp['canClose'] = $close ;
 		self::$alert[] = $temp;
 	}
+
+	private static function creatConfigFile() {
+		$db = session::get('installInfo')['databaseConnectionInfo'] ;
+		try {
+			$php = '';
+			$php .= "<?php\n";
+			$php .= "\t/*  created at : " . date('Y-m-d H:i:s') . "*/ \n";
+			$php .= "\n\n";
+			$php .= "return ['_dbHost' => '".$db['host']."' , '_dbUsername' => '".$db['user']."' , '_dbPassword' => '".$db['pass']."' , '_dbName' => '".$db['name']."' , '_dbTableStartWith' => '".$db['prefix']."'] ; \n";
+			File::generate_file(payment_path.'core'.DIRECTORY_SEPARATOR.'config.php', $php);
+			return true;
+		} catch (\Exception $exception){
+			return false ;
+		}
+	}
+
 	public function __destruct() {
 		if ( ! is_null(self::$alert) and ! is_null(self::$alert))
 			self::$mold->set('alert' , self::$alert );
