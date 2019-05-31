@@ -23,7 +23,7 @@ return [
 			]
 		],
 		'field' => [
-			'field' => [
+			'fields' => [
 				'fieldId' => 'INT(11) NOT NULL AUTO_INCREMENT',
 				'type' => "varchar(255) COLLATE utf8_persian_ci NOT NULL",
 				'title' => "varchar(255) COLLATE utf8_persian_ci NOT NULL",
@@ -44,7 +44,7 @@ return [
 			]
 		],
 		'fieldvalue' => [
-			'field' => [
+			'fields' => [
 				'fieldId' => 'INT(11) DEFAULT NULL',
 				'objectId' => 'INT(11) DEFAULT NULL',
 				'objectType' => "varchar(65) COLLATE utf8_persian_ci NOT NULL",

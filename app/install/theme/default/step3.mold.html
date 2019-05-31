@@ -1,0 +1,123 @@
+{view "[url patch]header.mold.html"}
+<div class="content mt-5  mb-5">
+    {set loadDivID,"#listToGetFromServer"}
+    {set loadDivIDInHtml,"listToGetFromServer"}
+    <form action="{url current}" id="listToGetFromServerForm" method="post" onsubmit="return search('{url current}' ,'{$loadDivID}');" >
+        <div class="container-fluid mt-5 mb-5">
+            <div class="row mt-5" id="listToGetFromServer">
+                <div class="col-md-4 mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="fa  fa-id-card-o fa-2x"></i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ 'installDB'}</h4>
+                        </div>
+                        <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                            {foreach from=$alert key=key value=alert}
+                            <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
+                                {if isset($alert.icon)}
+                                <i class="material-icons" data-notify="icon">{$alert.icon}</i>
+                                {/if}
+                                {if $alert.canClose}
+                                <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                    <i class="material-icons">close</i>
+                                </button>
+                                {/if}
+                                <span  class="text-{$text_align}">
+                                    {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}
+                                </span>
+                            </div>
+                            {/foreach}
+                            {call alertHeader}
+
+                            <strong class="text-info">{$user.fname} {$user.lname}</strong> {_ "dear"}<br>
+                            {_ "yourAccount"} <strong class="text-info">{$user.email}</strong> {_ "yourPhone"} <strong class="text-info">{$user.phone}</strong> {_ "andPassword"} <strong class="text-info">{$user.pass}</strong><br><br>
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>
+                                        {_ "DBUser"}
+                                    </td>
+                                    <td class="text-left ltr">
+                                        {$db.user}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "DBPassword"}
+                                    </td>
+                                    <td class="text-left ltr">
+                                        {$db.pass}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "DBHost"}
+                                    </td>
+                                    <td class="text-left ltr">
+                                        {$db.host}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "DBName"}
+                                    </td>
+                                    <td class="text-left ltr">
+                                        {$db.name}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "DBPrefix"}
+                                    </td>
+                                    <td class="text-left ltr">
+                                        {$db.prefix}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row w-100">
+                                <div class="col-md-9">
+                                    <input type="hidden" value="step2" name="step3">
+                                    <input type="submit" class="btn btn-fill btn-info w-100" value="{_ 'installDB'}" >
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{url current}?refresh=1" class="btn btn-fill btn-danger w-100">{_ "refresh"}</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 ml-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="fa fa-server  fa-2x"></i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ "checkServer"}</h4>
+                        </div>
+                        <div class="card-body text-left ltr text-secondary">
+                            <table class="table table-striped">
+                            {foreach from=$function key=key value=item}
+                                {if $key % 2 == 0}</tr><tr>{/if}
+                                <td>
+                                {if $item.status} <i class="fa fa-check-circle text-success"></i> {$item.name}
+                                {else} <i class="fa fa-times-circle text-danger"></i> {$item.name}
+                                {/if}
+                                </td>
+                            {/foreach}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+{map footerjs}
+<script src="{url themeBase}/assets/js/pagination.js"></script>
+{/map}
+{view "[url patch]footer.mold.html"}

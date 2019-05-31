@@ -1,6 +1,7 @@
 <?php
 namespace App\install\controller;
 
+use paymentCms\component\model;
 use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
 use paymentCms\component\session;
@@ -99,30 +100,34 @@ class home {
 	public static function step3(){
 		self::__init();
 		if ( request::isPost('step3') ){
-			$form = request::post('fname,lname,email,pass,phone,groupId=1,block=0');
-			$rules = [
-				"fname" => ["required", rlang('firstName')],
-				"lname" => ["required", rlang('lastName')],
-				"groupId" => ["required|match:>0", rlang('permission')],
-				"email" => ["required|email", rlang('email')],
-				"phone" => ["required|mobile", rlang('phone')],
-				"block" => ["required|format:{0/1}", rlang('block')],
-				"pass" => ["required", rlang('password')]
-			];
-			$valid = validate::check($form, $rules);
-			if ($valid->isFail()){
-				self::alert('danger' , null,$valid->errorsIn());
-				self::$mold ->view('step2.mold.html');
-			} else {
-				$installInfo = session::get('installInfo');
-				$installInfo['step'] = 'step3';
-				$installInfo['userInfo'] = $form;
-				session::set('installInfo' , $installInfo);
-				self::step4();
+			$listApps = include __DIR__.DIRECTORY_SEPARATOR.'listOfAppShouldInstall.php';
+			$db = session::get('installInfo')['databaseConnectionInfo'] ;
+			self::$db = new \database($db['host'], $db['user'], $db['pass'], $db['name']);
+			self::$db->setPrefix($db['prefix']);
+			model::setDb(self::$db);
+			model::transaction();
+			$allResultNotSave = false ;
+			$appStatus = [];
+			if ( is_array($listApps ) ){
+				plugins::setPrefix($db['prefix']);
+				foreach ($listApps as $app ){
+					$result = plugins::installLocal($app);
+					if ( $result == false ){
+						$allResultNotSave[] = $app ;
+					} else
+						$appStatus[$app] = 'active';
+				}
+				plugins::changeCacheOfAppStatus($appStatus);
 			}
-		} else
-			self::$mold ->view('step2.mold.html');
+			show($allResultNotSave);
+		} else {
+			self::checkPhp();
+			self::$mold->view('step3.mold.html');
+			self::$mold->set('user',session::get('installInfo')['userInfo']);
+			self::$mold->set('db',session::get('installInfo')['databaseConnectionInfo']);
+		}
 	}
+
 
 	private static function alert($type , $title , $description ,$icon = null , $close = true ){
 		if ( $icon != null )
@@ -137,5 +142,43 @@ class home {
 	public function __destruct() {
 		if ( ! is_null(self::$alert) and ! is_null(self::$alert))
 			self::$mold->set('alert' , self::$alert );
+	}
+
+	private static function checkPhp(){
+		$listFunction = include __DIR__.DIRECTORY_SEPARATOR.'listOfFunction.php';
+		$listExtension = include __DIR__.DIRECTORY_SEPARATOR.'listOfExtension.php';
+		$insertToMold = [] ;
+		$allHas = true ;
+		if (version_compare(phpversion(), "4.3.0", ">=")) {
+			$insertToMold[] = ['name' => 'php version: '.phpversion(), 'status' => true];
+		} else {
+			$insertToMold[] = ['name' => 'php version: '.phpversion(), 'status' => false];
+			$allHas = false;
+		}
+		if ( is_array($listFunction) ){
+			foreach ( $listFunction as $key => $value ){
+				if ( function_exists($value) )
+					$insertToMold[] = ['name' => $value , 'status' => true ];
+				else {
+					$insertToMold[] = ['name' => $value, 'status' => false];
+					$allHas = false;
+				}
+			}
+		}
+		if ( is_array($listExtension) ){
+			foreach ( $listExtension as $key => $value ){
+				if ( extension_loaded($value) )
+					$insertToMold[] = ['name' => $value , 'status' => true ];
+				else {
+					$insertToMold[] = ['name' => $value, 'status' => false];
+					$allHas = false;
+				}
+			}
+		}
+
+		self::$mold->set('function',$insertToMold);
+		self::$mold->set('functionSafe',$allHas);
+		return $allHas ;
+
 	}
 }

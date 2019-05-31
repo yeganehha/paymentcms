@@ -58,7 +58,9 @@ abstract class model {
 
 	public static function __init() {
 		if ( self::$db == null ) {
-			$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+			$configDataBase = include payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+			if ( $configDataBase === false )
+				return ;
 			self::$db = new \database($configDataBase['_dbHost'], $configDataBase['_dbUsername'], $configDataBase['_dbPassword'], $configDataBase['_dbName']);
 			self::$db->setPrefix($configDataBase['_dbTableStartWith']);
 		}
@@ -98,7 +100,12 @@ abstract class model {
 		show(self::db()->getLastQuery() , $end);
 	}
 
-
+	/**
+	 * @param \database $db
+	 */
+	public static function setDb($db) {
+		self::$db = $db;
+	}
 
 
 	public function search( $searchVariable, $searchWhereClaus , $tableName = null , $fields = '*' , $orderBy = null ,$limit = null , $groupBy = null) {
