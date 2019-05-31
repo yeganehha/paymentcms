@@ -42,5 +42,9 @@ return [
 	'yourPhone' => 'در حال راهاندازی می باشد. جهت ورود به ناحیه مدیریت نام کاربری شما :',
 	'andPassword' => ' و رمز عبور :',
 	'checkServer' => 'وضعیت سرور',
+	'baseLink' => 'لینک پایه',
+	'Administer' => 'مدیر ارشد',
+	'Guest' => 'مهمان',
+	'Internal' => 'داخلی - Internal',
 
 ];

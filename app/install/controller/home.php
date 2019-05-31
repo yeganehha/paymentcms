@@ -4,6 +4,7 @@ namespace App\install\controller;
 use paymentCms\component\model;
 use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
+use paymentCms\component\Response;
 use paymentCms\component\session;
 use paymentCms\component\validate;
 
@@ -102,6 +103,7 @@ class home {
 		if ( request::isPost('step3') ){
 			$listApps = include __DIR__.DIRECTORY_SEPARATOR.'listOfAppShouldInstall.php';
 			$db = session::get('installInfo')['databaseConnectionInfo'] ;
+			$user = session::get('installInfo')['userInfo'] ;
 			self::$db = new \database($db['host'], $db['user'], $db['pass'], $db['name']);
 			self::$db->setPrefix($db['prefix']);
 			model::setDb(self::$db);
@@ -119,12 +121,56 @@ class home {
 				}
 				plugins::changeCacheOfAppStatus($appStatus);
 			}
-			show($allResultNotSave);
+			if ( $appStatus['core'] == 'active'){
+				$model = new  \paymentCms\model\apps_link();
+				$model->setLink( \App::getCurrentBaseLink().'admin');
+				$model->setApp('admin');
+				$model->insertToDataBase();
+				$model->setLink( \App::getCurrentBaseLink().'users');
+				$model->setApp('user');
+				$model->insertToDataBase();
+			}
+			if ( $appStatus['api'] == 'active'){
+				$model = new  \paymentCms\model\api();
+				$model->setDomain( ( $_SERVER['HTTPS'] == 'on' ? 'https://':'http://' ).$_SERVER['HTTP_HOST'] );
+				$model->setName(rlang('Internal'));
+				$model->setAllowIp('localhost');
+				$model->setActive( 1);
+				$model->insertToDataBase();
+			}
+			if ( $appStatus['user'] == 'active'){
+				$model = new  \App\user\model\user_group();
+				$model->setLoginRequired( 1);
+				$model->setName( rlang('Administer'));
+				$adminGroupId = $model->insertToDataBase();
+				$model->setLoginRequired( 0);
+				$model->setName( rlang('Guest'));
+				$model->insertToDataBase();
+				if ( $adminGroupId !== false){
+					$model = new  \App\user\model\user_group_permission();
+					$model->setUserGroupId( $adminGroupId);
+					$model->setAccessPage( '--FULL-ACCESS--');
+					$model->insertToDataBase();
+					$model = new \paymentCms\model\user();
+					$model->setUserGroupId($adminGroupId);
+					$model->setFname($user['fname']);
+					$model->setLname($user['lname']);
+					$model->setEmail($user['email']);
+					$model->setPhone($user['phone']);
+					$model->setPassword($user['pass']);
+					$model->setBlock(0);
+					$model->setAdminNote('');
+					$model->setRegisterTime( date('Y-m-d H:i:s') );
+					$resultInsertUser = $model->insertToDataBase();
+				}
+			}
+			Response::redirect(\App::getCurrentBaseLink().'admin');
 		} else {
 			self::checkPhp();
 			self::$mold->view('step3.mold.html');
 			self::$mold->set('user',session::get('installInfo')['userInfo']);
 			self::$mold->set('db',session::get('installInfo')['databaseConnectionInfo']);
+			self::$mold->set('link',\App::getCurrentBaseLink());
 		}
 	}
 

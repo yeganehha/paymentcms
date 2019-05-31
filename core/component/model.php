@@ -84,11 +84,12 @@ abstract class model {
 
 	public static function commit(){
 		self::$transactionCounter-- ;
-		if ( self::$transactionCounter == 0 )
+		if ( self::$transactionCounter == 0 ) {
 			self::$db->commit();
+		}
 	}
 	public static function rollback(){
-		self::$transactionCounter == 0 ;
+		self::$transactionCounter = 0 ;
 		self::$db->rollback();
 	}
 	public static function queryUnprepared($query){

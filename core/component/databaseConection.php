@@ -33,6 +33,7 @@ class database {
 	 * @var string
 	 */
 	public static $prefix = '';
+	private static $transactionCounter = 0 ;
 	/**
 	 * MySQLi instances
 	 *
@@ -1998,9 +1999,14 @@ class database {
 	 */
 	public function startTransaction()
 	{
-		$this->mysqli()->autocommit(false);
-		$this->_transaction_in_progress = true;
-		register_shutdown_function(array($this, "_transaction_status_check"));
+		if ( self::$transactionCounter >= 0 )
+			self::$transactionCounter ++;
+		else {
+			self::$transactionCounter = 1;
+			$this->mysqli()->autocommit(false);
+			$this->_transaction_in_progress = true;
+			register_shutdown_function(array($this, "_transaction_status_check"));
+		}
 	}
 	/**
 	 * Transaction commit
@@ -2011,6 +2017,10 @@ class database {
 	 */
 	public function commit()
 	{
+		self::$transactionCounter-- ;
+		if ( self::$transactionCounter > 0 )
+			return false ;
+
 		$result = $this->mysqli()->commit();
 		$this->_transaction_in_progress = false;
 		$this->mysqli()->autocommit(true);
@@ -2025,6 +2035,7 @@ class database {
 	 */
 	public function rollback()
 	{
+		self::$transactionCounter = 0 ;
 		$result = $this->mysqli()->rollback();
 		$this->_transaction_in_progress = false;
 		$this->mysqli()->autocommit(true);

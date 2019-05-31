@@ -2,6 +2,7 @@
 
 return [
 	'core',
+	'api',
 	'admin',
 	'user',
 ];
