@@ -179,14 +179,24 @@ class plugins extends \controller {
 		if ( file_exists($file_name) ) {
 			$appData = require_once $file_name;
 			if ( isset($appData['db']) and !  is_null($appData['db'])) {
-				$query = $this->generateQueryDropTable($appData['db']);
+				$querys = $this->generateQueryDropTable($appData['db']);
 				model::transaction();
 				try {
-					if ( model::queryUnprepared($query) ) {
+					$hasError = false ;
+					foreach ( $querys as $tabelName => $query){
+						if ( model::queryUnprepared($query) === false) {
+							$hasError = true ;
+						}
+					}
+					if ( $hasError === false ){
 						model::commit();
 						file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
-						$this->changeCacheOfAppStatus($app,null);
+						$this->changeCacheOfAppStatus($app,'null');
 						Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
+						return true;
+					} else {
+						model::rollback();
+						Response::redirect(\app::getBaseAppLink('plugins/lists/pleaseTryAGain#app_'.$app));
 						return true;
 					}
 				} catch (Exception $exception){
@@ -280,7 +290,7 @@ class plugins extends \controller {
 				}
 				if ( isset($tableData['REFERENCES']) and is_array($tableData['REFERENCES']) and ! is_null($tableData['REFERENCES'])) {
 					foreach ($tableData['REFERENCES'] as $fieldName => $fieldData) {
-						$query[$tableName] .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
+						$query[$tableName] .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$configDataBase['_dbTableStartWith'].$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
 					}
 				}
 				$query[$tableName] = strings::deleteWordLastString($query[$tableName],','.chr(10) ).chr(10);
@@ -291,13 +301,14 @@ class plugins extends \controller {
 		return $query ;
 	}
 	private function generateQueryDropTable($tables){
-		$query = '';
+		$query[] = 'SET FOREIGN_KEY_CHECKS = 0;';
 		if ( is_array($tables) ) {
 			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			foreach ( $tables as $tableName => $tableData) {
-				$query .= 'DROP TABLE IF EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ;'.chr(10) ;
+				$query[$tableName] .= 'DROP TABLE IF EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ;'.chr(10) ;
 			}
 		}
+		$query[] = 'SET FOREIGN_KEY_CHECKS = 1;';
 		return $query ;
 	}
 	private function changeCacheOfAppStatus($app , $status , $name = 'appStatus'){

@@ -48,7 +48,7 @@ class cache {
 		self::$name = $name ;
 		self::$lifeTime = $lifeTime ;
 		self::$app = $app;
-		if ( self::checkDataIsValidOrNo(true) ) return true ;
+//		if ( self::checkDataIsValidOrNo(true) ) return true ;
 
 		return self::writeOnFile($data);
 	}

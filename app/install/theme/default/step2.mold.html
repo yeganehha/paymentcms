@@ -1,0 +1,105 @@
+{view "[url patch]header.mold.html"}
+<div class="content mt-5  mb-5">
+    {set loadDivID,"#listToGetFromServer"}
+    {set loadDivIDInHtml,"listToGetFromServer"}
+    <form action="{url current}" id="listToGetFromServerForm" method="post" onsubmit="return search('{url current}' ,'{$loadDivID}');" >
+        <div class="container-fluid mt-5 mb-5">
+            <div class="row mt-5" id="listToGetFromServer">
+                <div class="col-md-5 mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="fa fa-user-secret fa-2x"></i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ "admin"}</h4>
+                        </div>
+                        <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                            {foreach from=$alert key=key value=alert}
+                            <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
+                                {if isset($alert.icon)}
+                                <i class="material-icons" data-notify="icon">{$alert.icon}</i>
+                                {/if}
+                                {if $alert.canClose}
+                                <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                    <i class="material-icons">close</i>
+                                </button>
+                                {/if}
+                                <span  class="text-{$text_align}">
+                                    {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}
+                                </span>
+                            </div>
+                            {/foreach}
+                            {call alertHeader}
+
+
+                            <div class="col-md-12">
+                                <label class="col-md-3 col-form-label">{_ "firstName"}</label>
+                                <div class="col-md-9">
+                                    <div class="form-group has-default bmd-form-group is-filled">
+                                        <input type="text" required="" value="{if isset($Mold.post.fname)}{$Mold.post.fname}{/if}" name="fname" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 col-form-label">{_ "lastName"}</label>
+                                <div class="col-md-9">
+                                    <div class="form-group has-default bmd-form-group is-filled">
+                                        <input type="text" required="" value="{if isset($Mold.post.lname)}{$Mold.post.lname}{/if}" name="lname" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 col-form-label">{_ "email"}</label>
+                                <div class="col-md-9">
+                                    <div class="form-group has-default bmd-form-group is-filled">
+                                        <input type="email" dir="ltr" required="" value="{if isset($Mold.post.email)}{$Mold.post.email}{/if}" name="email" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 col-form-label">{_ "password"}</label>
+                                <div class="col-md-9">
+                                    <div class="form-group has-default bmd-form-group is-filled">
+                                        <input type="password"  dir="ltr" required  value="{if isset($Mold.post.pass)}{$Mold.post.pass}{/if}" name="pass" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="col-md-3 col-form-label">{_ "phone"}</label>
+                                <div class="col-md-9">
+                                    <div class="form-group has-default bmd-form-group is-filled">
+                                        <input type="text" dir="ltr" required="" value="{if isset($Mold.post.phone)}{$Mold.post.phone}{/if}" name="phone" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-footer">
+                            <input type="hidden" value="step2" name="step2">
+                            <input type="submit" class="btn btn-fill btn-info w-100" value="{_ 'installDB'}" >
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 ml-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="fa fa-question-circle  fa-2x"></i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ "help"}</h4>
+                        </div>
+                        <div class="card-body text-{$text_align} text-secondary">
+                            {_ "admin_help"}<br><br>
+                            <strong class="text-info">{_ "phone"} :</strong> {_ "phone_help"}<br><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+{map footerjs}
+<script src="{url themeBase}/assets/js/pagination.js"></script>
+{/map}
+{view "[url patch]footer.mold.html"}
