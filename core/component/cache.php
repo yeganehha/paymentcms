@@ -48,7 +48,7 @@ class cache {
 		self::$name = $name ;
 		self::$lifeTime = $lifeTime ;
 		self::$app = $app;
-		if ( self::checkDataIsValidOrNo(true) ) return true ;
+//		if ( self::checkDataIsValidOrNo(true) ) return true ;
 
 		return self::writeOnFile($data);
 	}
@@ -258,7 +258,6 @@ class cache {
 				return false ;
 		}
 		$information =  call_user_func($functionName);
-		$checkDataSize = false ;
 		if ( $information['dataSize'] != self::$dataSize and $checkDataSize )
 			return false ;
 		if ( $information['version'] != self::version or $information['time'] < time()  )
