@@ -96,6 +96,8 @@ class permissions extends \controller {
 			for ( $i = 0 ; $i < count($accessPages) ; $i++ ){
 				$accessPage[] = $accessPages[$i]['accessPage'];
 			}
+			if ( count($accessPage) == 1 and $accessPage[0] == '--FULL-ACCESS--' )
+				$this->mold->set('isAdminister' , true);
 			$this->mold->set('permissionActive',$accessPage);
 		}
 
@@ -184,25 +186,19 @@ class permissions extends \controller {
 
 	private function getPermissionOfGroupId($groupId = null){
 		if ( ! cache::hasLifeTime('userPermissions' , 'user')) {
-			model::join('user_group as user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
-			if ( $groupId == null )
-				return model::searching(null, null, 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
-			else
-				return model::searching($groupId, 'user_group_permission.user_groupId = ? ' , 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
-
-		} else {
-			$permission = cache::get('userPermissions',null , 'user');
-			if ( $groupId != null ){
-				$result = [] ;
-				for ( $i = 0 ; $i < count($permission) ; $i ++ ){
-					if ( $permission[$i]['user_groupId'] == $groupId)
-						$result[] = $permission[$i];
-				}
-				return $result;
-			}
-			else
-				return $permission;
+			$this->savePermissionOfGroupId();
 		}
+		$permission = cache::get('userPermissions',null , 'user');
+		if ( $groupId != null ){
+			$result = [] ;
+			for ( $i = 0 ; $i < count($permission) ; $i ++ ){
+				if ( $permission[$i]['user_groupId'] == $groupId)
+					$result[] = $permission[$i];
+			}
+			return $result;
+		}
+		else
+			return $permission;
 	}
 
 	private function savePermissionOfGroupId(){
