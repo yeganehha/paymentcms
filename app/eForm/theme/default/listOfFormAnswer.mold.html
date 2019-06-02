@@ -15,14 +15,14 @@
                             {set loadDivIDInHtml,"listToGetFromServer"}
                             <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
                                 <div class="row">
-                                   <div class="col-md-4">
-                                       <label class="col-md-3 col-form-label">{_ "name"}</label>
-                                       <div class="col-md-9">
-                                           <div class="form-group has-default">
-                                               <input type="text" name="content" class="form-control">
-                                           </div>
-                                       </div>
-                                   </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "name"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="content" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-md-2 text-center mt-3">
                                         <div class="form-check">
                                             <label class="form-check-label">
@@ -43,10 +43,10 @@
                                             </label>
                                         </div>
                                     </div>
-                                   <div class="col-md-4">
-                                       <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
-                                       <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
-                                   </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
+                                        <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -71,31 +71,22 @@
                                 <thead>
                                 <tr>
                                     <th class="text-center"></th>
-                                    <th>{_ "name"}</th>
-                                    <th>{_ "published"}</th>
-                                    <th>{_ "public"}</th>
+                                    <th>{_ "eForm"}</th>
+                                    <th>{_ "user"}</th>
+                                    <th>{_ "fillEnd"}</th>
                                     <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {foreach from=$forms key=key value=form}
+                                {foreach from=$answers key=key value=answer}
                                 <tr>
-                                    <td class="text-center">{$form.formId}</td>
-                                    <td>{$form.name}</td>
-                                    <td>{if $form.published == 1 }<i class="material-icons">check_circle</i>{else}-{/if}</td>
-                                    <td>{if $form.public == 1 }<i class="material-icons">check_circle</i>{else}-{/if}</td>
+                                    <td class="text-center">{$answer.fillId}</td>
+                                    <td><a href="{url}eForms/edit/{$answer.formId}" target="_blank">{$answer.name}</a></td>
+                                    <td><a href="{url}users/profile/{$answer.userId}" target="_blank">{$answer.fname} {$answer.lname}</a></td>
+                                    <td class="{if $float == 'right'}rtl{else}ltr{/if}">{$answer.fillEnd|jDate:"H-m-i ; jS F, Y"}</td>
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-info btn-link" href="{url}eForms/edit/{$form.formId}">
-                                            <i class="material-icons">edit</i>
-                                        </a>
-                                        <a class="btn btn-info btn-link" href="{url eForm}{$form.formId}/{$form.name|str_replace:' ':'_'}">
+                                        <a class="btn btn-info btn-link" href="{url}eFormsAnswer/answer/{$answer.fillId}">
                                             <i class="material-icons">remove_red_eye</i>
-                                        </a>
-                                        <a class="btn btn-info btn-link" href="{url}eFormsAnswer/lists/{$form.formId}">
-                                            <i class="fa fa-commenting"></i>
-                                        </a>
-                                        <a class="btn btn-info btn-link" href="{url}eFormsAnswer/summery/{$form.formId}">
-                                            <i class="fa fa-comments"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -114,12 +105,3 @@
         </div>
     </div>
 </div>
-{map navBarButton}
-<a class="btn btn-info" href="{url}eForms/insert">
-                      <span class="btn-label">
-                        <i class="fa fa-wpforms"></i>
-                      </span>
-    {_ "add"} {_ "eForm"} {_ "new"}
-    <div class="ripple-container"></div>
-</a>
-{/map}
