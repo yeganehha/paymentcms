@@ -83,7 +83,7 @@
                                     <td class="text-center">{$answer.fillId}</td>
                                     <td><a href="{url}eForms/edit/{$answer.formId}" target="_blank">{$answer.name}</a></td>
                                     <td><a href="{url}users/profile/{$answer.userId}" target="_blank">{$answer.fname} {$answer.lname}</a></td>
-                                    <td class="{if $float == 'right'}rtl{else}ltr{/if}">{$answer.fillEnd|jDate:"H-m-i ; jS F, Y"}</td>
+                                    <td class="{if $float == 'right'}rtl{else}ltr{/if}">{$answer.fillEnd|jDate:"H-i-s ; jS F, Y"}</td>
                                     <td class="td-actions text-right">
                                         <a class="btn btn-info btn-link" href="{url}eFormsAnswer/answer/{$answer.fillId}">
                                             <i class="material-icons">remove_red_eye</i>

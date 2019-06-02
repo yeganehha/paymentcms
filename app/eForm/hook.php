@@ -34,7 +34,7 @@ class hook extends pluginController {
 	public function _adminHeaderNavbar($vars2){
 		$this->menu->after('dashboard','eForms' , rlang('eForms') , \app::getBaseAppLink('eForms/lists','admin') , 'fa fa-wpforms' );
 		$this->menu->addChild('eForms','allFormsNotAnswer' , rlang(['eForms','pending'] ) , \app::getBaseAppLink('eForms/lists','admin')  );
-		$this->menu->add('userAnswer' , rlang(['list','yourAnswers']) , \app::getBaseAppLink('eForms/yourAnswer' ,'admin') ,null,null,'eForms' );
+		$this->menu->add('userAnswer' , rlang(['list','yourAnswers']) , \app::getBaseAppLink('eFormsAnswer/yourAnswer' ,'admin') ,null,null,'eForms' );
 		$this->menu->add('allForms' , rlang(['list','eForms']) , \app::getBaseAppLink('eForms/all' ,'admin') ,null,null,'eForms' );
 		$this->menu->add('newForms' , rlang(['eForm','new'] ) , \app::getBaseAppLink('eForms/insert' ,'admin') ,null,null,'eForms' );
 	}
