@@ -97,6 +97,33 @@ class eFormsAnswer extends \controller {
 		$this->mold->setPageTitle(rlang(['answers' , 'eForm']));
 		$this->mold->set('answers' , $search);
 	}
+	public function summery($formId = null ) {
+		$get = request::post('StartTime,EndTime' ,null);
+		if ( $get['StartTime'] != null  and $get['EndTime'] == null ) {
+			$value[] = $get['StartTime'] ;
+			$variable[] = ' e.fillEnd >= ? ' ;
+		} elseif ( $get['EndTime'] != null and $get['StartTime'] == null) {
+			$value[] = $get['EndTime'] ;
+			$variable[] = ' e.fillEnd <= ? ' ;
+		} elseif ($get['EndTime'] != null and $get['StartTime'] != null) {
+			$value[] = $get['StartTime'] ;
+			$value[] = $get['EndTime'] ;
+			$variable[] = ' ( e.fillEnd BETWEEN ? And ? ) ' ;
+		}
+		if ( $formId != null ){
+			$value[] = $formId ;
+			$variable[] = ' e.formId = ? ' ;
+		}
+
+		$model = $this->model('eformfilled');
+		$search = $model->summery($formId);
+		if ( count($search) ==  0 )
+			$search = null;
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('summery.mold.html');
+		$this->mold->setPageTitle(rlang(['answers' , 'eForm']));
+		$this->mold->set('answers' , $search);
+	}
 	public function yourAnswer() {
 		$userId = session::get('userAppLoginInformation')['userId'];
 		if ( $userId > 0 ) {

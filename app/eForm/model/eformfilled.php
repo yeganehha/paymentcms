@@ -55,6 +55,35 @@ class eformfilled extends model implements modelInterFace{
 		return $array ;
 	}
 
+	
+	public function summery($formId , $startTime = null , $endTime = null ){
+		if ( $startTime != null  and $endTime == null ) {
+			$value[] = $startTime ;
+			$variable = ' eformfilled.fillEnd >= ? ' ;
+		} elseif ( $endTime != null and $startTime == null) {
+			$value[] = $endTime ;
+			$variable = ' eformfilled.fillEnd <= ? ' ;
+		} elseif ($endTime != null and $startTime != null) {
+			$value[] = $startTime ;
+			$value[] = $endTime ;
+			$variable = ' ( eformfilled.fillEnd BETWEEN ? And ? ) ' ;
+		}
+
+		try {
+			$db = parent::db();
+			$db->join('field field', 'field.fieldId = fieldvalue.fieldId', "left");
+			$db->join('eformfilled eformfilled' , ' eformfilled.fillId = fieldvalue.objectId ', 'INNER');
+			if ( isset($variable))
+				$db->joinWhere('eformfilled eformfilled' , $variable , $value);
+			$db->joinWhere('eformfilled eformfilled' , 'eformfilled.formId' , $formId);
+			$db->groupBy('fieldvalue.fieldId,fieldvalue.value');
+			$db->orderBy("field.orderNumber","Desc");
+			$db->orderBy("co","Desc");
+			return $db->get ("fieldvalue fieldvalue", null, ['fieldvalue.value' , 'fieldvalue.fieldId' , 'field.title' , 'field.orderNumber' , 'field.type' , 'count(*) as co']);
+		} catch (\Exception $e) {
+			return false ;
+		}
+	}
 	/**
 	 * @return string
 	 */

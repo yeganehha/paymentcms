@@ -679,6 +679,12 @@ class MoldRendering {
 		return 'urlencode('.$value.' )' ;
 	}
 
+	private function ___asciiToChar($value ){
+		if ( !$this->engineStatus )
+			return ;
+		return 'chr('.$value.' )' ;
+	}
+
 	private function ___date_format($value,$format){
 		if ( !$this->engineStatus )
 			return ;
