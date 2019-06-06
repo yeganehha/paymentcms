@@ -68,14 +68,27 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <div class="price">
-                            <a href="{url}plugins/installLocal/{$app.name}" class="btn btn-info">{_ "install"}</a>
-                        </div>
                         {func method="isAppActive" class="App\admin\controller\plugins_mold" set="setValue" app=$app.name version=$app.version}
+                        <div class="price">
+                            <form action="{url}plugins/installFromStorage" method="post">
+                                <input type="hidden" name="app" value="{$app.name}">
+                                <input type="hidden" name="link" value="{$app.insertLink}">
+                                <input type="hidden" name="type" value="{$app.type}">
+                            {if $setValue == 'notInstallYet' }
+                                <input type="hidden" name="installType" value="install">
+                                <input type="submit" value="{_ 'install'}" class="btn btn-info">
+                            {elseif $setValue == 'updated' }
+                                <input type="hidden" name="installType" value="none">
+                                <input type="submit" value="{_ 'install'}" class="btn tox-tbtn--disabled disabled" disabled>
+                            {elseif $setValue == 'needUpDate'}
+                                <input type="hidden" name="installType" value="update">
+                                <input type="submit" value="{_ 'update'}" class="btn btn-warning">
+                            {/if}
+                            </form>
+                        </div>
                         <div class="stats">
                             <p class="card-category"><i class="fa fa-user"></i> {$app.author} </p>
                             <p class="card-category mr-3 ml-3" > {_ "installedNumber"} : {$app.count} </p>
-                            <p class="card-category mr-3 ml-3" > {$setValue} </p>
                         </div>
                     </div>
                 </div>

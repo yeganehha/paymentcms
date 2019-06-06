@@ -60,4 +60,9 @@ return [
 	'unlink',
 	'strpos',
 	'substr',
+	'copy',
+	'realpath',
+	'pathinfo',
+	'parse_url',
+	'basename',
 ];

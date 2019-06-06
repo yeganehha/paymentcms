@@ -230,8 +230,13 @@ class App {
 		return file::get_name_folders(self::$appPatch);
 	}
 
-	public static function appsListWithConfig(){
-		$apps = file::get_name_folders(self::$appPatch);
+	public static function appsListWithConfig($app = null){
+		if ( is_array($app) )
+			$apps = $app;
+		elseif ( !is_array($app) and $app != null )
+			$apps = [$app];
+		else
+			$apps = file::get_name_folders(self::$appPatch);
 		$return = [];
 		if ( is_array($apps) ){
 			foreach ($apps as $app ){

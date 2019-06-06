@@ -1,0 +1,15 @@
+{view "[url patch]header.mold.html"}
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5 mb-5">
+        <div class="row mt-5">
+            <div class="col-md-8 ml-auto mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                <div class="card img-fluid">
+                    <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                    {$page->getTemplate()}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{view "[url patch]footer.mold.html"}

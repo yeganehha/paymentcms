@@ -48,6 +48,8 @@ class plugins extends \controller {
 			$this->alert('success' ,null ,rlang('appUninstalled'));
 		elseif ($status == 'pleaseTryAGain')
 			$this->alert('danger' ,null ,rlang('pleaseTryAGain'));
+		elseif ($status == 'appDownloadSuccessfully')
+			$this->alert('success' ,null ,rlang('appDownloadSuccessfully'));
 		$apps = \App::appsListWithConfig();
 		$plugins = \App::pluginsListWithConfig();
 		$this->mold->view('pluginLocalList.mold.html');
@@ -57,6 +59,46 @@ class plugins extends \controller {
 		$this->mold->set('plugins' , $plugins);
 	}
 
+
+	public function installFromStorage(){
+		$form = request::post('app,link,type=app,installType=none');
+		if ( $form['installType'] == 'install' or $form['installType'] == 'update'  ){
+			if ( $form['type'] == 'app')
+				$destinationFolder = payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR ;
+			else
+				$destinationFolder = payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR ;
+			if ( is_dir($destinationFolder.$form['app']) and  $form['installType'] == 'install' ) {
+				$appStatus = cache::get('appStatus', $form['app']  ,'paymentCms');
+				if ( $appStatus == null and  $form['type'] == 'app' ){
+					Response::redirect(\app::getBaseAppLink('plugins/installLocal/'.$form['app']));
+					return true ;
+				} elseif( $appStatus == null and  $form['type'] == 'app' ){
+					Response::redirect(\app::getBaseAppLink('plugins/installingPlugin/'.$form['app']));
+					return true ;
+				}
+			}
+			$folder = payment_path.'core'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'storage' .DIRECTORY_SEPARATOR ;
+			file::make_folder($folder);
+			$tempName = $form['app'].'_'.md5($form['app'].time().$form['type']).'.zip';
+			if ( copy($form['link'],$folder.$tempName ) ) {
+				if ( file::unzip($folder.$tempName,$destinationFolder) ){
+					file::remove_file($folder.$tempName);
+					Response::redirect(\app::getBaseAppLink('plugins/lists/appDownloadSuccessfully'));
+					return true ;
+				} else {
+					file::remove_file($folder.$tempName);
+					Response::redirect(\app::getBaseAppLink('plugins/install/extractError'));
+					return false ;
+				}
+			} else {
+				Response::redirect(\app::getBaseAppLink('plugins/install/downloadError'));
+				return false ;
+			}
+		} else {
+			Response::redirect(\app::getBaseAppLink('plugins/lists'));
+			return false ;
+		}
+	}
 	public function installLocal($app = null){
 		if ( is_null($app)){
 			Response::redirect(\app::getBaseAppLink('plugins/lists'));
@@ -191,7 +233,7 @@ class plugins extends \controller {
 					if ( $hasError === false ){
 						model::commit();
 						file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
-						$this->changeCacheOfAppStatus($app,'null');
+						$this->changeCacheOfAppStatus($app,null);
 						Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
 						return true;
 					} else {
@@ -233,7 +275,11 @@ class plugins extends \controller {
 		}
 	}
 
-	public function install(){
+	public function install($massage = null){
+		if ( $massage == 'extractError')
+			$this->alert('danger' , '', rlang('extractError') );
+		if ( $massage == 'downloadError')
+			$this->alert('danger' , '', rlang('downloadError') );
 		$get = request::post('page=1,perEachPage=25,name' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],

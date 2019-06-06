@@ -14,6 +14,8 @@
 
 namespace paymentCms\component;
 
+use ZipArchive;
+
 class file
 {
     private static $whereDirectory;
@@ -621,5 +623,40 @@ class file
         #generate the file
         $file = @fopen($path, "w");
         return (@fwrite($file, $data)) ? true : false;
+    }
+
+
+	/**
+	 * @param      $source
+	 * @param null $path
+	 *
+	 * @return bool
+	 */
+	public static function unzip($source, $path = null ){
+	    if ( $path == null )
+	        $path = pathinfo( realpath( $source ), PATHINFO_DIRNAME );
+
+	    $zip = new ZipArchive;
+	    $res = $zip->open($source);
+	    if ($res === TRUE) {
+		    $zip->extractTo( $path );
+		    $zip->close();
+		    return true;
+	    }
+	    else {
+		    return false ;
+	    }
+    }
+
+
+	/**
+	 * @param $url
+	 *
+	 * @return string
+	 */
+	public static function getBaseFileNameOfUrl($url){
+	    $parts = parse_url($url);
+	    $filename = basename($parts["path"]);
+	    return $filename ;
     }
 }
