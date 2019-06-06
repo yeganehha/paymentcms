@@ -5,4 +5,5 @@ return [
 	'api',
 	'admin',
 	'user',
+	'home',
 ];

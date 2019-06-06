@@ -22,7 +22,7 @@ namespace App\landing\model;
 use paymentCms\component\model;
 use paymentCms\model\modelInterFace ;
 
-class landingpage extends model implements modelInterFace {
+class landingPage extends model implements modelInterFace {
 
 	private $primaryKey = 'landingPageId';
 	private $primaryKeyShouldNotInsertOrUpdate = 'landingPageId';

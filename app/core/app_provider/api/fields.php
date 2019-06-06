@@ -35,7 +35,7 @@ class fields extends \App\api\controller\innerController {
 		$searchWhere = ' serviceType = ? and ( 0 ';
 		$searchValue[] = $serviceType ;
 		if ( $serviceId != null ){
-			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($serviceId)),', ').')' ;
+			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count((array)$serviceId)),', ').')' ;
 			$searchValue = array_merge($searchValue,(array)$serviceId);
 		}
 		if ( $fieldsId != null ){

@@ -2,6 +2,8 @@
 
 namespace paymentCms\component\mold;
 
+use paymentCms\component\session;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
@@ -21,16 +23,14 @@ class MoldData {
 	}
 
 	public function setMoldData($moldVersion){
-		if (session_status() == PHP_SESSION_NONE) {
-			session_start();
-		}
+		$session = session::get();
 		$this->set('Mold' , [
 			'now' => time() ,
 			'get' => $_GET ,
 			'post' => $_POST ,
 			'cookies' => $_COOKIE ,
 			'server' => $_SERVER ,
-			'session' => $_SESSION ,
+			'session' => $session ,
 			'version' => $moldVersion ,
 		]);
 	}

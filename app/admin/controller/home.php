@@ -26,7 +26,7 @@ class home extends \controller {
 		$appsApiLinks ="https://www.paymentcms.ir/api/apps/updateWithNews";
 		$localData = array(
 			'version' => PCVERSION ,
-			'siteUrl' => \App::getBaseAppLink(null,'core'),
+			'siteUrl' => \App::getCurrentBaseLink(),
 			'lang' => 'fa',
 			'theme' => 'default',
 			'app' => json_encode(\App::appsListWithConfig()),

@@ -250,7 +250,7 @@ class eForms extends \controller {
 				Response::redirect(\App::getBaseAppLink('eForms/edit/' . $eFormId . '/updateDone', 'admin'));
 			} else {
 				model::commit();
-				Response::redirect(\App::getBaseAppLink('eForms/edit/' . $result['result'] . '/insertDone', 'admin'));
+				Response::redirect(\App::getBaseAppLink('eForms/edit/' . $eForm->getFormId() . '/insertDone', 'admin'));
 			}
 			return true;
 		}

@@ -47,16 +47,15 @@ class apps extends \App\api\controller\innerController  {
 				$variable[] = 'l.author LIKE ?' ;
 			}
 			$value[] = 1 ;
-			$variable[] = 'l.publish = ?' ;
 			/* @var \App\paymentServer\model\plugin_list $pluginModel */
 			$pluginModel = $this->model('plugin_list');
-			$numberOfAll = ($pluginModel->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' or ' , $variable) , 'plugin_list l', 'COUNT(name) as co' )) [0]['co'];
+			$numberOfAll = ($pluginModel->search( (array) $value  , ( count($variable) == 0 ) ? 'l.publish = ?' : implode(' or ' , $variable) . ' and l.publish = ?'  , 'plugin_list l', 'COUNT(name) as co' )) [0]['co'];
 			if ( $get['page'] < 1 ) $get['page'] = 1 ;
 			$total = ceil($numberOfAll / $get['perEachPage'] ) ;
 			if ( $get['page'] > $total ) $get['page'] = $total ;
 			$pagination = ['start' => ($get['page'] -1 ) * $get['perEachPage'] , 'limit' => (int) $get['perEachPage'] , 'totalPage' => $total  , 'totalRecords' =>$numberOfAll];
 			model::join('plugin_statistics s', 'l.name = s.pluginName');
-			$pagination['plugins'] = $pluginModel->search((array) $value, ( count($variable) == 0 ) ? null : implode(' or ' , $variable), 'plugin_list l', 'l.* , count(*) as count , CONCAT(\''.\App::getCurrentBaseLink('storage/Dl_').'\', l.name , \'_\' , l.version , \'.zip\') as insertLink', ['column' => 'count', 'type' => 'desc'],  [$pagination['start'] , $pagination['limit'] ], 'l.name');
+			$pagination['plugins'] = $pluginModel->search((array) $value, ( count($variable) == 0 ) ? 'l.publish = ?' : implode(' or ' , $variable) . ' and l.publish = ?' , 'plugin_list l', 'l.* , count(*) as count , CONCAT(\''.\App::getCurrentBaseLink('storage/Dl_').'\', l.name , \'_\' , l.version , \'.zip\') as insertLink', ['column' => 'count', 'type' => 'desc'],  [$pagination['start'] , $pagination['limit'] ], 'l.name');
 			self::json($pagination);
 		}
 	}

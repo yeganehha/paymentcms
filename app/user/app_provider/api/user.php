@@ -2,6 +2,7 @@
 
 namespace App\user\app_provider\api;
 
+use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\session;
 use paymentCms\component\validate;
@@ -47,7 +48,7 @@ class user extends \App\api\controller\innerController  {
 			"block" => ["required|format:{0/1}", rlang('block')],
 		];
 		if ( $userId == null )
-			$rules[] = 	["password" => ["required", rlang('password')] ];
+			$rules["password"] = 	 ["required", rlang('password')] ;
 		$valid = validate::check($get, $rules);
 		if ($valid->isFail()){
 			return self::jsonError($valid->errorsIn(),400);
@@ -66,7 +67,7 @@ class user extends \App\api\controller\innerController  {
 		$model->setLname($get['lname']);
 		$model->setEmail($get['email']);
 		$model->setPhone($get['phone']);
-		if ( $userId != null and $get['password'] != null ) $model->setPassword($get['password']);
+		if ( $get['password'] != null ) $model->setPassword($get['password']);
 		$model->setBlock($get['block']);
 		$model->setAdminNote($get['admin_note']);
 		$model->setRegisterTime( ($model->getRegisterTime() != null ) ? $model->getRegisterTime() : date('Y-m-d H:i:s') );

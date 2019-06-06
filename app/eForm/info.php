@@ -10,7 +10,7 @@ return [
 		'support' => 'http://erfanebrahimi.ir',
 	] ,
 	'db' => [
-		'eForm' => [
+		'eform' => [
 			'fields' => [
 				'formId' => 'INT NOT NULL AUTO_INCREMENT',
 				'name' => 'VARCHAR(65) NOT NULL',
@@ -32,7 +32,7 @@ return [
 			'REFERENCES' => [
 			]
 		],
-		'eFormFilled' => [
+		'eformfilled' => [
 			'fields' => [
 				'fillId' => 'INT NOT NULL AUTO_INCREMENT',
 				'formId' => 'INT NOT NULL',

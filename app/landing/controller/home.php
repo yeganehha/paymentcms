@@ -24,13 +24,13 @@ class home extends \controller {
 	 *                  [global-access]
 	 */
 	public function index($id = null , $name = null ){
-		/* @var \App\landing\model\landingpage $page */
+		/* @var \App\landing\model\landingPage $page */
 		if ( $id != null ){
-			$page = $this->model('landingpage' , $id );
+			$page = $this->model('landingPage' , $id );
 			if ( $page->getLandingPageId() != $id )
 				\App\core\controller\httpErrorHandler::E404();
 		} else {
-			$page = $this->model('landingpage' , ' 1 ' , ' useAsDefault = ? ' );
+			$page = $this->model('landingPage' , ' 1 ' , ' useAsDefault = ? ' );
 			if ( $page->getLandingPageId() == null)
 				\App\core\controller\httpErrorHandler::E404();
 		}

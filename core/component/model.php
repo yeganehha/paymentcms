@@ -167,7 +167,7 @@ abstract class model {
 	public function insertToDataBase( ) {
 		$data = $this->returnAsArray();
 		$primaryKey = $this->getPrimaryKeyShouldNotInsertOrUpdate();
-		if ( $primaryKey != null and isset($data[$primaryKey])) {
+		if ( $primaryKey != null) {
 			unset($data[$primaryKey]);
 		}
 		$id = self::$db->insert($this->modelName , $data  );

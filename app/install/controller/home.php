@@ -7,6 +7,7 @@ use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
 use paymentCms\component\Response;
 use paymentCms\component\session;
+use paymentCms\component\strings;
 use paymentCms\component\validate;
 
 /**
@@ -138,6 +139,12 @@ class home {
 				$model->setLink( \App::getCurrentBaseLink().'users');
 				$model->setApp('user');
 				$model->insertToDataBase();
+				$model->setLink( \App::getCurrentBaseLink().'api');
+				$model->setApp('api');
+				$model->insertToDataBase();
+				$model->setLink( strings::deleteWordFirstString(\App::getCurrentBaseLink(),'/'));
+				$model->setApp('home');
+				$model->insertToDataBase();
 			}
 			if ( $appStatus['api'] == 'active'){
 				$model = new  \paymentCms\model\api();
@@ -226,7 +233,7 @@ class home {
 		$listExtension = include __DIR__.DIRECTORY_SEPARATOR.'listOfExtension.php';
 		$insertToMold = [] ;
 		$allHas = true ;
-		if (version_compare(phpversion(), "4.3.0", ">=")) {
+		if (version_compare(phpversion(), "5.6.0", ">=")) {
 			$insertToMold[] = ['name' => 'php version: '.phpversion(), 'status' => true];
 		} else {
 			$insertToMold[] = ['name' => 'php version: '.phpversion(), 'status' => false];

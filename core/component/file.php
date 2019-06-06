@@ -348,9 +348,11 @@ class file
 
     public static function get_name_folders($dir)
     {
+    	if ( ! is_dir($dir))
+    		return [] ;
         $get_folders = scandir($dir);
-        $get_folders = array_filter($get_folders);
-        $get_folders = array_diff($get_folders, array(".", ".."));
+        $get_folders = array_filter((array)$get_folders);
+        $get_folders = array_diff((array)$get_folders, array(".", ".."));
 
         $result = [];
         if ( is_array($get_folders) ) {

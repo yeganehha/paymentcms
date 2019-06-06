@@ -58,7 +58,7 @@ class landingPage extends \controller {
 				$variable[] = ' useAsDefault = ? ';
 			}
 		}
-		$model = parent::model('landingpage');
+		$model = parent::model('landingPage');
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , null, 'COUNT(landingPageId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , null, '*'  , ['column' => 'landingPageId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
@@ -92,8 +92,8 @@ class landingPage extends \controller {
 		if ( request::isPost() ) {
 			$this->checkData($pageId);
 		}
-		/* @var \App\landing\model\landingpage $page */
-		$page = $this->model('landingpage' , $pageId );
+		/* @var \App\landing\model\landingPage $page */
+		$page = $this->model('landingPage' , $pageId );
 		if ( $page->getLandingPageId() != $pageId ){
 			httpErrorHandler::E404();
 			return false ;
@@ -146,15 +146,15 @@ class landingPage extends \controller {
 			return false;
 		} else {
 			model::transaction();
-			/* @var \App\landing\model\landingpage $page */
+			/* @var \App\landing\model\landingPage $page */
 			if ( $pageId != null ) {
-				$page = $this->model('landingpage' , $pageId );
+				$page = $this->model('landingPage' , $pageId );
 				if ( $page->getLandingPageId() != $pageId){
 					httpErrorHandler::E404();
 					return false;
 				}
 			} else
-				$page = $this->model('landingpage' );
+				$page = $this->model('landingPage' );
 
 			$page->setName($form['name']);
 			$page->setMetaDescription($form['metaDescription']);
@@ -185,7 +185,7 @@ class landingPage extends \controller {
 			if ( $pageId != null )
 				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $pageId . '/updateDone', 'admin'));
 			else
-				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $result['result'] . '/insertDone', 'admin'));
+				Response::redirect(\App::getBaseAppLink('landingPage/edit/' . $page->getLandingPageId() . '/insertDone', 'admin'));
 			return true;
 		}
 	}

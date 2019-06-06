@@ -45,7 +45,7 @@ class App {
 				$fullAddress = self::getFullRequestUrl();
 				foreach ($links as $link) {
 					if (strings::strFirstHas($fullAddress, $link['link'])) {
-						if (isset(self::$url[0]) and strings::strLastHas($link['link'], '/' . self::$url[0])) {
+						if ( (isset(self::$url[0]) and strings::strLastHas($link['link'], '/' . self::$url[0])) or count(self::$url) == 0 ) {
 							$appName = $link['app'];
 							array_shift(self::$url);
 						}
@@ -73,7 +73,7 @@ class App {
 		$methodName = self::$method ;
 		if (class_exists($className) and method_exists($className, $methodName)) {
 			$class = new $className ();
-			call_user_func_array([$class, $methodName], self::$params);
+			call_user_func_array([$class, $methodName], (array) self::$params);
 		} else {
 			$className ='App\core\controller\httpErrorHandler' ;
 			$methodName = 'E404' ;
@@ -200,7 +200,7 @@ class App {
 
 
 	private static function getParamsFromUrl(){
-		self::$params = array_merge(self::$params , self::$url) ;
+		self::$params = array_merge((array)self::$params , (array)self::$url) ;
 	}
 
 	/**
@@ -304,10 +304,10 @@ class App {
 		if ( $app != null and $controller != null ){
 			if ( is_file(self::$appPatch.$app.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.$controller.'.php') ){
 				$methods =  get_class_methods( 'App\\'.$app.'\controller\\'.$controller );
-				for ( $i = count($methods) -1  ; $i >= 0 ; $i-- )
+				for ( $i = count( (array) $methods) -1  ; $i >= 0 ; $i-- )
 					if ( strings::strFirstHas($methods[$i],'__'))
 						unset($methods[$i]);
-					if ( count($methods) == 0 )
+					if ( count( (array) $methods) == 0 )
 						return false ;
 				return [ 'app' => $app ,'appProvider' => '', 'controller' => $controller,'methods' =>$methods];
 			} else {

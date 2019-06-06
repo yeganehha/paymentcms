@@ -299,7 +299,7 @@ class plugins extends \controller {
 				'perEachPage' => $get['perEachPage'] ,
 				'name' => $get['name'] ,
 				'version' => PCVERSION ,
-				'siteUrl' => \App::getBaseAppLink(null,'core'),
+				'siteUrl' => \App::getCurrentBaseLink(),
 				'lang' => 'fa',
 				'theme' => 'default',
 				'app' => json_encode(\App::appsListWithConfig()),
