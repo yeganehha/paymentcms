@@ -102,7 +102,11 @@ class controller {
 		return ['start' => ($page -1 ) * $number , 'limit' => $number];
 	}
 
-	protected function callHooks($hookName,$variable){
+	protected function callHooks($hookName,$variable = null){
+		if ( $variable == null )
+			$variable = [] ;
+		elseif ( ! is_array($variable) )
+			$variable = (array) $variable ;
 		$files = [];
 		$appsActives = cache::get('appStatus', null  ,'paymentCms');
 		if ( is_array($appsActives) and ! empty($appsActives) ) {

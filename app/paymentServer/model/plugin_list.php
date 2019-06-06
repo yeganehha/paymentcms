@@ -32,6 +32,7 @@ class plugin_list extends model implements modelInterFace {
 	private $description ;
 	private $icon ;
 	private $type ;
+	private $publish ;
 
 	public function setFromArray($result) {
 		$this->name = $result['name'] ;
@@ -40,6 +41,7 @@ class plugin_list extends model implements modelInterFace {
 		$this->icon = $result['icon'] ;
 		$this->description = $result['description'] ;
 		$this->type = $result['type'] ;
+		$this->publish = $result['publish'] ;
 	}
 
 
@@ -50,6 +52,7 @@ class plugin_list extends model implements modelInterFace {
 		$array['icon'] = $this->icon ;
 		$array['description'] = $this->description ;
 		$array['type'] = $this->type ;
+		$array['publish'] = $this->publish ;
 		return $array ;
 	}
 
@@ -152,6 +155,20 @@ class plugin_list extends model implements modelInterFace {
 	 */
 	public function setType($type) {
 		$this->type = $type;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getPublish() {
+		return $this->publish;
+	}
+
+	/**
+	 * @param mixed $publish
+	 */
+	public function setPublish($publish) {
+		$this->publish = $publish;
 	}
 
 

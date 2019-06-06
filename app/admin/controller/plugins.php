@@ -292,8 +292,8 @@ class plugins extends \controller {
 			//TODO:: add error is not valid data
 
 		} else {
-			//		$d="http://localhost/payment/api/update/version";
-			$appsApiLinks ="http://localhost/payment/api/apps/listApps";
+			//		$d="https://www.paymentcms.ir/api/update/version";
+			$appsApiLinks ="https://www.paymentcms.ir/api/apps/listApps";
 			$localData = array(
 				'page' => $get['page'] ,
 				'perEachPage' => $get['perEachPage'] ,

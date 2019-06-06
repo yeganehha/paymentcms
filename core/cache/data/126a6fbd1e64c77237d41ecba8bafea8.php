@@ -23,7 +23,7 @@ if ( ! function_exists('cacheSystem_3f46345c7e54cced49283ab164b53519_checker' ) 
 				 ]  , 
 			 "2" =>  [ 
 				 "apps_linkId" =>  3  , 
-				 "link" =>  'http://localhost/payment/api'  , 
+				 "link" =>  'https://www.paymentcms.ir/api'  ,
 				 "app" =>  'api'  , 
 				 ]  , 
 			 "3" =>  [ 

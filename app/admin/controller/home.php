@@ -23,7 +23,7 @@ class home extends \controller {
 
 
 	public function index(){
-		$appsApiLinks ="http://localhost/payment/api/apps/updateWithNews";
+		$appsApiLinks ="https://www.paymentcms.ir/api/apps/updateWithNews";
 		$localData = array(
 			'version' => PCVERSION ,
 			'siteUrl' => \App::getBaseAppLink(null,'core'),
@@ -40,5 +40,6 @@ class home extends \controller {
 		$this->mold->view('home.mold.html');
 		$this->mold->setPageTitle(rlang('dashboard'));
 		$this->mold->set('activeMenu' , 'dashboard');
+		$this->callHooks('adminDashboard');
 	}
 }

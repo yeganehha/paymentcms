@@ -46,6 +46,8 @@ class apps extends \App\api\controller\innerController  {
 				$variable[] = 'l.name LIKE ?' ;
 				$variable[] = 'l.author LIKE ?' ;
 			}
+			$value[] = 1 ;
+			$variable[] = 'l.publish = ?' ;
 			/* @var \App\paymentServer\model\plugin_list $pluginModel */
 			$pluginModel = $this->model('plugin_list');
 			$numberOfAll = ($pluginModel->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' or ' , $variable) , 'plugin_list l', 'COUNT(name) as co' )) [0]['co'];
