@@ -29,13 +29,17 @@ class plugin_list extends model implements modelInterFace {
 	private $name ;
 	private $version ;
 	private $author ;
+	private $description ;
 	private $icon ;
+	private $type ;
 
 	public function setFromArray($result) {
 		$this->name = $result['name'] ;
 		$this->version = $result['version'] ;
 		$this->author = $result['author'] ;
 		$this->icon = $result['icon'] ;
+		$this->description = $result['description'] ;
+		$this->type = $result['type'] ;
 	}
 
 
@@ -44,6 +48,8 @@ class plugin_list extends model implements modelInterFace {
 		$array['version'] = $this->version ;
 		$array['author'] = $this->author ;
 		$array['icon'] = $this->icon ;
+		$array['description'] = $this->description ;
+		$array['type'] = $this->type ;
 		return $array ;
 	}
 
@@ -118,6 +124,34 @@ class plugin_list extends model implements modelInterFace {
 	 */
 	public function setVersion($version) {
 		$this->version = $version;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	 * @param mixed $description
+	 */
+	public function setDescription($description) {
+		$this->description = $description;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getType() {
+		return $this->type;
+	}
+
+	/**
+	 * @param mixed $type
+	 */
+	public function setType($type) {
+		$this->type = $type;
 	}
 
 

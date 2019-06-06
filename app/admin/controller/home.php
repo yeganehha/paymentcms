@@ -23,6 +23,22 @@ class home extends \controller {
 
 
 	public function index(){
-		echo 'hello world!';
+		$appsApiLinks ="http://localhost/payment/api/apps/updateWithNews";
+		$localData = array(
+			'version' => PCVERSION ,
+			'siteUrl' => \App::getBaseAppLink(null,'core'),
+			'lang' => 'fa',
+			'theme' => 'default',
+			'app' => json_encode(\App::appsListWithConfig()),
+		);
+		$update = json_decode(curl($appsApiLinks,$localData),true);
+		if ( $update['update']['needUpdate'])
+			$this->alert('danger' , rlang('update') ,rlang('needUpdate') , 'autorenew');
+
+		$this->mold->set('tabOne' , $update['panel1']);
+		$this->mold->set('tabTwo' , $update['panel2']);
+		$this->mold->view('home.mold.html');
+		$this->mold->setPageTitle(rlang('dashboard'));
+		$this->mold->set('activeMenu' , 'dashboard');
 	}
 }

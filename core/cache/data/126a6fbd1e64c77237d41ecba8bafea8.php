@@ -1,12 +1,12 @@
 <?php
-	/* cache version 0.0.0.1 , created at : 2019-06-06 20:27:02
+	/* cache version 0.0.0.1 , created at : 2019-06-06 20:57:32
 		 from apps_link */ 
 
 
 if ( ! function_exists('cacheSystem_3f46345c7e54cced49283ab164b53519_checker' ) ) {
 
 	function cacheSystem_3f46345c7e54cced49283ab164b53519_checker() {
-		return [ "dataSize" => 734 , "version" => "0.0.0.1" , "time" => 3707329269 ]  ;
+		return [ "dataSize" => 733 , "version" => "0.0.0.1" , "time" => 3707331099 ]  ;
 	}
 
 	function cacheSystem_3f46345c7e54cced49283ab164b53519_storage() {
@@ -18,7 +18,7 @@ if ( ! function_exists('cacheSystem_3f46345c7e54cced49283ab164b53519_checker' ) 
 				 ]  , 
 			 "1" =>  [ 
 				 "apps_linkId" =>  2  , 
-				 "link" =>  'http://localhost/payment/admin2'  , 
+				 "link" =>  'http://localhost/payment/admin'  , 
 				 "app" =>  'admin'  , 
 				 ]  , 
 			 "2" =>  [ 
