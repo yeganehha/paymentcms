@@ -212,7 +212,7 @@ class cache {
 			$php .= "\t}\n\n";
 			$php .= "}";
 			if (is_file(self::$cacheFilePatch)) unlink(self::$cacheFilePatch);
-			File::generate_file(self::$cacheFilePatch,$php);
+			file::generate_file(self::$cacheFilePatch,$php);
 			return true;
 		} catch (\Exception $exception){
 			return false ;

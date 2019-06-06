@@ -6,29 +6,14 @@
                 <div class="page-categories">
                     {if !isset($newUser)}<ul class="nav nav-pills nav-pills-warning nav-pills-icons justify-content-center" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" data-toggle="tab" href="#link6" role="tablist">
-                                <i class="material-icons">dashboard</i> {_ "info"}
-                            </a>
-                        </li><li class="nav-item">
-                            <a class="nav-link {if isset($activeTab) and $activeTab =='payments'}active{/if}" data-toggle="tab" href="#link7" role="tablist">
-                                <i class="material-icons">account_balance_wallet</i> {_ "payments"}
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {if isset($activeTab) and $activeTab =='edit'}active{/if}" data-toggle="tab" href="#link8" role="tablist">
+                            <a class="nav-link  {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" data-toggle="tab" href="#link8" role="tablist">
                                 <i class="material-icons">edit</i> {_ "edit"}
                             </a>
                         </li>
                         {call userProfileMorePage}
                     </ul>{/if}
                     <div class="tab-content tab-space tab-subcategories">
-                        {if !isset($newUser)}<div class="tab-pane {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" id="link6">
-
-                        </div>
-                        <div class="tab-pane {if isset($activeTab) and $activeTab =='payments'}active{/if}" id="link7">
-
-                        </div>{/if}
-                        <div class="tab-pane {if isset($newUser)}active{/if} {if isset($activeTab) and $activeTab =='edit'}active{/if}" id="link8">
+                        <div class="tab-pane {if isset($newUser)}active{/if}  {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" id="link8">
                             <div class="row">
                                 <div class="col-md-8 col-sm-12">
                                     <div class="card">

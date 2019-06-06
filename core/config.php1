@@ -1,0 +1,5 @@
+<?php
+	/*  created at : 2019-06-06 22:27:09*/ 
+
+
+return ['_dbHost' => 'localhost' , '_dbUsername' => 'paymentc_momFuck' , '_dbPassword' => '7418220ramina.' , '_dbName' => 'paymentc_coreASDb' , '_dbTableStartWith' => 'per_yefaneha_'] ; 

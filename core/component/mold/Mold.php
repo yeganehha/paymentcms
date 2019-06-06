@@ -27,7 +27,7 @@ class Mold {
 
 	/**
 	 * when you want to call it as builder pattern use init
-	 * @link https://pinoox.com/documnet/mold/methods/init
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/init
 	 * @return Mold
 	 * @example ->init();
 	 */
@@ -39,9 +39,9 @@ class Mold {
 		} else {
 			$this->mold = $mold;
 		}
-		if ( Request::isGet('moldAssetsFileLoader') ){
+		if ( request::isGet('moldAssetsFileLoader') ){
 			$this->autoCompile = false ;
-			$this->moldFiles->renderAssets(Request::getOne('moldAssetsFileLoader'));
+			$this->moldFiles->renderAssets(request::getOne('moldAssetsFileLoader'));
 		}
 		return $this->mold;
 
@@ -49,7 +49,7 @@ class Mold {
 
 	/**
 	 * this method get variable to set in template and render it when template is compiling
-	 * @link https://pinoox.com/documnet/mold/methods/set
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/set
 	 * @param string : name of variable that call it from front
 	 * @param mixed : value that return when variable call from front
 	 * @param array : 2D array that index of array is variable that call from front and value of array return on call variable in front
@@ -66,7 +66,7 @@ class Mold {
 
 	/**
 	 * set page title in header of html
-	 * @link https://pinoox.com/documnet/mold/methods/setPageTitle
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/setPageTitle
 	 * @param string : title of current page
 	 * @return Mold
 	 * @example ->setPageTitle('hello world!');
@@ -78,7 +78,7 @@ class Mold {
 
 	/**
 	 * this method get user information to set in template and render it when template is compiling
-	 * @link https://pinoox.com/documnet/mold/methods/setUser
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/setUser
 	 * @param mixed : value that return when <_user> call from front
 	 * @return Mold
 	 * @example ->setPageTitle($user_object);
@@ -91,7 +91,7 @@ class Mold {
 
 	/**
 	 * this method get config values to set in template and render it when template is compiling
-	 * @link https://pinoox.com/documnet/pintemplate/methods/setConfig
+	 * @link https://www.paymentcms.ir/documnet/pintemplate/methods/setConfig
 	 * @param mixed : value that return when <_config> call from front
 	 * @return Mold
 	 * @example ->setConfig($config_object);
@@ -104,7 +104,7 @@ class Mold {
 
 	/**
 	 * this method get variable to unset that
-	 * @link https://pinoox.com/documnet/mold/methods/remove
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/remove
 	 * @param string : name of variable that call it from front
 	 * @return Mold
 	 * @example ->remove('variable');
@@ -117,7 +117,7 @@ class Mold {
 
 	/**
 	 * this method get variable to check set before and return value of that or not set yet
-	 * @link https://pinoox.com/documnet/mold/methods/get
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/get
 	 * @param string : name of variable that needed value
 	 * @return mixed :
 	 * @example ->get('variable');
@@ -131,7 +131,7 @@ class Mold {
 	/**
 	 * compile and show html page after all controller finish processes
 	 * on default : auto compiled
-	 * @link https://pinoox.com/documnet/mold/methods/AutoCompile
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/AutoCompile
 	 * @return Mold :
 	 * @example ->AutoCompile();
 	 */
@@ -143,7 +143,7 @@ class Mold {
 
 	/**
 	 * turn off compile and show html page after all controller finish processes
-	 * @link https://pinoox.com/documnet/mold/methods/offAutoCompile
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/offAutoCompile
 	 * @return Mold :
 	 * @example ->offAutoCompile();
 	 */
@@ -154,7 +154,7 @@ class Mold {
 
 	/**
 	 * change path of file to be read and then compile
-	 * @link https://pinoox.com/documnet/mold/methods/path
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/path
 	 * @param string $folder optional: name of folder in app>theme . on null , run template files from app>theme.
 	 * @param string $app optional : name of app [default : current app]
 	 * @return Mold :
@@ -169,7 +169,7 @@ class Mold {
 
 	/**
 	 * get path of file to be read and then compile
-	 * @link https://pinoox.com/documnet/mold/methods/getPath
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/getPath
 	 * @return array['folder','app'] :
 	 * @example ->getPath();
 	 */
@@ -179,7 +179,7 @@ class Mold {
 
 	/**
 	 * push file in to the list of file should compile after header and before footer
-	 * @link https://pinoox.com/documnet/mold/methods/view
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/view
 	 * @param string : name of file that should compile
 	 * @return Mold :
 	 * @example ->view('login.mold.html');
@@ -199,7 +199,7 @@ class Mold {
 
 	/**
 	 * push file in to the list of file should compile as a header (top off other file).
-	 * @link https://pinoox.com/documnet/mold/methods/header
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/header
 	 * @param string : name of file that should compile
 	 * @return Mold :
 	 * @example ->header('header.mold.html');
@@ -218,7 +218,7 @@ class Mold {
 
 	/**
 	 * push file in to the list of file should compile as a footer (end off other file).
-	 * @link https://pinoox.com/documnet/mold/methods/footer
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/footer
 	 * @param string : name of file that should compile
 	 * @return Mold :
 	 * @example ->header('footer.mold.html');
@@ -238,7 +238,7 @@ class Mold {
 
 	/**
 	 * push file in to the list of file after special file.
-	 * @link https://pinoox.com/documnet/mold/methods/after
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/after
 	 * @param string : name of file should find in list and insert other file after that
 	 * @param string : list of file that should insert after special file
 	 * @return Mold :
@@ -261,7 +261,7 @@ class Mold {
 
 	/**
 	 * push file in to the list of file before special file.
-	 * @link https://pinoox.com/documnet/mold/methods/before
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/before
 	 * @param string : name of file should find in list and insert other file before that
 	 * @param string : list of file that should insert before special file
 	 * @return Mold :
@@ -284,7 +284,7 @@ class Mold {
 
 	/**
 	 * this method get files to dont show view
-	 * @link https://pinoox.com/documnet/mold/methods/unshow
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/unshow
 	 * @param string : name of files that should not show
 	 * @return Mold
 	 * @example ->unshow('copyright.mold.html');
@@ -297,7 +297,7 @@ class Mold {
 
 	/**
 	 * return list of file should render order by index
-	 * @link https://pinoox.com/documnet/mold/methods/getViews
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/getViews
 	 * @return array :
 	 * @example ->getViews();
 	 */
@@ -308,7 +308,7 @@ class Mold {
 
 	/**
 	 * render template and return html code
-	 * @link https://pinoox.com/documnet/mold/methods/render
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/render
 	 * @return string :
 	 * @example ->render();
 	 */
@@ -318,7 +318,7 @@ class Mold {
 
 	/**
 	 * this method cause cache file minify. default do not minify file
-	 * @link https://pinoox.com/documnet/mold/methods/minifyCache
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/minifyCache
 	 * @return Mold
 	 * @example ->minifyCache();
 	 */
@@ -329,7 +329,7 @@ class Mold {
 
 	/**
 	 * this method dont allow minify cache file
-	 * @link https://pinoox.com/documnet/mold/methods/offMinifyCache
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/offMinifyCache
 	 * @return Mold
 	 * @example ->offMinifyCache();
 	 */
@@ -341,7 +341,7 @@ class Mold {
 	/**
 	 * enable or disable cache compiled template file or on enable it, set cache life time.
 	 * if don't call this method any time, cache system turn off
-	 * @link https://pinoox.com/documnet/mold/methods/cache
+	 * @link https://www.paymentcms.ir/documnet/mold/methods/cache
 	 * @param boolean|int $time [optional]:
 	 *                          if do not send any params to this method, cache turn on and cache life time set 5 days
 	 *                          if send true, cache turn on and cache life time set 5 days

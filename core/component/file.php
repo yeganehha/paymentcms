@@ -77,10 +77,10 @@ class file
         if (is_dir($folder)) {
             if ($safe) {
                 if (!is_file($pathIndex)) {
-                    File::generate_file($pathIndex, $data);
+                    file::generate_file($pathIndex, $data);
                 }
                 if (!is_file($pathHtaccess)) {
-                    File::generate_htaccess($folder);
+                    file::generate_htaccess($folder);
                 }
             }
             return true;
@@ -90,8 +90,8 @@ class file
         $f = @mkdir($folder, $chmod, $multi);
 
         if ($safe) {
-            File::generate_file($pathIndex, $data);
-            File::generate_htaccess($folder);
+            file::generate_file($pathIndex, $data);
+            file::generate_htaccess($folder);
         }
 
         return $f ? true : false;

@@ -35,4 +35,8 @@ return [
 	'extractError' => 'در استخراج فایل های پلاگن مد نظر مشکلی پیش آمده است، لطفا مجددا اقدام فرمایید.',
 	'downloadError' => 'در دانلود فایل های پلاگن مد نظر مشکلی پیش آمده است، لطفا مجددا اقدام فرمایید.',
 	'appDownloadSuccessfully' => 'پلاگین مد نظر با موفقیت در سرور شما قرار گرفت. هماکنون می توانید اقدام به نصب و فعالسازی آن کنید.',
+	'permission:admin_home_index' => 'دسترسی به داشبورد مدیریت',
+	'permission:admin_plugins_index' => 'دسترسی به لیست پلاگین ها',
+	'permission:admin_plugins_pLists' => 'دسترسی به لیست پلاگین ها',
+	'permission:admin_plugins_lists' => 'دسترسی به لیست پلاگین ها',
 ];

@@ -181,7 +181,7 @@ class MoldFiles {
 		$cacheFilePath = $this->directorySeparator($cacheFilePath) ;
 		if ( is_file($cacheFilePath) )
 			unlink($cacheFilePath);
-		File::generate_file($cacheFilePath , $php );
+		file::generate_file($cacheFilePath , $php );
 		if ( $runAfterCreatFile )
 			include $cacheFilePath ;
 	}
@@ -206,8 +206,8 @@ class MoldFiles {
 			$php .= "\t\t 'path' => '" . $fileInfo['path'] . "' ,\n";
 			$php .= "\t\t 'app' => '" . $fileInfo['app'] . "' ,\n";
 			$php .= "\t\t 'folder' => '" . $fileInfo['folder'] . "' ,\n";
-			$php .= "\t\t 'parentSize' => '" . File::file_size($fileInfo['path']) . "' ,\n";
-			$php .= "\t\t 'parentCreatedAt' => '" . File::file_time($fileInfo['path']) . "' ,\n";
+			$php .= "\t\t 'parentSize' => '" . file::file_size($fileInfo['path']) . "' ,\n";
+			$php .= "\t\t 'parentCreatedAt' => '" . file::file_time($fileInfo['path']) . "' ,\n";
 			$php .= "\t\t 'createdAt' => '" . time() . "', \n";
 			$php .= "\t\t 'lifeTime' => '" . ( intval($this->cacheLifeTime) ) . "' \n";
 			$php .= "\t ) ) and  ";
@@ -340,7 +340,7 @@ class MoldFiles {
 			$this->deleteAssetsFile();
 			die('Mold can not find assets file or the file is terminated!');
 		}
-		$extFile = strtolower(File::ext_file($file));
+		$extFile = strtolower(file::ext_file($file));
 		if ( $extFile == 'js' ){
 			header('Content-Type: text/javascript');
 		} elseif ( $extFile == 'css' ){
@@ -365,10 +365,10 @@ class MoldFiles {
 
 	public function checkFileISMoldOrNOt($File,$app){
 //		$fileName = array_pop(explode(DIRECTORY_SEPARATOR,$File) );
-		$fileExtOne = File::ext_file($File);
-		$fileExtTwo = File::ext_file(strings::deleteWordLastString($File,'.'.$fileExtOne) );
+		$fileExtOne = file::ext_file($File);
+		$fileExtTwo = file::ext_file(strings::deleteWordLastString($File,'.'.$fileExtOne) );
 		if ( strings::strLastHas($app,':plugin') ) {
-			$fileExtTree = File::ext_file(strings::deleteWordLastString($File, '.' . $fileExtTwo.'.'.$fileExtOne));
+			$fileExtTree = file::ext_file(strings::deleteWordLastString($File, '.' . $fileExtTwo.'.'.$fileExtOne));
 			if ( $fileExtTree != strings::deleteWordLastString($app,':plugin') )
 				die('Just Can Load Mold File that name is ended with .'.strings::deleteWordLastString($app,':plugin').'.mold.'.$fileExtOne.' ! file path : ' . $File);
 		}
@@ -379,9 +379,9 @@ class MoldFiles {
 	}
 
 	private function deleteAssetsFile(){
-		$otherFiles = File::get_files(\app::getAppPath('cache/theme/assets'),['.htaccess','index.html']);
+		$otherFiles = file::get_files(\app::getAppPath('cache/theme/assets'),['.htaccess','index.html']);
 		foreach ( $otherFiles as $unlinkFiles )
-			if ( time() - File::file_time($unlinkFiles) >= 10*60 )
+			if ( time() - file::file_time($unlinkFiles) >= 10*60 )
 				unlink($unlinkFiles);
 	}
 
@@ -414,11 +414,11 @@ class MoldFiles {
 			if ( ! $isAssets )
 				$this->compileFile($data, $cacheFilePath ,true );
 			return false ;
-		} elseif ( $data['parentCreatedAt'] != File::file_time($data['path'])  ){
+		} elseif ( $data['parentCreatedAt'] != file::file_time($data['path'])  ){
 			if (!  $isAssets )
 				$this->compileFile($data, $cacheFilePath ,true );
 			return false ;
-		}elseif ( $data['parentSize'] != File::file_size($data['path'])  ){
+		}elseif ( $data['parentSize'] != file::file_size($data['path'])  ){
 			if ( ! $isAssets )
 				$this->compileFile($data, $cacheFilePath ,true );
 			return false ;

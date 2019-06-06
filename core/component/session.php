@@ -16,6 +16,7 @@ class session extends \SessionHandler
 	private static $manualSession = false ;
 	private static $gc_probability = 1 ;
 	private static $gc_divisor = 100 ;
+	private static $objectOfThis = null ;
 
 	/**
 	 * @param int $gc_probability
@@ -29,7 +30,7 @@ class session extends \SessionHandler
 	}
 
 
-	public function __init(){
+	public static function __init(){
 		ini_set('session.cookie_httponly', 1);
 		ini_set('session.use_only_cookies', 1);
 		if (!empty(self::$lifeTime) and self::$lifeTime > 0) {
@@ -41,14 +42,15 @@ class session extends \SessionHandler
 		ini_set('session.gc_divisor', self::$gc_divisor);
 
 		if (self::$manualSession) {
+			self::$objectOfThis = new session();
 			// Set handler to override SESSION
 			session_set_save_handler(
-				array($this, "_open"),
-				array($this, "_close"),
-				array($this, "_read"),
-				array($this, "_write"),
-				array($this, "_destroy"),
-				array($this, "_gc")
+				array(self::$objectOfThis, "_open"),
+				array(self::$objectOfThis, "_close"),
+				array(self::$objectOfThis, "_read"),
+				array(self::$objectOfThis, "_write"),
+				array(self::$objectOfThis, "_destroy"),
+				array(self::$objectOfThis, "_gc")
 			);
 		}
 		if(session_id() == '')

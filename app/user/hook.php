@@ -32,8 +32,8 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class hook extends pluginController {
 
 	public function _adminHeaderNavbar($vars2){
-		$this->menu->after('dashboard','users' , rlang(['list','users'] ) , \app::getBaseAppLink('users/lists') , 'fa fa-users' );
-		$this->menu->addChild('configuration' ,'permission', rlang('permission' ) , \app::getBaseAppLink('permissions','admin') , 'fa fa-lock' );
+		$this->menu->after('dashboard','users' , rlang(['list','users'] ) , \app::getBaseAppLink('users/lists','admin') , 'fa fa-users' );
+		$this->menu->addChild('configuration' ,'permission', rlang('permission' ) , \app::getBaseAppLink('permissions','admin','admin') , 'fa fa-lock' );
 		$this->mold->path('default','user');
 		$this->mold->view('adminHeaderNavItem.header.mold.html');
 	}

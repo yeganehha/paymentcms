@@ -32,7 +32,7 @@ spl_autoload_register(function ($class_name_call) {
 		$class_patch = payment_path . 'plugins' . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
 	}else {
 		Lang::addToLangfile($paths[0]);
-		$class_patch = payment_path . $dire . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
+		$class_patch = payment_path . strtolower($dire) . DIRECTORY_SEPARATOR . strtolower(implode(DIRECTORY_SEPARATOR, $paths)) . DIRECTORY_SEPARATOR . $class_name . '.php';
 	}
 	$debug = debug_backtrace();
 	if ( file_exists($class_patch)) {

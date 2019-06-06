@@ -1,16 +1,16 @@
 <?php
-	/* cache version 0.0.0.1 , created at : 2019-06-01 09:41:06
+	/* cache version 0.0.0.1 , created at : 2019-06-06 22:27:09
 		 from securitySlat */ 
 
 
-if ( ! function_exists('cacheSystem_712d684e3b00d48fcbbb6b50b088a925_checker' ) ) {
+if ( ! function_exists('cacheSystem_45c347bf447a4c817894517e44b8d1ae_checker' ) ) {
 
-	function cacheSystem_712d684e3b00d48fcbbb6b50b088a925_checker() {
-		return [ "dataSize" => 10 , "version" => "0.0.0.1" , "time" => 3706858513 ]  ;
+	function cacheSystem_45c347bf447a4c817894517e44b8d1ae_checker() {
+		return [ "dataSize" => 10 , "version" => "0.0.0.1" , "time" => 9.2233720384146E+18 ]  ;
 	}
 
-	function cacheSystem_712d684e3b00d48fcbbb6b50b088a925_storage() {
-		return  'riHQtKzUuj'  ; 
+	function cacheSystem_45c347bf447a4c817894517e44b8d1ae_storage() {
+		return  'WnmAytlVJ0'  ; 
 	}
 
 }
