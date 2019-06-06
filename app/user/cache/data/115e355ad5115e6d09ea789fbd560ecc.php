@@ -1,12 +1,12 @@
 <?php
-	/* cache version 0.0.0.1 , created at : 2019-06-01 10:05:03
+	/* cache version 0.0.0.1 , created at : 2019-06-06 19:16:39
 		 from userPermissions */ 
 
 
 if ( ! function_exists('cacheSystem_afe23580206c6a5e645a531d80fe798e_checker' ) ) {
 
 	function cacheSystem_afe23580206c6a5e645a531d80fe798e_checker() {
-		return [ "dataSize" => 1612 , "version" => "0.0.0.1" , "time" => 3706859950 ]  ;
+		return [ "dataSize" => 1612 , "version" => "0.0.0.1" , "time" => 3707325046 ]  ;
 	}
 
 	function cacheSystem_afe23580206c6a5e645a531d80fe798e_storage() {
