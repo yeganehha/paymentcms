@@ -3,6 +3,9 @@
 namespace App\core\controller;
 
 
+use paymentCms\component\httpHeader;
+use paymentCms\component\mold\Mold;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
@@ -22,23 +25,48 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class httpErrorHandler extends \controller {
 
+
 	public function __construct() {
 
 	}
 
 	public static function E404(){
-		echo '404';
-		exit;
-		parent::view('httpErrorHandler' , array('errorType' => '404'));
+		ob_clean();
+		$mold = new Mold();
+		$mold->path('default', 'core');
+		$mold->header('header.mold.html');
+		$mold->footer('footer.mold.html');
+		$mold->set('direction' , 'rtl');
+		$mold->set('text_align' , 'right');
+		$mold->set('float' , 'right');
+		$mold->view('404.mold.html');
+		httpHeader::generateStatusCodeHTTP(404);
 	}
 	public static  function E500($class_patch){
-		echo '500<br>'.$class_patch;
+		ob_clean();
 		exit;
-		parent::view('httpErrorHandler' , array('errorType' => '500'));
+		$mold = new Mold();
+		$mold->path('default', 'core');
+		$mold->header('header.mold.html');
+		$mold->footer('footer.mold.html');
+		$mold->set('direction' , 'rtl');
+		$mold->set('text_align' , 'right');
+		$mold->set('float' , 'right');
+		$mold->view('500.mold.html');
+		$mold->set('path',$class_patch);
+		httpHeader::generateStatusCodeHTTP(500);
 	}
 
 	public static function E403() {
-		echo '403<br>';
-		exit;
+		ob_clean();
+		$mold = new Mold();
+		$mold->path('default', 'core');
+		$mold->header('header.mold.html');
+		$mold->footer('footer.mold.html');
+		$mold->set('direction' , 'rtl');
+		$mold->set('text_align' , 'right');
+		$mold->set('float' , 'right');
+		$mold->view('404.mold.html');
+		httpHeader::generateStatusCodeHTTP(403);
 	}
 }

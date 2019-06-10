@@ -58,6 +58,9 @@ spl_autoload_register(function ($class_name_call) {
 
 
 function shutdown() {
+	$html = ob_get_contents();
+	ob_clean();
+	ob_end_clean();
 	$error = error_get_last();
 	if ($error != null and $error['type'] === E_ERROR) {
 		$localData = array(
@@ -68,7 +71,10 @@ function shutdown() {
 		curl("https://www.paymentcms.ir/api/report/bug",$localData);
 		\App\core\controller\httpErrorHandler::E500($error['file']);
 	}
+	echo $html ;
+	exit;
 }
+ob_start();
 register_shutdown_function('shutdown');
 
 require_once __DIR__ .DIRECTORY_SEPARATOR. 'app.php';
