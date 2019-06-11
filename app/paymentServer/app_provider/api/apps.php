@@ -69,18 +69,17 @@ class apps extends \App\api\controller\innerController  {
                                             <div class=\"card-icon\" >
                                                 <i class=\"material-icons\">info</i>
                                             </div>
-                                            <h4 class=\"card-title float-right m-3\">{_ \"help\"}</h4>
+                                            <h4 class=\"card-title float-right m-3\">به سامانه مدیریت محتوای پرداختی خوش آمدید!</h4>
                                         </div>
                                         <div class=\"card-body text-right text-secondary\">
-                                            <strong class=\"text-info\">{_ \"name\"} :</strong> {_ \"eForm_add_helper_name\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"description\"} :</strong> {_ \"eForm_add_helper_description\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"afterAnswer\"} :</strong> {_ \"eForm_add_helper_after_description\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"template\"} :</strong> {_ \"eForm_add_helper_template\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"access\"} :</strong> {_ \"eForm_add_helper_access\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"published\"} :</strong> {_ \"eForm_add_helper_published\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"oneTime\"} :</strong> {_ \"eForm_add_helper_oneTime\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"public\"} :</strong> {_ \"eForm_add_helper_public\"}<br><br>
-                                            <strong class=\"text-info\">{_ \"showHistory\"} :</strong> {_ \"eForm_add_helper_showHistory\"}<br><br>
+<p>از این که نرمافزار کدباز ( open source ) ما را جهت مدیریت وبسایت خودتان انتخاب نموده اید، متشکریم!</p>
+<p>&nbsp;</p>
+<p><strong>در اجرای صفحه با خطا مواجه می گردید ؟</strong> این نرمافزار با مواجه شدن به خطا های غیر منتظره، به صورت خودکار تیم پشتیبانی را درجریان مشکل به وجود آمده قرار می دهد. در همین راستا هسته اصلی این نرمافزار و اپلیکیشن های متصل به آن به صورت روزانه بروزرسانی می شوند. پس با خیالی آسوده به توسعه قویی تر وبسایت خود بپردازید و وظیفه برقراری امنیت و افزایش سرعت وبسایتتان را به ما بسپارید.</p>
+<p>&nbsp;</p>
+<p>مطالب و اپلیکیشن های ما را روزانه دنبال کنید و روزانه امکانات وبسایتتان را افزایش دهید.</p>
+<p>در صورتی که توسعه دهنده Back End ویا Front End  هستید شک نکنید که ما مایل به همکاری با شما هستیم.</p>
+<p>در کنار شما برای پیاده سازی ایده های شما هستیم!</p>
+<p><a href=\"https://www.paymentcms.ir\" target=\"_blank\" rel=\"noopener\">تیم پشتیبانی Payment CMS</a></p>
                                         </div>
                                         <div class=\"card-footer\">
                                         </div>
