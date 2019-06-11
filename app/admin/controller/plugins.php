@@ -202,7 +202,7 @@ class plugins extends \controller {
 			return false;
 		}
 		$appStatus = cache::get('appStatus', $app ,'paymentCms');
-		if ( $appStatus == 'active' ){
+		if ( $appStatus == 'active' and ( ! ($app == 'admin' or $app == 'core' or $app == 'api' or $app == 'user'))){
 			$this->changeCacheOfAppStatus($app,'deActive');
 			Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
 			return true;
