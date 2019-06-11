@@ -40,6 +40,19 @@ class MoldFiles {
 		MoldRendering::emptyMap();
 	}
 
+	public function reset(){
+		$this->moldData = null ;
+		$this->path = null ;
+		$this->app = null ;
+		$this->folder = null ;
+		$this->lastHeaderFile = null ;
+		$this->lastFooterFile = null ;
+		$this->lastBodyFile = null ;
+		$this->files = [] ;
+		$this->debugFilePath = [] ;
+		$this->minifyHtml = false ;
+		$this->cacheLifeTime = false ;
+	}
 	public function setPath($folder,$app = null ){
 		$app = ( is_null($app) ) ?  \app::getApp() : $app ;
 		$folder = ( is_null($folder) ) ?  '' : $folder.'/' ;

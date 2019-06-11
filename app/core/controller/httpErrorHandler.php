@@ -31,7 +31,6 @@ class httpErrorHandler extends \controller {
 	}
 
 	public static function E404(){
-		ob_clean();
 		$mold = new Mold();
 		$mold->path('default', 'core');
 		$mold->header('header.mold.html');
@@ -40,11 +39,12 @@ class httpErrorHandler extends \controller {
 		$mold->set('text_align' , 'right');
 		$mold->set('float' , 'right');
 		$mold->view('404.mold.html');
+		Mold::stopAllAutoCompile();
+		echo $mold->render();
 		httpHeader::generateStatusCodeHTTP(404);
+		exit;
 	}
 	public static  function E500($class_patch){
-		ob_clean();
-		exit;
 		$mold = new Mold();
 		$mold->path('default', 'core');
 		$mold->header('header.mold.html');
@@ -54,11 +54,13 @@ class httpErrorHandler extends \controller {
 		$mold->set('float' , 'right');
 		$mold->view('500.mold.html');
 		$mold->set('path',$class_patch);
+		Mold::stopAllAutoCompile();
+		echo $mold->render();
 		httpHeader::generateStatusCodeHTTP(500);
+		exit;
 	}
 
 	public static function E403() {
-		ob_clean();
 		$mold = new Mold();
 		$mold->path('default', 'core');
 		$mold->header('header.mold.html');
@@ -67,6 +69,9 @@ class httpErrorHandler extends \controller {
 		$mold->set('text_align' , 'right');
 		$mold->set('float' , 'right');
 		$mold->view('404.mold.html');
+		Mold::stopAllAutoCompile();
+		echo $mold->render();
 		httpHeader::generateStatusCodeHTTP(403);
+		exit;
 	}
 }

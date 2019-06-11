@@ -44,7 +44,7 @@
                             <input type="hidden" value="{if isset($showField) }finish{else}start{/if}" name="step">
                             <input type="submit" class="btn btn-fill btn-info w-100" value="{if isset($showField) }{_ 'finish'}{else}{_ 'start'}{/if}" >
                             {else}
-                            <a href="{url admin}eForms/lists" class="btn btn-fill btn-info w-100">{_ "back"}</a>
+                            <a href="{$BackUrl}" class="btn btn-fill btn-info w-100">{_ "back"}</a>
                             {/if}
                         </div>
                     </div>

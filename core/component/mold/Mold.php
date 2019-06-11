@@ -20,6 +20,7 @@ class Mold {
 	private $moldData ;
 	private $moldFiles ;
 	public $autoCompile = true ;
+	public static $stopAllAutoCompile = false ;
 
 	public function __construct() {
 		$this->init($this);
@@ -45,6 +46,11 @@ class Mold {
 		}
 		return $this->mold;
 
+	}
+
+
+	public static function stopAllAutoCompile() {
+		self::$stopAllAutoCompile = true;
 	}
 
 	/**
@@ -368,7 +374,7 @@ class Mold {
 
 
 	public function __destruct() {
-		if ( $this->autoCompile )
+		if ( $this->autoCompile and ! self::$stopAllAutoCompile )
 			echo self::render();
 	}
 }

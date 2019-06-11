@@ -22,6 +22,9 @@ class MoldData {
 
 	}
 
+	public function reset(){
+		$this->data = [] ;
+	}
 	public function setMoldData($moldVersion){
 		$session = session::get();
 		$this->set('Mold' , [
