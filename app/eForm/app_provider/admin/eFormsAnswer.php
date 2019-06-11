@@ -7,6 +7,7 @@ namespace App\eForm\app_provider\admin;
 use App\core\controller\fieldService;
 use App\core\controller\httpErrorHandler;
 use App\eForm\model\eform;
+use App\eForm\model\eformfilled;
 use App\user\app_provider\api\user;
 use paymentCms\component\file;
 use paymentCms\component\model;
@@ -65,14 +66,14 @@ class eFormsAnswer extends \controller {
 				$variable[] = ' u.phone LIKE ? ' ;
 			}
 			if ( $get['StartTime'] != null  and $get['EndTime'] == null ) {
-				$value[] = $get['StartTime'] ;
+				$value[] = date('Y-m-d H:i:s' , $get['StartTime'] / 1000 )  ;
 				$variable[] = ' e.fillEnd >= ? ' ;
 			} elseif ( $get['EndTime'] != null and $get['StartTime'] == null) {
-				$value[] = $get['EndTime'] ;
+				$value[] = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 );
 				$variable[] = ' e.fillEnd <= ? ' ;
 			} elseif ($get['EndTime'] != null and $get['StartTime'] != null) {
-				$value[] = $get['StartTime'] ;
-				$value[] = $get['EndTime'] ;
+				$value[] = date('Y-m-d H:i:s' , $get['StartTime'] / 1000 ) ;
+				$value[] = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 );
 				$variable[] = ' ( e.fillEnd BETWEEN ? And ? ) ' ;
 			}
 		}
@@ -99,24 +100,15 @@ class eFormsAnswer extends \controller {
 	}
 	public function summery($formId = null ) {
 		$get = request::post('StartTime,EndTime' ,null);
-		if ( $get['StartTime'] != null  and $get['EndTime'] == null ) {
-			$value[] = $get['StartTime'] ;
-			$variable[] = ' e.fillEnd >= ? ' ;
-		} elseif ( $get['EndTime'] != null and $get['StartTime'] == null) {
-			$value[] = $get['EndTime'] ;
-			$variable[] = ' e.fillEnd <= ? ' ;
-		} elseif ($get['EndTime'] != null and $get['StartTime'] != null) {
-			$value[] = $get['StartTime'] ;
-			$value[] = $get['EndTime'] ;
-			$variable[] = ' ( e.fillEnd BETWEEN ? And ? ) ' ;
-		}
-		if ( $formId != null ){
-			$value[] = $formId ;
-			$variable[] = ' e.formId = ? ' ;
-		}
-
+		/* @var eformfilled $model */
 		$model = $this->model('eformfilled');
-		$search = $model->summery($formId);
+		$EndTime = null ;
+		$startTime = null ;
+		if ( $get['StartTime'] != null )
+			$startTime = date('Y-m-d H:i:s' , $get['StartTime'] / 1000 ) ;
+		if ( $get['EndTime'] != null )
+			$EndTime = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 ) ;
+		$search = $model->summery($formId,$startTime,$EndTime);
 		if ( count($search) ==  0 )
 			$search = null;
 		$this->mold->path('default', 'eForm');

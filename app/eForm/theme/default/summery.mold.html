@@ -1,6 +1,46 @@
 <div class="content mt-5  mb-5">
     <div class="container-fluid mt-5 mb-5">
         <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon pointer"  data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">
+                        <div class="card-icon" >
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "eForms"}</h4>
+                    </div>
+                    <div class="collapse" id="searchUsers">
+                        <div class="card-body">
+                            <form class="form-horizontal" method="post">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "from"} {_ "date"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" autocomplete="off" class="form-control persianDatepicker-from">
+                                                <input type="hidden" name="StartTime" value="{if isset($Mold.post.StartTime)}{$Mold.post.StartTime}{/if}"  class="form-control persianDatepicker-from-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "toDate"} {_ "date"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" autocomplete="off" class="form-control persianDatepicker-to">
+                                                <input type="hidden" name="EndTime" value="{if isset($Mold.post.EndTime)}{$Mold.post.EndTime}{/if}" class="form-control persianDatepicker-to-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
+                                        <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div><div><div><div><div>
             {set lastIdOfField,""}
             {foreach from=$answers key=key value=answer}
@@ -58,6 +98,10 @@
     </div>
 </div>
 {map footerjs}
+<script src="{url theme}assets/js/persian-date.min.js"></script>
+<script src="{url theme}assets/js/persian-datepicker.min.js"></script>
+<script src="{url theme}assets/js/input-persian-datepicker.js"></script>
+<link rel="stylesheet" href="{url theme}assets/css/persian-datepicker.min.css"/>
 <script src="{url themeBase}/assets/js/pagination.js"></script>
 <script src="{url themeBase}/assets/js/plugins/chartist.min.js"></script>
 <script>

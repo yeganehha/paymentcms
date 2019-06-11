@@ -35,7 +35,7 @@ class logs extends \controller {
 		$this->lists();
 	}
 	public function lists() {
-		$get = request::post('page=1,perEachPage=25,content,userId,startTime,endTime,ip,viewPage' ,null);
+		$get = request::post('page=1,perEachPage=25,content,userId,StartTime,EndTime,ip,viewPage' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
 			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
@@ -61,15 +61,15 @@ class logs extends \controller {
 				$value[] = $get['ip'] ;
 				$variable[] = ' ip = ? ';
 			}
-			if ( $get['startTime'] != null and $get['endTime'] == null) {
-				$value[] = $get['startTime'] ;
+			if ( $get['StartTime'] != null and $get['EndTime'] == null) {
+				$value[] = date('Y-m-d H:i:s' , $get['StartTime'] / 1000 ) ;
 				$variable[] = ' activity_time > ? ';
-			} elseif ( $get['startTime'] == null and $get['endTime'] != null) {
-				$value[] = $get['endTime'] ;
+			} elseif ( $get['StartTime'] == null and $get['EndTime'] != null) {
+				$value[] = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 ) ;
 				$variable[] = ' activity_time < ? ';
-			} elseif ( $get['startTime'] != null and $get['endTime'] != null)  {
-				$value[] = $get['startTime'] ;
-				$value[] = $get['endTime'] ;
+			} elseif ( $get['StartTime'] != null and $get['EndTime'] != null)  {
+				$value[] = date('Y-m-d H:i:s' , $get['StartTime'] / 1000 ) ;
+				$value[] = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 ) ;
 				$variable[] = ' (activity_time BETWEEN ? AND ?) ';
 			}
 		}
