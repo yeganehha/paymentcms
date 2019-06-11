@@ -34,7 +34,7 @@ namespace paymentCms\component;
  * http://apptools.com/phptools/browser/
  *
  */
-class Browser
+class browser
 {
     private $_agent = '';
     private $_browser_name = '';

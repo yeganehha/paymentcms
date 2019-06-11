@@ -44,17 +44,37 @@ class pluginController {
 	 *
 	 * @return \App\model\model
 	 */
-	protected function model($model = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
-		if ( $model == null )
-			$model = $this->model;
-		$model = 'paymentCms\model\\'.$model ;
-		if (class_exists($model)) {
-			return new $model($searchVariable,$searchWhereClaus) ;
-		} else {
-			App\core\controller\httpErrorHandler::E500($model);
-			exit;
+	protected function model($modelName = null , $searchVariable = null , $searchWhereClaus = 'id = ? ') {
+		if ( is_array($modelName) and count($modelName) == 2 ) {
+			$app = $modelName[0];
+			$modelName = $modelName[1];
 		}
+		if ( $modelName == null )
+			$modelName = $this->model;
+		if ( empty(\app::getAppProvider()) and ! isset($app))
+			$model = 'App\\'.\app::getApp().'\model\\'.$modelName ;
+		elseif ( ! isset($app) )
+			$model = 'App\\'.\app::getAppProvider().'\model\\'.$modelName ;
+		elseif ( isset($app))
+			$model = 'App\\'.$app.'\model\\'.$modelName ;
 
+		if (class_exists($model)) {
+			if ( $searchWhereClaus == null )
+				return new $model($searchVariable) ;
+			else
+				return new $model($searchVariable,$searchWhereClaus) ;
+		} else {
+			$model = 'paymentCms\model\\'.$modelName ;
+			if (class_exists($model)) {
+				if ( $searchWhereClaus == null )
+					return new $model($searchVariable) ;
+				else
+					return new $model($searchVariable,$searchWhereClaus) ;
+			} else {
+				App\core\controller\httpErrorHandler::E500($model);
+				exit;
+			}
+		}
 	}
 
 }

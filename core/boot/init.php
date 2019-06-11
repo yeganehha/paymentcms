@@ -10,20 +10,23 @@
  * Description of this Page :
  */
 
+use paymentCms\component\httpHeader;
 use paymentCms\component\session;
 
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 define('PCVERSION' ,'1.0.0.1');
-
+define('debugger' , true );
 
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL);
 
-error_reporting(0);
-ini_set('display_startup_errors', 0);
-ini_set('display_errors', false);
+if ( ! debugger ) {
+	error_reporting(0);
+	ini_set('display_startup_errors', 0);
+	ini_set('display_errors', false);
+}
 
 spl_autoload_register(function ($class_name_call) {
 	if ( class_exists($class_name_call , false))
@@ -69,7 +72,17 @@ function shutdown() {
 			'server' => json_encode($_SERVER),'post' => json_encode($_POST),'get' => json_encode($_GET),'session' => json_encode(session::get()),'cookie' => json_encode($_COOKIE),'php' => phpversion(),'version' => PCVERSION ,'url' => \App::getFullRequestUrl(), 'app' => json_encode(\App::appsListWithConfig()),'siteUrl' => \App::getCurrentBaseLink(), 'lang' => 'fa', 'theme' => 'default',
 		);
 		curl("https://www.paymentcms.ir/api/report/bug",$localData);
-		\App\core\controller\httpErrorHandler::E500($error['file']);
+		if ( debugger ) {
+			httpHeader::generateStatusCodeHTTP(500);
+			echo '<div style="margin: 20px;"><strong>CMS ERROR : </strong><br><hr>' . "\n";
+			echo 'Error : <strong>' . $localData['type'] . ' ! </strong>' . str_replace(["\n", "\r"], "", $localData['message']) . '<br><br>' . "\n";
+			echo 'File name : ' . $localData['file'] . '<br><br>' . "\n";
+			echo 'Error line : ' . $localData['line']  . '<br><br>' . "\n";
+			echo 'App : ' . $localData['app_run'] . '<br><br>' . "\n";
+			exit;
+		} else {
+			\App\core\controller\httpErrorHandler::E500($error['file']);
+		}
 	}
 	echo $html ;
 	exit;

@@ -95,4 +95,23 @@ class user extends \App\api\controller\innerController  {
 	public static function generateUser($data){
 		return self::editUser(null,$data);
 	}
+
+
+	/**
+	 * @param bool $justId
+	 *
+	 * @return bool|null
+	 *                  [no-access]
+	 */
+	public static function getUserLogin($justId = false){
+		if ( session::has('userAppLoginInformation')  ){
+			$user = session::get('userAppLoginInformation');
+			if ( $justId )
+				return $user['userId'];
+			else
+				return $user ;
+		}
+		else
+			return false;
+	}
 }
