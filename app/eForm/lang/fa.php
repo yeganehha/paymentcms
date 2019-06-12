@@ -52,4 +52,10 @@ return [
 	'answer' => 'پاسخ',
 	'from' => 'از',
 	'toDate' => 'تا',
+	'importFile' => 'وارد سازی نتایج از طریق فایل',
+	'file' => 'فایل',
+	'upload' => 'آپلود',
+	'downloadSampleCsv' => 'دانلود نمونه فایل',
+	'cantUploadFile' => 'امکان آپلود فایل نمی باشد!',
+	'importDone' => 'پاسخ ها با موفقیت وارد شدند!',
 	];

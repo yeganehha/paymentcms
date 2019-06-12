@@ -55,7 +55,6 @@ return [
 				'fieldId'
 			],
 			'PRIMARY KEY' => [
-				'fieldId'
 			],
 			'REFERENCES' => [
 				'fieldId' => [ 'table' => 'field' , 'column' => 'fieldId' , 'on_delete' => 'CASCADE' , 'on_update' => 'CASCADE' ]

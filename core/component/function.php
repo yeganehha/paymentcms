@@ -51,8 +51,10 @@ function show($pram = null , $exit = true ){
 	echo '<pre>';
 	var_dump($pram);
 	echo '</pre>';
-	if ( $exit )
+	if ( $exit ) {
+		\paymentCms\component\mold\Mold::stopAllAutoCompile();
 		exit;
+	}
 }
 
 function phpinfo_array($return=false){

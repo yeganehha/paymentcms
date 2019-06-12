@@ -65,4 +65,5 @@ return [
 	'pathinfo',
 	'parse_url',
 	'basename',
+	'str_getcsv',
 ];

@@ -9,10 +9,15 @@ use App\core\controller\httpErrorHandler;
 use App\eForm\model\eform;
 use App\eForm\model\eformfilled;
 use App\user\app_provider\api\user;
+use http\Header;
+use paymentCms\component\arrays;
 use paymentCms\component\file;
+use paymentCms\component\httpHeader;
 use paymentCms\component\model;
+use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
 use paymentCms\component\Response;
+use paymentCms\component\security;
 use paymentCms\component\session;
 use paymentCms\component\strings;
 use paymentCms\component\validate;
@@ -37,6 +42,10 @@ class eFormsAnswer extends \controller {
 		$this->lists($formId);
 	}
 	public function lists($formId = null , $userId = null) {
+//		show('ssssss');
+		if ( request::isFile('importFile') ) {
+			$this->import($formId);
+		}
 		$get = request::post('page=1,perEachPage=25,fname,lname,phone,email,StartTime,EndTime' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
@@ -97,6 +106,7 @@ class eFormsAnswer extends \controller {
 		$this->mold->view('listOfFormAnswer.mold.html');
 		$this->mold->setPageTitle(rlang(['answers' , 'eForm']));
 		$this->mold->set('answers' , $search);
+		$this->mold->set('formId' , $formId);
 	}
 	public function summery($formId = null ) {
 		$get = request::post('StartTime,EndTime' ,null);
@@ -109,6 +119,7 @@ class eFormsAnswer extends \controller {
 		if ( $get['EndTime'] != null )
 			$EndTime = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 ) ;
 		$search = $model->summery($formId,$startTime,$EndTime);
+//		show($search);
 		if ( count($search) ==  0 )
 			$search = null;
 		$this->mold->path('default', 'eForm');
@@ -195,5 +206,86 @@ class eFormsAnswer extends \controller {
 		$this->mold->view('formEditor.mold.html');
 		$this->mold->setPageTitle(rlang(['edit','eForm']));
 		return $form;
+	}
+	private function import($formId ){
+		/* @var \App\eForm\model\eform $form */
+		$form = $this->model('eform' , $formId );
+		if ( $form->getFormId() != $formId ){
+			return false ;
+		}
+
+
+		$target_folder = payment_path.'app'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR ;
+		file::make_folder($target_folder,true);
+		$target_file = $target_folder.md5(time().$formId.rand(999,9999)).'.csv' ;
+		$file = request::file('importFile');
+		if ( move_uploaded_file($file["tmp_name"], $target_file) ){
+			$csv = $this->parse_csv_file($target_file);
+			model::transaction();
+			$error = false;
+			foreach ( $csv as $indexRow => $row ){
+				if ( $error !== false )
+					break ;
+				/* @var \App\eForm\model\eformfilled $fill */
+				$fill = $this->model('eformfilled' );
+				$fill->setUserId( session::get('userAppLoginInformation')['userId'] );
+				$fill->setFormId($form->getFormId());
+				$fill->setFillStart(date('Y-m-d H:i:s'));
+				$fill->setFillEnd(date('Y-m-d H:i:s'));
+				$fill->setIp(security::getIp());
+				$fill->insertToDataBase();
+				if ( $fill->getFillId() > 0 ){
+					$resultFillOutForm = fieldService::fillOutForm($form->getFormId(),'eForm',$row, $fill->getFillId() , 'eformfilled');
+					if ( ! $resultFillOutForm['status'] )
+						$error = $resultFillOutForm['massage'];
+				} else
+					$error = rlang('pleaseTryAGain');
+			}
+			if ( $error === false ){
+				model::commit();
+				unlink($target_file);
+				$this->alert('success','',rlang('importDone'));
+				return true;
+			} else {
+				model::rollback();
+				unlink($target_file);
+				$this->alert('danger','',$error);
+				return false;
+			}
+		} else {
+			$this->alert('danger','',rlang('cantUploadFile'));
+			return false;
+		}
+	}
+
+	private function parse_csv_file($csvfile , $firstLineHeader = true) {
+		$csv = Array();
+		$rowcount = 0;
+		if (($handle = fopen($csvfile, "r")) !== FALSE) {
+			$max_line_length = defined('MAX_LINE_LENGTH') ? MAX_LINE_LENGTH : 500;
+			$header = fgetcsv($handle, $max_line_length);
+			$header_colcount = count($header);
+			while (($row = fgetcsv($handle, $max_line_length)) !== FALSE) {
+				$row_colcount = count($row);
+				if ($row_colcount == $header_colcount) {
+					if ( $firstLineHeader ){
+						for ( $i = 0 ; $i < $header_colcount ; $i ++ ){
+							if ( isset($header[$i]) and isset($row[$i]) )
+								$csv[$rowcount][ (int) filter_var($header[$i], FILTER_SANITIZE_NUMBER_INT) ] = $row[$i];
+						}
+					} else
+						$csv[] = $row ;
+				}
+				else {
+					return null;
+				}
+				$rowcount++;
+			}
+			fclose($handle);
+		}
+		else {
+			return null;
+		}
+		return $csv;
 	}
 }
