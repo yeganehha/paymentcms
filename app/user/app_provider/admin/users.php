@@ -102,7 +102,7 @@ class users extends \controller {
 		}
 		if ( $updateStatus == 'updateDone') {
 			$this->alert('success' , '',rlang('editUserSuccessFully'));
-			$this->mold->set('activeTab','edit');
+//			$this->mold->set('activeTab','edit');
 		}elseif ( $updateStatus == 'insertDone') {
 			$this->alert('success' , '',rlang('insertUserSuccessFully'));
 		}
@@ -139,5 +139,22 @@ class users extends \controller {
 			$this->mold->set('activeTab','edit');
 			return false;
 		}
+	}
+
+
+
+	public function insertForm(){
+		if ( request::isPost() ) {
+			$this->checkData();
+		}
+		/* @var \App\user\model\user_group $model */
+		$model = $this->model(['user','user_group']);
+		$access = $model->search(null,null);
+		$this->mold->set('access',$access);
+		$this->mold->path('default', 'eForm');
+		$this->mold->view('formEditor.mold.html');
+		$this->mold->path('default');
+		$this->mold->setPageTitle(rlang(['add','eForm']));
+		$this->mold->set('activeMenu' , 'newForms');
 	}
 }

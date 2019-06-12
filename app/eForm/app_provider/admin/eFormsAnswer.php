@@ -119,6 +119,9 @@ class eFormsAnswer extends \controller {
 		if ( $get['EndTime'] != null )
 			$EndTime = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 ) ;
 		$search = $model->summery($formId,$startTime,$EndTime);
+		usort($search, function($a, $b) {
+			return $a['fieldId'] - $b['fieldId'];
+		});
 //		show($search);
 		if ( count($search) ==  0 )
 			$search = null;
@@ -215,7 +218,7 @@ class eFormsAnswer extends \controller {
 		}
 
 
-		$target_folder = payment_path.'app'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR ;
+		$target_folder = payment_path.'app'.DIRECTORY_SEPARATOR.'eForm'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR ;
 		file::make_folder($target_folder,true);
 		$target_file = $target_folder.md5(time().$formId.rand(999,9999)).'.csv' ;
 		$file = request::file('importFile');
