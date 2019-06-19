@@ -21,6 +21,7 @@ use paymentCms\component\security;
 use paymentCms\component\session;
 use paymentCms\component\strings;
 use paymentCms\component\validate;
+use paymentCms\model\field;
 
 /**
  * Created by Yeganehha .
@@ -63,9 +64,14 @@ class eFormsAnswer extends \controller {
 			if ( $get['customField'] != null and is_array($get['customField'])) {
 				foreach ($get['customField'] as $idCustomField => $valueCustomField ){
 					if ($valueCustomField != null or $valueCustomField != '') {
-						$value[] = $idCustomField;
-						$value[] = '%' . $valueCustomField . '%';
-						$cfvVariable[] = ' ( cfv.fieldId = ? and cfv.value LIKE ? ) ';
+						if ( fieldService::saveInTable() ){
+							$value[] = '%' . $valueCustomField . '%';
+							$cfvVariable[] = '  cfv.f_'.$idCustomField.' LIKE ?  ';
+						} else {
+							$value[] = $idCustomField;
+							$value[] = '%' . $valueCustomField . '%';
+							$cfvVariable[] = ' ( cfv.fieldId = ? and cfv.value LIKE ? ) ';
+						}
 					}
 				}
 			}
@@ -109,14 +115,22 @@ class eFormsAnswer extends \controller {
 		$model = parent::model('eformfilled');
 		$model = parent::model('eformfilled');
 		model::join('user u' , 'e.userId = u.userId', "left" );
-		if ( count($cfvVariable) > 0 )
-			model::join('fieldvalue cfv' , ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and ('. implode(' or ' , $cfvVariable ).') )', "INNER" );
+		if ( count($cfvVariable) > 0 ) {
+			if ( fieldService::saveInTable() )
+				model::join('customFieldValue_'.$formId.'_eForm cfv', ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and (' . implode(' and ', $cfvVariable) . ') )', "INNER");
+			else
+				model::join('fieldvalue cfv', ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and (' . implode(' or ', $cfvVariable) . ') )', "INNER");
+		}
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , 'eformfilled e', 'COUNT(e.fillId) as co' , null,null)) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		model::join('user u' , 'e.userId = u.userId', "left" );
 		model::join('eform form' , 'e.formId = form.formId', "left" );
-		if ( count($cfvVariable) > 0 )
-			model::join('fieldvalue cfv' , ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and ('. implode(' or ' , $cfvVariable ).') )', "INNER" );
+		if ( count($cfvVariable) > 0 ) {
+			if (fieldService::saveInTable())
+				model::join('customFieldValue_' . $formId . '_eForm cfv', ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and (' . implode(' and ', $cfvVariable) . ') )', "INNER");
+			else
+				model::join('fieldvalue cfv', ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and (' . implode(' or ', $cfvVariable) . ') )', "INNER");
+		}
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eformfilled e', 'e.fillId,e.formId,form.name,u.lname,u.userId,u.fname,u.phone,u.email,e.fillEnd'  , ['column' => 'e.fillId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] ,'e.fillId' );
 		$fields = fieldService::getFieldsToFillOut($formId,'eForm' );
 		$this->mold->set('fields' , $fields['result']);
@@ -125,6 +139,7 @@ class eFormsAnswer extends \controller {
 		$this->mold->setPageTitle(rlang(['answers' , 'eForm']));
 		$this->mold->set('answers' , $search);
 		$this->mold->set('formId' , $formId);
+		$this->mold->set('admin' , true);
 	}
 	public function summery($formId = null ) {
 		$get = request::post('StartTime,EndTime,customField' ,null);
@@ -155,6 +170,7 @@ class eFormsAnswer extends \controller {
 		if ( $userId > 0 ) {
 			$this->lists(null, $userId);
 			$this->mold->set('activeMenu','userAnswer');
+			$this->mold->set('user' , true);
 		} else{
 			httpErrorHandler::E403();
 		}
@@ -185,50 +201,6 @@ class eFormsAnswer extends \controller {
 		$this->mold->path('default', 'eForm');
 		$this->mold->view('answer.mold.html');
 		$this->mold->setPageTitle(rlang('answer'));
-	}
-	public function edit($formId,$updateStatus = null){
-		if ( request::isPost() ) {
-			$this->checkData($formId);
-		}
-
-		/* @var \App\eForm\model\eform $form */
-		$form = $this->model('eform' , $formId );
-		if ( $form->getFormId() != $formId ){
-			httpErrorHandler::E404();
-			return false ;
-		}
-		if ( $updateStatus == 'updateDone') {
-			$this->alert('success' , '',rlang('editEFormSuccessFully'));
-			$this->mold->set('activeTab','edit');
-		} elseif ( $updateStatus == 'insertDone') {
-			$this->alert('success' , '',rlang('insertEFromSuccessFully'));
-		}
-
-		$files = file::get_files_by_pattern(__DIR__.'/../../theme/'.'default'.'/','*.form.mold.html');
-		$template = [];
-		for ( $i = 0 ; $i < count($files) ; $i++){
-			$files[$i] = strings::deleteWordLastString($files[$i],'.form.mold.html');
-			$files[$i] = strings::deleteWordFirstString($files[$i],__DIR__.'/../../theme/'.'default'.'/');
-			$template[$files[$i]] = rlang($files[$i].'_templateFile');
-			if ( $template[$files[$i]] == null)
-				$template[$files[$i]] = $files[$i] ;
-		}
-		unset($files);
-		/* @var \App\user\model\user_group $model */
-		$model = $this->model(['user','user_group']);
-		$access = $model->search(null,null);
-
-		$accessSelect = array_filter((array) explode(',' , $form->getAccess()));
-
-		fieldService::getFieldsToEdit($form->getFormId(),'eForm',$this->mold);
-		$this->mold->set('access',$access);
-		$this->mold->set('accessSelect',$accessSelect);
-		$this->mold->set('template',$template);
-		$this->mold->set('form',$form);
-		$this->mold->path('default', 'eForm');
-		$this->mold->view('formEditor.mold.html');
-		$this->mold->setPageTitle(rlang(['edit','eForm']));
-		return $form;
 	}
 	private function import($formId ){
 		/* @var \App\eForm\model\eform $form */

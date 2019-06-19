@@ -4,6 +4,7 @@
 namespace App\eForm\model;
 
 
+use App\core\controller\fieldService;
 use paymentCms\component\model;
 use paymentCms\model\modelInterFace;
 
@@ -70,30 +71,63 @@ class eformfilled extends model implements modelInterFace{
 		}
 
 		try {
-			$db = parent::db();
-			$db->join('field field', 'field.fieldId = fieldvalue.fieldId', "left");
-			$db->join('eformfilled eformfilled' , ' eformfilled.fillId = fieldvalue.objectId ', 'INNER');
-			if ( isset($variable))
-				$db->joinWhere('eformfilled eformfilled' , $variable , $value);
-			$db->joinWhere('eformfilled eformfilled' , 'eformfilled.formId' , $formId);
-			$db->groupBy('fieldvalue.fieldId,fieldvalue.value');
-			$db->orderBy("field.orderNumber","Desc");
-			$db->orderBy("co","Desc");
-			$db->where('fieldvalue.objectType' , 'eformfilled' );
-			if (  $customField != null and is_array($customField) ){
-				$ids = $db->subQuery ();
-				foreach ($customField as $idCustomField => $valueCustomField ) {
-					if ($valueCustomField != null or $valueCustomField != '') {
-						$ids->where('( fieldvalue.fieldId = ? and fieldvalue.value LIKE ? )', [$idCustomField, '%' . $valueCustomField . '%']);
+			if ( fieldService::saveInTable() ) {
+				$db = parent::db();
+				$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+
+				$db->join('field field', ' ( field.serviceId = eformfilled.formId and field.serviceType = "eForm" ) ', "left");
+				if (isset($variable))
+					$db->Where($variable, $value);
+				$db->Where('eformfilled.formId', $formId);
+				$db->orderBy("field.orderNumber", "Desc");
+				$db->groupBy('field.fieldId');
+				$fields = $db->get("eformfilled eformfilled", null, [ 'field.fieldId', 'field.title', 'field.orderNumber', 'field.type , eformfilled.formId']);
+				$searchQuery = "";
+				if ($customField != null and is_array($customField)) {
+					$variable = [] ;
+					foreach ($customField as $idCustomField => $valueCustomField) {
+						if ($valueCustomField != null or $valueCustomField != '') {
+							$variable[] = ' f_'.$idCustomField.' Like "%'.$valueCustomField.'%" ';
+						}
 					}
+					if ( count($variable) > 0 )
+					$searchQuery = " WHERE ( ".implode( ' and ' , $variable ) .' ) ';
 				}
-				$ids->where('fieldvalue.objectType' , 'eformfilled' );
-				$ids->groupBy('fieldvalue.objectId');
-				$ids->get ("fieldvalue fieldvalue", null, "fieldvalue.objectId");
-				$db->where ("fieldvalue.objectId", $ids, 'in');
+				$querys = [];
+				for ( $i = 0 ; $i < count( $fields ) ; $i++ ){
+					$querys[] = "SELECT '".$fields[$i]['fieldId']."' AS fieldId, '".$fields[$i]['title']."' AS title, '".$fields[$i]['orderNumber']."' AS orderNumber, '".$fields[$i]['type']."' AS type, f_".$fields[$i]['fieldId']." AS value, COUNT(f_".$fields[$i]['fieldId'].") AS co FROM ".$configDataBase['_dbTableStartWith']."customFieldValue_".$fields[$i]['formId']."_eForm ".$searchQuery." GROUP BY f_".$fields[$i]['fieldId'] ;
+				}
+				if ( count($querys) == 0 )
+					return null ;
+				$query = 'select * From ( '. implode(' UNION ' , $querys) .' ) as t  ORDER BY orderNumber , co DESC ';
+				return model::rawQuery($query);
 			}
-			return $db->get ("fieldvalue fieldvalue", null, ['fieldvalue.value' , 'fieldvalue.fieldId' , 'field.title' , 'field.orderNumber' , 'field.type' , 'count(*) as co']);
+			else {
+				$db = parent::db();
+				$db->join('field field', 'field.fieldId = fieldvalue.fieldId', "left");
+				$db->join('eformfilled eformfilled', ' eformfilled.fillId = fieldvalue.objectId ', 'INNER');
+				if (isset($variable)) $db->joinWhere('eformfilled eformfilled', $variable, $value);
+				$db->joinWhere('eformfilled eformfilled', 'eformfilled.formId', $formId);
+				$db->groupBy('fieldvalue.fieldId,fieldvalue.value');
+				$db->orderBy("field.orderNumber", "Desc");
+				$db->orderBy("co", "Desc");
+				$db->where('fieldvalue.objectType', 'eformfilled');
+				if ($customField != null and is_array($customField)) {
+					$ids = $db->subQuery();
+					foreach ($customField as $idCustomField => $valueCustomField) {
+						if ($valueCustomField != null or $valueCustomField != '') {
+							$ids->where('( fieldvalue.fieldId = ? and fieldvalue.value LIKE ? )', [$idCustomField, '%' . $valueCustomField . '%']);
+						}
+					}
+					$ids->where('fieldvalue.objectType', 'eformfilled');
+					$ids->groupBy('fieldvalue.objectId');
+					$ids->get("fieldvalue fieldvalue", null, "fieldvalue.objectId");
+					$db->where("fieldvalue.objectId", $ids, 'in');
+				}
+				return $db->get("fieldvalue fieldvalue", null, ['fieldvalue.value', 'fieldvalue.fieldId', 'field.title', 'field.orderNumber', 'field.type', 'count(*) as co']);
+			}
 		} catch (\Exception $e) {
+			show($e);
 			return false ;
 		}
 	}

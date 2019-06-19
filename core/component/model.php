@@ -95,6 +95,9 @@ abstract class model {
 	public static function queryUnprepared($query){
 		return self::$db->queryUnprepared($query);
 	}
+	public static function rawQuery($query){
+		return self::$db->rawQuery($query);
+	}
 
 	public static function debugQuery($end = false){
 		show(self::db()->getLastError(),false);

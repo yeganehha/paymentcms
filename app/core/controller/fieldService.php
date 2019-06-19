@@ -62,4 +62,7 @@ class fieldService  {
 	public static function showFilledOutFormWithAllFields($serviceId,$serviceType,$objectId , $objectType){
 		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType );
 	}
+	public static function saveInTable(){
+		return \App\core\app_provider\api\fields::$creatTable;
+	}
 }
