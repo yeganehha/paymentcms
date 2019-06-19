@@ -135,6 +135,9 @@ abstract class model {
 		self::$db->join($table, $condition, $joinOn);
 	}
 
+	public static function insert($table,$data){
+		return self::$db->insert($table, $data);
+	}
 	public static function joinWhere($table, $condition , $conditionValue){
 		self::$db->joinOrWhere($table, $condition, $conditionValue);
 	}
