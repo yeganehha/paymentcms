@@ -31,8 +31,71 @@
                                             </div>
                                         </div>
                                     </div>
+
+
+
+                                    {if is_array($fields)}
+                                    {foreach from=$fields key=key value=field}
+                                    {if $field.type == 'textarea'}
                                     <div class="col-md-4">
-                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-check">
+                                                <textarea class="form-control" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" >{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {elseif $field.type == 'checkbox'}
+                                    <div class="col-md-4">
+                                        <label class="col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        {foreach from=$field.valuesDe key=keyValue value=value}
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]"  {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if} > {$value}
+                                                <span class="form-check-sign"><span class="check"></span></span>
+                                            </label>
+                                        </div>
+                                        {/foreach}
+                                    </div>
+                                    {elseif $field.type == 'radio'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            {foreach from=$field.valuesDe key=keyValue value=value}
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if} > {$value}
+                                                    <span class="circle"><span class="check"></span></span>
+                                                </label>
+                                            </div>
+                                            {/foreach}
+                                        </div>
+                                    </div>
+                                    {elseif $field.type == 'select'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
+                                                {foreach from=$field.valuesDe key=keyValue value=value}
+                                                <option value="{$value}" {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}selected{/if}{/if} >{$value}</option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {else}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <input type="{$field.type}"  id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" value="{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}" class="form-control">
+                                        </div>
+                                    </div>
+                                    {/if}
+                                    {/foreach}
+                                    {/if}
+
+
+                                    <div class="col-md-4">
+                                        <a class="btn btn-link"  href="{url current}">{_ "close"}</a>
                                         <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
                                     </div>
                                 </div>

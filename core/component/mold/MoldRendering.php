@@ -348,6 +348,12 @@ class MoldRendering {
 			return ;
 		$this->replace($data['find'], ' } ');
 	}
+
+	private function _rand($data){
+		if ( !$this->engineStatus )
+			return rand();
+		$this->replace($data['find'], 'echo rand();' );
+	}
 	private function _foreach($data){
 		if ( !$this->engineStatus )
 			return ;

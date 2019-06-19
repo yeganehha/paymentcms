@@ -46,7 +46,7 @@ class eFormsAnswer extends \controller {
 		if ( request::isFile('importFile') ) {
 			$this->import($formId);
 		}
-		$get = request::post('page=1,perEachPage=25,fname,lname,phone,email,StartTime,EndTime' ,null);
+		$get = request::post('page=1,perEachPage=25,fname,lname,phone,email,StartTime,EndTime,customField' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
 			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
@@ -54,10 +54,21 @@ class eFormsAnswer extends \controller {
 		$valid = validate::check($get, $rules);
 		$value = array( );
 		$variable = array( );
+		$cfvValue = array( );
+		$cfvVariable = array( );
 		if ($valid->isFail()){
 			//TODO:: add error is not valid data
 
 		} else {
+			if ( $get['customField'] != null and is_array($get['customField'])) {
+				foreach ($get['customField'] as $idCustomField => $valueCustomField ){
+					if ($valueCustomField != null or $valueCustomField != '') {
+						$value[] = $idCustomField;
+						$value[] = '%' . $valueCustomField . '%';
+						$cfvVariable[] = ' ( cfv.fieldId = ? and cfv.value LIKE ? ) ';
+					}
+				}
+			}
 			if ( $get['fname'] != null ) {
 				$value[] = '%'.$get['fname'].'%' ;
 				$variable[] = ' u.fname LIKE ? ' ;
@@ -96,12 +107,19 @@ class eFormsAnswer extends \controller {
 		}
 		/* @var eform $model */
 		$model = parent::model('eformfilled');
+		$model = parent::model('eformfilled');
 		model::join('user u' , 'e.userId = u.userId', "left" );
-		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , 'eformfilled e', 'COUNT(e.fillId) as co' , null,null,'e.fillId')) [0]['co'];
+		if ( count($cfvVariable) > 0 )
+			model::join('fieldvalue cfv' , ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and ('. implode(' or ' , $cfvVariable ).') )', "INNER" );
+		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' and ' , $variable) , 'eformfilled e', 'COUNT(e.fillId) as co' , null,null)) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		model::join('user u' , 'e.userId = u.userId', "left" );
 		model::join('eform form' , 'e.formId = form.formId', "left" );
+		if ( count($cfvVariable) > 0 )
+			model::join('fieldvalue cfv' , ' ( e.fillId = cfv.objectId and cfv.objectType = "eformfilled" and ('. implode(' or ' , $cfvVariable ).') )', "INNER" );
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode(' and ' , $variable) )  , 'eformfilled e', 'e.fillId,e.formId,form.name,u.lname,u.userId,u.fname,u.phone,u.email,e.fillEnd'  , ['column' => 'e.fillId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] ,'e.fillId' );
+		$fields = fieldService::getFieldsToFillOut($formId,'eForm' );
+		$this->mold->set('fields' , $fields['result']);
 		$this->mold->path('default', 'eForm');
 		$this->mold->view('listOfFormAnswer.mold.html');
 		$this->mold->setPageTitle(rlang(['answers' , 'eForm']));
@@ -109,7 +127,7 @@ class eFormsAnswer extends \controller {
 		$this->mold->set('formId' , $formId);
 	}
 	public function summery($formId = null ) {
-		$get = request::post('StartTime,EndTime' ,null);
+		$get = request::post('StartTime,EndTime,customField' ,null);
 		/* @var eformfilled $model */
 		$model = $this->model('eformfilled');
 		$EndTime = null ;
@@ -118,13 +136,15 @@ class eFormsAnswer extends \controller {
 			$startTime = date('Y-m-d H:i:s' , $get['StartTime'] / 1000 ) ;
 		if ( $get['EndTime'] != null )
 			$EndTime = date('Y-m-d H:i:s' , $get['EndTime'] / 1000 ) ;
-		$search = $model->summery($formId,$startTime,$EndTime);
+		$search = $model->summery($formId,$startTime,$EndTime,$get['customField']);
 		usort($search, function($a, $b) {
 			return $a['fieldId'] - $b['fieldId'];
 		});
 //		show($search);
 		if ( count($search) ==  0 )
 			$search = null;
+		$fields = fieldService::getFieldsToFillOut($formId,'eForm' );
+		$this->mold->set('fields' , $fields['result']);
 		$this->mold->path('default', 'eForm');
 		$this->mold->view('summery.mold.html');
 		$this->mold->setPageTitle(rlang(['answers' , 'eForm']));

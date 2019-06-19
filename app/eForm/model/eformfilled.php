@@ -56,7 +56,7 @@ class eformfilled extends model implements modelInterFace{
 	}
 
 	
-	public function summery($formId , $startTime = null , $endTime = null ){
+	public function summery($formId , $startTime = null , $endTime = null , $customField = null){
 		if ( $startTime != null  and $endTime == null ) {
 			$value[] = $startTime ;
 			$variable = ' eformfilled.fillEnd >= ? ' ;
@@ -79,6 +79,19 @@ class eformfilled extends model implements modelInterFace{
 			$db->groupBy('fieldvalue.fieldId,fieldvalue.value');
 			$db->orderBy("field.orderNumber","Desc");
 			$db->orderBy("co","Desc");
+			$db->where('fieldvalue.objectType' , 'eformfilled' );
+			if (  $customField != null and is_array($customField) ){
+				$ids = $db->subQuery ();
+				foreach ($customField as $idCustomField => $valueCustomField ) {
+					if ($valueCustomField != null or $valueCustomField != '') {
+						$ids->where('( fieldvalue.fieldId = ? and fieldvalue.value LIKE ? )', [$idCustomField, '%' . $valueCustomField . '%']);
+					}
+				}
+				$ids->where('fieldvalue.objectType' , 'eformfilled' );
+				$ids->groupBy('fieldvalue.objectId');
+				$ids->get ("fieldvalue fieldvalue", null, "fieldvalue.objectId");
+				$db->where ("fieldvalue.objectId", $ids, 'in');
+			}
 			return $db->get ("fieldvalue fieldvalue", null, ['fieldvalue.value' , 'fieldvalue.fieldId' , 'field.title' , 'field.orderNumber' , 'field.type' , 'count(*) as co']);
 		} catch (\Exception $e) {
 			return false ;
