@@ -82,12 +82,14 @@ class fields extends \App\api\controller\innerController {
 			return self::jsonError($valid->errorsIn(),500);
 		model::transaction();
 		try {
-			if ( self::$creatTable ){
+			$tableCreated = false ;
+			if ( self::$creatTable and ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType)){
 				$query = self::generateQueryCreatTable(self::$tableName.$serviceId.'_'.$serviceType);
 				if ( model::queryUnprepared($query) === false) {
 					model::rollback();
 					return self::jsonError('cantCreatTable', 500);
 				}
+				$tableCreated = true ;
 			}
 
 			/* @var \paymentCms\model\field $modelField */
@@ -107,14 +109,18 @@ class fields extends \App\api\controller\innerController {
 					$modelField->setValues($field['value']);
 					$modelField->setServiceId($serviceId);
 					$modelField->setServiceType($serviceType);
-					if ($field['id'] > 0)
+					if ($field['id'] > 0) {
 						$modelField->upDateDataBase();
-					else {
+						if ( $tableCreated )
+							$idsOfItem[] = $modelField->getFieldId() ;
+					} else {
 						$modelField->insertToDataBase();
 						$idsOfItem[] = $modelField->getFieldId() ;
 					}
 				}
 				if ( self::$creatTable and count($idsOfItem) > 0 ){
+					if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+						return self::json(null);
 					$query = self::addToTable(self::$tableName.$serviceId.'_'.$serviceType,(array)$idsOfItem);
 					if ( model::queryUnprepared($query) === false) {
 						model::rollback();
@@ -129,6 +135,8 @@ class fields extends \App\api\controller\innerController {
 				$modelField->db()->where('serviceType', $serviceType);
 				$modelField->db()->delete('field');
 				if ( self::$creatTable and count($deletedFields) > 0 ){
+					if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+						return self::json(null);
 					$query = self::deleteFromTable(self::$tableName.$serviceId.'_'.$serviceType,(array)$deletedFields);
 					if ( model::queryUnprepared($query) === false) {
 						model::rollback();
@@ -190,6 +198,8 @@ class fields extends \App\api\controller\innerController {
 				}
 			}
 			if ( self::$creatTable ) {
+				if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+					return self::json(null);
 				if ( ! model::insert(self::$tableName.$serviceId.'_'.$serviceType,$insertRow)){
 					model::rollback();
 					return self::jsonError(rlang('canNotInsertFieldValueRow'), 500);
@@ -254,6 +264,8 @@ class fields extends \App\api\controller\innerController {
 				}
 			}
 			if ( self::$creatTable ) {
+				if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+					return self::json(null);
 				$count = model::searching([$objectId,$objectType] ,'objectId = ? and objectType = ?',self::$tableName.$serviceId.'_'.$serviceType,$insertRow);
 				if ( $count == null ){
 					$insertRow['objectId'] = $objectId ;
@@ -292,6 +304,8 @@ class fields extends \App\api\controller\innerController {
 						$allFields['result'][$index]['value'] = $fieldsFill[$allField['fieldId']]['value'];
 
 		} else {
+			if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+				return self::json(null);
 			$fieldsFill = model::searching([$objectId, $objectType], 'objectId = ? and objectType = ? ', self::$tableName.$serviceId.'_'.$serviceType);
 			if ($fieldsFill == null){
 				$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe);
@@ -301,6 +315,7 @@ class fields extends \App\api\controller\innerController {
 				foreach ($allFields['result'] as $index => $allField)
 					if (isset($fieldsFill[0]['f_'.$allField['fieldId']]))
 						$allFields['result'][$index]['value'] = $fieldsFill[0]['f_'.$allField['fieldId']];
+
 		}
 		return self::json($allFields['result']);
 	}
@@ -339,7 +354,7 @@ class fields extends \App\api\controller\innerController {
 		if ( $configDataBase == null )
 			$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 		$query = 'ALTER TABLE `'.$configDataBase['_dbTableStartWith'].$tableName.'` '.chr(10) ;
-		$query .= '`DROP f_'.implode( '` ,'.chr(10).'DROP `f_' , $ids ).'` ;';
+		$query .= 'DROP `f_'.implode( '` ,'.chr(10).'DROP `f_' , $ids ).'` ;';
 		return $query ;
 	}
 }
