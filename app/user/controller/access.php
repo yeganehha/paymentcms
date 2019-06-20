@@ -51,7 +51,7 @@ class access extends \controller  {
 			$model->setPassword($get['password']);
 			$password = $model->getPassword();
 
-			$model = $this->model('user' , [$password,$get['username'],$get['username']] , 'password = ? and ( phone = ? or email = ?) ' );
+			$model = $this->model('user' , [$password,$get['username'],$get['username']] , 'password = ? and ( phone = ? or email = ?) and block = 0 ' );
 			if ( $model->getUserId() == null ){
 				$this->alert('danger','',rlang('cantFindUser') );
 				return false;
