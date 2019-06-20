@@ -76,10 +76,12 @@ class user extends \App\api\controller\innerController  {
 		if ($userId == null) {
 			$result = $model->insertToDataBase();
 			if ( $result !== false ) {
-				$resultFillOutForm = fieldService::fillOutForm(0,'user_register',$get['customField'], $model->getUserId() , 'user_register');
-				if ( ! $resultFillOutForm['status'] ) {
-					model::rollback() ;
-					return self::jsonError(rlang('pleaseTryAGain'), 500);
+				if ($get['customField'] != null ) {
+					$resultFillOutForm = fieldService::fillOutForm(0, 'user_register', $get['customField'], $model->getUserId(), 'user_register');
+					if (!$resultFillOutForm['status']) {
+						model::rollback();
+						return self::jsonError(rlang('pleaseTryAGain'), 500);
+					}
 				}
 				model::commit();
 				return self::json($model->getUserId());
@@ -90,10 +92,12 @@ class user extends \App\api\controller\innerController  {
 		} else {
 			$result = $model->upDateDataBase();
 			if ( $result ) {
-				$resultFillOutForm = fieldService::updateFillOutForm(0,'user_register',$get['customField'], $model->getUserId() , 'user_register');
-				if ( ! $resultFillOutForm['status'] ) {
-					model::rollback() ;
-					return self::jsonError(rlang('pleaseTryAGain'), 500);
+				if ($get['customField'] != null ) {
+					$resultFillOutForm = fieldService::updateFillOutForm(0, 'user_register', $get['customField'], $model->getUserId(), 'user_register');
+					if (!$resultFillOutForm['status']) {
+						model::rollback();
+						return self::jsonError(rlang('pleaseTryAGain'), 500);
+					}
 				}
 				if ( $model->getUserId() == session::get('userAppLoginInformation')['userId'])
 					session::lifeTime(1 ,'hour')->set('userAppLoginInformation',$model->returnAsArray());

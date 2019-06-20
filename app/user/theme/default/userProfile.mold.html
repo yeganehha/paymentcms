@@ -21,9 +21,9 @@
                                             <div class="card-icon" >
                                                 <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
                                             </div>
-                                            <h4 class="card-title float-{$float} m-3">{if isset($newUser)}{_ "add"}{else}{_ "edit"}{/if} {_ "user"}</h4>
+                                            <h4 class="card-title float-{$float} m-3">{if isset($myProfile)}{_ "profile"}{else}{if isset($newUser)}{_ "add"}{else}{_ "edit"}{/if} {_ "user"}{/if}</h4>
                                         </div>
-                                        <form class="form-horizontal" method="post" action="{url}users/{if isset($newUser)}insert{else}profile/{if isset($user)}{$user->getUserId()}{/if}{/if}">
+                                        <form class="form-horizontal" method="post" action="{url}users/{if isset($newUser)}insert{else}{if isset($myProfile)}myProfile{else}profile/{if isset($user)}{$user->getUserId()}{/if}{/if}{/if}">
                                             <div class="card-body">
                                                 {call addUserFormUpDescription}
                                                 <div class="row">
@@ -67,6 +67,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {if ! isset($myProfile)}
                                                     <div class="col-md-6">
                                                         <label class="col-md-3 col-form-label">{_ "permission"}</label>
                                                         <div class="col-md-9">
@@ -79,8 +80,9 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {/if}
                                                     {call fillOutFieldServiceForm}
-                                                    {if ! isset($newUser)}
+                                                    {if ! isset($newUser) and ! isset($myProfile)}
                                                     <div class="col-md-12">
                                                         <label class="col-md-3 col-form-label">{_ "admin_note"}</label>
                                                         <div class="col-md-9">

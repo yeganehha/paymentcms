@@ -6,6 +6,7 @@ namespace App\user\app_provider\admin;
 
 use App\core\controller\fieldService;
 use App\core\controller\httpErrorHandler;
+use App\user\app_provider\api\user;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -123,18 +124,62 @@ class users extends \controller {
 	}
 
 	/**
+	 * @param null $updateStatus
+	 * [user-access]
+	 * @return bool|\paymentCms\model\user
+	 */
+	public function myProfile($updateStatus = null){
+		$userLogin = user::getUserLogin();
+		$this->mold->set('myProfile' , true);
+		$myProfile = true ;
+		$_POST['groupId'] = $userLogin['user_group_id'];
+		$userId = $userLogin['userId'];
+
+		if ( request::isPost() ) {
+			$this->checkData($userId , true);
+		}
+		/* @var \paymentCms\model\user $user */
+		$user = $this->model('user' , $userId );
+		if ( $user->getUserId() != $userId ){
+			httpErrorHandler::E404();
+			return false ;
+		}
+		if ( $updateStatus == 'updateDone') {
+			$this->alert('success' , '',rlang('editUserSuccessFully'));
+//			$this->mold->set('activeTab','edit');
+		}elseif ( $updateStatus == 'insertDone') {
+			$this->alert('success' , '',rlang('insertUserSuccessFully'));
+		}
+
+		/* @var \App\user\model\user_group $model */
+		$model = $this->model('user_group');
+		$access = $model->search(null,null);
+
+		$this->mold->set('access',$access);
+		$this->mold->set('user',$user);
+		$this->mold->path('default', 'user');
+		$this->mold->view('userProfile.mold.html');
+		$this->mold->setPageTitle(rlang(['profile','user']));
+		return $user;
+	}
+
+	/**
 	 * @param null $userId
 	 *
 	 * @return bool
 	 * [no-access]
 	 */
-	public function checkData($userId = null){
+	public function checkData($userId = null,$myPerofile = false){
 		$result = \App\user\app_provider\api\user::editUser($userId,$_POST);
 		if ( $result['status'] ){
+			if ( $myPerofile )
+				$link = 'myProfile' ;
+			else
+				$link = 'profile/'.$result['result'] ;
 			if ($userId == null) {
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $result['result'] . '/insertDone', 'admin'));
+				Response::redirect(\App::getBaseAppLink('users/' . $link . '/insertDone', 'admin'));
 			} else {
-				Response::redirect(\App::getBaseAppLink('users/profile/' . $result['result'] . '/updateDone', 'admin'));
+				Response::redirect(\App::getBaseAppLink('users/' . $link . '/updateDone', 'admin'));
 			}
 			exit;
 		} else {
