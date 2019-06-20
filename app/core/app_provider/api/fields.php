@@ -201,6 +201,70 @@ class fields extends \App\api\controller\innerController {
 		return self::json(null);
 	}
 
+	public static function updateFillOutForm($serviceId , $serviceType , $data , $objectId , $objectType ){
+		$fields = self::getFieldsToEdit($serviceId,$serviceType , ['admin' , 'invisible'] , true);
+		if (!empty($fields) and is_array($fields)) {
+			foreach ($fields['result'] as $key => $field) {
+				$regix = null;
+				if ($field['regex'] != null) {
+					$regix = explode(',', $field['regex']);
+				}
+				if ($field['status'] == 'required') {
+					$regix[] = 'required';
+				}
+				if ($regix == null or count($regix) == 0)
+					continue;
+				$rules[$field['fieldId']] = [implode('|', array_unique(array_filter($regix))), $field['title']];
+			}
+		}
+		if (isset($rules)) {
+			$valid = validate::check($data, $rules);
+			if ($valid->isFail()) {
+				return self::jsonError($valid->errorsIn());
+			}
+		}
+		if ( is_array($data) and ! empty($data) ){
+			model::transaction();
+			$insertRow = [] ;
+			foreach ( $data as $fieldId => $fieldValue){
+				if ($fieldValue == null) continue;
+				if ( ! self::$creatTable ) {
+					/* @var \paymentCms\model\fieldvalue $fieldValueModel */
+					$fieldValueModel = self::model('fieldvalue' ,'objectId = ? and objectType = ? and fieldId = ?' , [$objectId,$objectType,$fieldId]);
+					if ( $fieldValueModel->getFieldId() !=  $fieldId ) {
+						$fieldValueModel->setObjectId($objectId);
+						$fieldValueModel->setObjectType($objectType);
+						$fieldValueModel->setFieldId($fieldId);
+						$fieldValueModel->setValue($fieldValue);
+						$fieldValueStatus = $fieldValueModel->insertToDataBase();
+						if (!$fieldValueStatus) {
+							model::rollback();
+							return self::jsonError(rlang('canNotInsertFieldValue'), 500);
+						}
+					} else {
+						$fieldValueModel->setValue($fieldValue);
+						$fieldValueStatus = $fieldValueModel->upDateDataBase();
+						if (!$fieldValueStatus) {
+							model::rollback();
+							return self::jsonError(rlang('canNotInsertFieldValue'), 500);
+						}
+					}
+				} else {
+					$insertRow['f_'.$fieldId]=$fieldValue;
+				}
+			}
+			if ( self::$creatTable ) {
+				if ( ! model::update(self::$tableName.$serviceId.'_'.$serviceType,$insertRow,'objectId = ? and objectType = ?',[$objectId,$objectType])){
+					model::rollback();
+					return self::jsonError(rlang('canNotInsertFieldValueRow'), 500);
+				}
+			}
+			model::commit();
+			return self::json(null);
+		}
+		return self::json(null);
+	}
+
 	public static function showFilledOutForm($serviceId , $serviceType , $objectId , $objectType ,$statusNotBe = null ){
 		if ( ! self::$creatTable ) {
 			/* @var \paymentCms\model\fieldvalue $fieldValueModel */

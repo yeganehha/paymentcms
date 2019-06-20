@@ -79,6 +79,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {call fillOutFieldServiceForm}
                                                     {if ! isset($newUser)}
                                                     <div class="col-md-12">
                                                         <label class="col-md-3 col-form-label">{_ "admin_note"}</label>
@@ -101,8 +102,6 @@
                                                             </label>
                                                         </div>
                                                     </div>
-                                                    {else}
-                                                    {call fillOutFieldServiceForm}
                                                     {/if}
                                                 </div>
                                                 {call addServiceFormField}

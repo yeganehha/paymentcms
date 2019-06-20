@@ -141,6 +141,11 @@ abstract class model {
 	public static function insert($table,$data){
 		return self::$db->insert($table, $data);
 	}
+
+	public static function update($table,$data,$variable,$value){
+		self::$db->where($variable , $value);
+		return self::$db->update($table, $data);
+	}
 	public static function joinWhere($table, $condition , $conditionValue){
 		self::$db->joinOrWhere($table, $condition, $conditionValue);
 	}

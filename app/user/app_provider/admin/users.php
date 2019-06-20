@@ -113,6 +113,7 @@ class users extends \controller {
 		$model = $this->model('user_group');
 		$access = $model->search(null,null);
 
+		fieldService::showFilledOutFormWithAllFields(0,'user_register',$user->getUserId() , 'user_register' , true,$this->mold);
 		$this->mold->set('access',$access);
 		$this->mold->set('user',$user);
 		$this->mold->path('default', 'user');

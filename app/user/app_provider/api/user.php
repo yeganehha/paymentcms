@@ -90,7 +90,7 @@ class user extends \App\api\controller\innerController  {
 		} else {
 			$result = $model->upDateDataBase();
 			if ( $result ) {
-				$resultFillOutForm = fieldService::fillOutForm(0,'user_register',$get['customField'], $model->getUserId() , 'user_register');
+				$resultFillOutForm = fieldService::updateFillOutForm(0,'user_register',$get['customField'], $model->getUserId() , 'user_register');
 				if ( ! $resultFillOutForm['status'] ) {
 					model::rollback() ;
 					return self::jsonError(rlang('pleaseTryAGain'), 500);
