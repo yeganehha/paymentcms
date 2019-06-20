@@ -254,7 +254,15 @@ class fields extends \App\api\controller\innerController {
 				}
 			}
 			if ( self::$creatTable ) {
-				if ( ! model::update(self::$tableName.$serviceId.'_'.$serviceType,$insertRow,'objectId = ? and objectType = ?',[$objectId,$objectType])){
+				$count = model::searching([$objectId,$objectType] ,'objectId = ? and objectType = ?',self::$tableName.$serviceId.'_'.$serviceType,$insertRow);
+				if ( $count == null ){
+					$insertRow['objectId'] = $objectId ;
+					$insertRow['objectType'] = $objectType ;
+					$result = model::insert(self::$tableName.$serviceId.'_'.$serviceType,$insertRow);
+				} else {
+					$result = model::update(self::$tableName.$serviceId.'_'.$serviceType,$insertRow,'objectId = ? and objectType = ?',[$objectId,$objectType]);
+				}
+				if ( ! $result ){
 					model::rollback();
 					return self::jsonError(rlang('canNotInsertFieldValueRow'), 500);
 				}
@@ -285,7 +293,10 @@ class fields extends \App\api\controller\innerController {
 
 		} else {
 			$fieldsFill = model::searching([$objectId, $objectType], 'objectId = ? and objectType = ? ', self::$tableName.$serviceId.'_'.$serviceType);
-			$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe, true, array_keys($fieldsFill));
+			if ($fieldsFill == null){
+				$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe);
+			} else
+				$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe, true, array_keys($fieldsFill));
 			if (is_array($allFields['result']))
 				foreach ($allFields['result'] as $index => $allField)
 					if (isset($fieldsFill[0]['f_'.$allField['fieldId']]))
