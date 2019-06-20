@@ -55,7 +55,6 @@ class eFormsAnswer extends \controller {
 		$valid = validate::check($get, $rules);
 		$value = array( );
 		$variable = array( );
-		$cfvValue = array( );
 		$cfvVariable = array( );
 		if ($valid->isFail()){
 			//TODO:: add error is not valid data

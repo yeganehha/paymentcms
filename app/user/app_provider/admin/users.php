@@ -36,7 +36,7 @@ class users extends \controller {
 		$this->lists();
 	}
 	public function lists() {
-		$get = request::post('page=1,perEachPage=25,fname,lname,email,phone,userId' ,null);
+		$get = request::post('page=1,perEachPage=25,fname,lname,email,phone,userId,customField' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
 			"perEachPage" => ["required|match:>0|match:<501", rlang('page')],
@@ -44,10 +44,22 @@ class users extends \controller {
 		$valid = validate::check($get, $rules);
 		$value = array( );
 		$variable = array( );
+		$cfvVariable = [] ;
 		if ($valid->isFail()){
 			//TODO:: add error is not valid data
 
 		} else {
+			if ( $get['customField'] != null and is_array($get['customField'])) {
+				foreach ($get['customField'] as $idCustomField => $valueCustomField ){
+					if ($valueCustomField != null or $valueCustomField != '') {
+						if ( fieldService::saveInTable() ){
+							$cfvVariable[] = '  cfv.f_'.$idCustomField.' LIKE "%' . $valueCustomField . '%" ';
+						} else {
+							$cfvVariable[] = ' ( cfv.fieldId = '.$idCustomField.' and cfv.value LIKE "%' . $valueCustomField . '%" ) ';
+						}
+					}
+				}
+			}
 			if ( $get['fname'] != null ) {
 				$value[] = '%'.$get['fname'].'%' ;
 				$variable[] = 'fname LIKE ?' ;
@@ -70,9 +82,23 @@ class users extends \controller {
 			}
 		}
 		$model = parent::model('user');
+		if ( count($cfvVariable) > 0 ) {
+			if ( fieldService::saveInTable() )
+				model::join('customFieldValue_0_user_register cfv', ' ( userId = cfv.objectId and cfv.objectType = "user_register" and (' . implode(' and ', $cfvVariable) . ') )', "INNER");
+			else
+				model::join('fieldvalue cfv', ' ( userId = cfv.objectId and cfv.objectType = "user_register" and (' . implode(' or ', $cfvVariable) . ') )', "INNER");
+		}
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode(' or ' , $variable) , null, 'COUNT(userId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
+		if ( count($cfvVariable) > 0 ) {
+			if ( fieldService::saveInTable() )
+				model::join('customFieldValue_0_user_register cfv', ' ( userId = cfv.objectId and cfv.objectType = "user_register" and (' . implode(' and ', $cfvVariable) . ') )', "INNER");
+			else
+				model::join('fieldvalue cfv', ' ( userId = cfv.objectId and cfv.objectType = "user_register" and (' . implode(' or ', $cfvVariable) . ') )', "INNER");
+		}
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode('or' , $variable) )  , null, '*'  , ['column' => 'userId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$fields = fieldService::getFieldsToFillOut(0,'user_register' );
+		$this->mold->set('fields' , $fields['result']);
 		$this->mold->path('default', 'user');
 		$this->mold->view('userList.mold.html');
 		$this->mold->setPageTitle(rlang('users'));
@@ -169,7 +195,7 @@ class users extends \controller {
 	 * @return bool
 	 * [no-access]
 	 */
-	public function checkData($userId = null,$myPerofile = false){
+	private function checkData($userId = null,$myPerofile = false){
 		$result = \App\user\app_provider\api\user::editUser($userId,$_POST);
 		if ( $result['status'] ){
 			if ( $myPerofile )
