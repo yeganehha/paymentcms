@@ -4,6 +4,7 @@
 namespace App\user\app_provider\admin;
 
 
+use App\core\controller\fieldService;
 use App\core\controller\httpErrorHandler;
 use paymentCms\component\model;
 use paymentCms\component\request;
@@ -85,6 +86,7 @@ class users extends \controller {
 		$model = $this->model('user_group');
 		$access = $model->search(null,null);
 		$this->mold->set('access',$access);
+		fieldService::getFieldsToFillOut(0,'user_register' ,$this->mold);
 		$this->mold->set('newUser',true);
 		$this->mold->path('default', 'user');
 		$this->mold->view('userProfile.mold.html');
@@ -145,16 +147,22 @@ class users extends \controller {
 
 	public function insertForm(){
 		if ( request::isPost() ) {
-			$this->checkData();
+			$form = request::post('moreField,deleteField');
+			$resultUpdateField = fieldService::updateFields(0,'user_register' ,$form['moreField'],$form['deleteField']);
+			if ( ! $resultUpdateField['status'] ) {
+				$this->alert('warning' , null, rlang('pleaseTryAGain').'<br>'.$resultUpdateField['massage'],'error');
+			} else {
+				$this->alert('success' , null, rlang('eFormRegisterSuccess'));
+			}
 		}
-		/* @var \App\user\model\user_group $model */
-		$model = $this->model(['user','user_group']);
-		$access = $model->search(null,null);
-		$this->mold->set('access',$access);
-		$this->mold->path('default', 'eForm');
+//		/* @var \App\user\model\user_group $model */
+//		$model = $this->model(['user','user_group']);
+//		$access = $model->search(null,null);
+//		$this->mold->set('access',$access);
+		fieldService::getFieldsToEdit(0,'user_register',$this->mold);
+		$this->mold->path('default', 'user');
 		$this->mold->view('formEditor.mold.html');
 		$this->mold->path('default');
-		$this->mold->setPageTitle(rlang(['add','eForm']));
-		$this->mold->set('activeMenu' , 'newForms');
+		$this->mold->setPageTitle(rlang('eFormRegister'));
 	}
 }

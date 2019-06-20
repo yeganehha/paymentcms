@@ -37,11 +37,11 @@ class fields extends \App\api\controller\innerController {
 		$fieldModel = self::model('field') ;
 		$searchWhere = ' serviceType = ? and ( 0 ';
 		$searchValue[] = $serviceType ;
-		if ( $serviceId != null ){
+		if ( $serviceId !== null ){
 			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count((array)$serviceId)),', ').')' ;
 			$searchValue = array_merge($searchValue,(array)$serviceId);
 		}
-		if ( $fieldsId != null ){
+		if ( $fieldsId !== null ){
 			$searchWhere .= ' or fieldId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($fieldsId)),', ').')' ;
 			$searchValue = array_merge($searchValue,(array)$fieldsId);
 		}

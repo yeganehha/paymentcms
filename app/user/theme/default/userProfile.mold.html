@@ -17,7 +17,7 @@
                             <div class="row">
                                 <div class="col-md-12 col-sm-12">
                                     <div class="card">
-                                        <div class="card-header card-header-rose card-header-icon" >
+                                        <div class="card-header card-header-info card-header-icon" >
                                             <div class="card-icon" >
                                                 <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
                                             </div>
@@ -101,13 +101,15 @@
                                                             </label>
                                                         </div>
                                                     </div>
+                                                    {else}
+                                                    {call fillOutFieldServiceForm}
                                                     {/if}
                                                 </div>
                                                 {call addServiceFormField}
                                             </div>
                                             <div class="card-footer">
                                                 <button class="btn btn-link" type="reset">{_ "refresh"}</button>
-                                                <button type="submit" class="btn btn-fill btn-rose">
+                                                <button type="submit" class="btn btn-fill btn-info">
                                                  <span class="btn-label">
                                                     <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
                                                  </span>

@@ -2,6 +2,7 @@
 
 namespace App\user\app_provider\api;
 
+use App\core\controller\fieldService;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\session;
@@ -38,7 +39,7 @@ class user extends \App\api\controller\innerController  {
 
 
 	public static function editUser($userId,$data){
-		$get = request::getFromArray($data,'fname,lname,email,phone,password,groupId,block=0,admin_note' ,null);
+		$get = request::getFromArray($data,'fname,lname,email,phone,password,groupId,block=0,admin_note,customField' ,null);
 		$rules = [
 			"fname" => ["required", rlang('firstName')],
 			"lname" => ["required", rlang('lastName')],
@@ -71,21 +72,36 @@ class user extends \App\api\controller\innerController  {
 		$model->setBlock($get['block']);
 		$model->setAdminNote($get['admin_note']);
 		$model->setRegisterTime( ($model->getRegisterTime() != null ) ? $model->getRegisterTime() : date('Y-m-d H:i:s') );
+		model::transaction();
 		if ($userId == null) {
 			$result = $model->insertToDataBase();
 			if ( $result !== false ) {
+				$resultFillOutForm = fieldService::fillOutForm(0,'user_register',$get['customField'], $model->getUserId() , 'user_register');
+				if ( ! $resultFillOutForm['status'] ) {
+					model::rollback() ;
+					return self::jsonError(rlang('pleaseTryAGain'), 500);
+				}
+				model::commit();
 				return self::json($model->getUserId());
 			} else {
+				model::rollback() ;
 				return self::jsonError(rlang('pleaseTryAGain'),500);
 			}
 		} else {
 			$result = $model->upDateDataBase();
 			if ( $result ) {
+				$resultFillOutForm = fieldService::fillOutForm(0,'user_register',$get['customField'], $model->getUserId() , 'user_register');
+				if ( ! $resultFillOutForm['status'] ) {
+					model::rollback() ;
+					return self::jsonError(rlang('pleaseTryAGain'), 500);
+				}
 				if ( $model->getUserId() == session::get('userAppLoginInformation')['userId'])
 					session::lifeTime(1 ,'hour')->set('userAppLoginInformation',$model->returnAsArray());
+				model::commit();
 				return self::json($model->getUserId());
 			}
 			else {
+				model::rollback() ;
 				return self::jsonError(rlang('pleaseTryAGain'),500);
 			}
 		}
