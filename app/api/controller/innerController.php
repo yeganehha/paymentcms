@@ -6,6 +6,7 @@ namespace App\api\controller;
 
 use paymentCms\component\cache;
 use paymentCms\component\file;
+use paymentCms\component\menu\menu;
 use paymentCms\component\model;
 use paymentCms\component\mold\Mold;
 use paymentCms\component\request;
@@ -107,6 +108,7 @@ class innerController {
 				}
 			}
 		}
+		$menu = new menu('api');
 		foreach ($files as $file) {
 			$controller = $file['controller'];
 			$aria = $file['aria'] ;
@@ -119,7 +121,7 @@ class innerController {
 					$mold->path(null,$controller.':plugin');
 				else
 					$mold->path(null,$controller);
-				$Object = new $class($mold);
+				$Object = new $class($mold,$menu);
 				call_user_func_array([$Object,$method],$variable);
 			}
 		}

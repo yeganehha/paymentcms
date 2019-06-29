@@ -6,39 +6,24 @@
                 <div class="page-categories">
                     {if !isset($newUser)}<ul class="nav nav-pills nav-pills-warning nav-pills-icons justify-content-center" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" data-toggle="tab" href="#link6" role="tablist">
-                                <i class="material-icons">dashboard</i> {_ "info"}
-                            </a>
-                        </li><li class="nav-item">
-                            <a class="nav-link {if isset($activeTab) and $activeTab =='payments'}active{/if}" data-toggle="tab" href="#link7" role="tablist">
-                                <i class="material-icons">account_balance_wallet</i> {_ "payments"}
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {if isset($activeTab) and $activeTab =='edit'}active{/if}" data-toggle="tab" href="#link8" role="tablist">
+                            <a class="nav-link  {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" data-toggle="tab" href="#link8" role="tablist">
                                 <i class="material-icons">edit</i> {_ "edit"}
                             </a>
                         </li>
                         {call userProfileMorePage}
                     </ul>{/if}
                     <div class="tab-content tab-space tab-subcategories">
-                        {if !isset($newUser)}<div class="tab-pane {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" id="link6">
-
-                        </div>
-                        <div class="tab-pane {if isset($activeTab) and $activeTab =='payments'}active{/if}" id="link7">
-
-                        </div>{/if}
-                        <div class="tab-pane {if isset($newUser)}active{/if} {if isset($activeTab) and $activeTab =='edit'}active{/if}" id="link8">
+                        <div class="tab-pane {if isset($newUser)}active{/if}  {if !isset($activeTab)}active{else}{if $activeTab =='dashboard'}active{/if}{/if}" id="link8">
                             <div class="row">
-                                <div class="col-md-8 col-sm-12">
+                                <div class="col-md-12 col-sm-12">
                                     <div class="card">
-                                        <div class="card-header card-header-rose card-header-icon" >
+                                        <div class="card-header card-header-info card-header-icon" >
                                             <div class="card-icon" >
                                                 <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
                                             </div>
-                                            <h4 class="card-title float-{$float} m-3">{if isset($newUser)}{_ "add"}{else}{_ "edit"}{/if} {_ "user"}</h4>
+                                            <h4 class="card-title float-{$float} m-3">{if isset($myProfile)}{_ "profile"}{else}{if isset($newUser)}{_ "add"}{else}{_ "edit"}{/if} {_ "user"}{/if}</h4>
                                         </div>
-                                        <form class="form-horizontal" method="post" action="{url}users/{if isset($newUser)}insert{else}profile/{if isset($user)}{$user->getUserId()}{/if}{/if}">
+                                        <form class="form-horizontal" method="post" action="{url}users/{if isset($newUser)}insert{else}{if isset($myProfile)}myProfile{else}profile/{if isset($user)}{$user->getUserId()}{/if}{/if}{/if}">
                                             <div class="card-body">
                                                 {call addUserFormUpDescription}
                                                 <div class="row">
@@ -82,6 +67,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {if ! isset($myProfile)}
                                                     <div class="col-md-6">
                                                         <label class="col-md-3 col-form-label">{_ "permission"}</label>
                                                         <div class="col-md-9">
@@ -94,7 +80,9 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {if ! isset($newUser)}
+                                                    {/if}
+                                                    {call fillOutFieldServiceForm}
+                                                    {if ! isset($newUser) and ! isset($myProfile)}
                                                     <div class="col-md-12">
                                                         <label class="col-md-3 col-form-label">{_ "admin_note"}</label>
                                                         <div class="col-md-9">
@@ -122,7 +110,7 @@
                                             </div>
                                             <div class="card-footer">
                                                 <button class="btn btn-link" type="reset">{_ "refresh"}</button>
-                                                <button type="submit" class="btn btn-fill btn-rose">
+                                                <button type="submit" class="btn btn-fill btn-info">
                                                  <span class="btn-label">
                                                     <i class="material-icons">{if isset($newUser)}person_add{else}edit{/if}</i>
                                                  </span>
@@ -132,6 +120,7 @@
                                         </form>
                                     </div>
                                 </div>
+                                {if false }
                                 <div class="col-sm col-md-4">
                                     <div class="card">
                                         <div class="card-header card-header-info card-header-icon " >
@@ -148,6 +137,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                {/if}
                             </div>
                         </div>
                     </div>

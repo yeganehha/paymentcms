@@ -51,13 +51,14 @@ class access extends \controller  {
 			$model->setPassword($get['password']);
 			$password = $model->getPassword();
 
-			$model = $this->model('user' , [$password,$get['username'],$get['username']] , 'password = ? and ( phone = ? or email = ?) ' );
+			$model = $this->model('user' , [$password,$get['username'],$get['username']] , 'password = ? and ( phone = ? or email = ?) and block = 0 ' );
 			if ( $model->getUserId() == null ){
 				$this->alert('danger','',rlang('cantFindUser') );
 				return false;
 			}
 			session::regenerateSessionId();
 			session::lifeTime(1 ,'hour')->set('userAppLoginInformation',$model->returnAsArray());
+			$this->callHooks('addLog' , [rlang(['login', 'user']), 'login user']);
 			if ( request::isGet('callBack') ){
 				Response::redirect(urldecode(request::getOne('callBack')));
 			} else
@@ -76,6 +77,7 @@ class access extends \controller  {
 	 * [user-access]
 	 */
 	public function logout(){
+		$this->callHooks('addLog' , [rlang(['logOut' , 'user' ]), 'logout user']);
 		session::remove('userAppLoginInformation');
 		Response::redirect(\App::getBaseAppLink(null,'home'));
 	}

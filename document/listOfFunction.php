@@ -60,4 +60,5 @@ return [
 	'unlink',
 	'strpos',
 	'substr',
+	'extension_loaded',
 ];

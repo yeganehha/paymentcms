@@ -129,7 +129,10 @@ class linksConfiguration extends \controller {
 		$result = $model->upDateDataBase();
 		if ( $result ){
 			$this->generateAllLinks();
-			Response::redirect(\App::getBaseAppLink('linksConfiguration/editDone','admin'));
+			if ( $model->getApp() == 'admin' )
+				Response::redirect($get['link'].'/linksConfiguration/editDone');
+			else
+				Response::redirect(\App::getBaseAppLink('linksConfiguration/editDone','admin'));
 			return true ;
 		} else {
 			$this->alert('danger','',rlang('pleaseTryAGain'));

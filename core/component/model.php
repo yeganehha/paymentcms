@@ -58,7 +58,9 @@ abstract class model {
 
 	public static function __init() {
 		if ( self::$db == null ) {
-			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+			$configDataBase = include payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+			if ( $configDataBase === false )
+				return ;
 			self::$db = new \database($configDataBase['_dbHost'], $configDataBase['_dbUsername'], $configDataBase['_dbPassword'], $configDataBase['_dbName']);
 			self::$db->setPrefix($configDataBase['_dbTableStartWith']);
 		}
@@ -74,22 +76,30 @@ abstract class model {
 	public static function transaction(){
 		if ( self::$transactionCounter >= 0 )
 			self::$transactionCounter ++;
-		else
-			self::$transactionCounter = 1 ;
-		self::$db->startTransaction();
+		else {
+			self::$transactionCounter = 1;
+			self::$db->startTransaction();
+		}
 	}
 
 	public static function commit(){
 		self::$transactionCounter-- ;
-		if ( self::$transactionCounter == 0 )
+		if ( self::$transactionCounter == 0 ) {
 			self::$db->commit();
+		}
 	}
 	public static function rollback(){
-		self::$transactionCounter == 0 ;
+		self::$transactionCounter = 0 ;
 		self::$db->rollback();
 	}
 	public static function queryUnprepared($query){
 		return self::$db->queryUnprepared($query);
+	}
+	public static function tableExist($table){
+		return self::$db->tableExists($table);
+	}
+	public static function rawQuery($query){
+		return self::$db->rawQuery($query);
 	}
 
 	public static function debugQuery($end = false){
@@ -97,7 +107,12 @@ abstract class model {
 		show(self::db()->getLastQuery() , $end);
 	}
 
-
+	/**
+	 * @param \database $db
+	 */
+	public static function setDb($db) {
+		self::$db = $db;
+	}
 
 
 	public function search( $searchVariable, $searchWhereClaus , $tableName = null , $fields = '*' , $orderBy = null ,$limit = null , $groupBy = null) {
@@ -126,6 +141,14 @@ abstract class model {
 		self::$db->join($table, $condition, $joinOn);
 	}
 
+	public static function insert($table,$data){
+		return self::$db->insert($table, $data);
+	}
+
+	public static function update($table,$data,$variable,$value){
+		self::$db->where($variable , $value);
+		return self::$db->update($table, $data);
+	}
 	public static function joinWhere($table, $condition , $conditionValue){
 		self::$db->joinOrWhere($table, $condition, $conditionValue);
 	}
@@ -163,7 +186,7 @@ abstract class model {
 		}
 		$id = self::$db->insert($this->modelName , $data  );
 		if ( $id ) {
-			if ( $primaryKey != null) {
+			if ( $primaryKey != null ) {
 				$data[$primaryKey] = $id;
 				$this->setFromArray($data);
 			}

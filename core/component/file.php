@@ -14,6 +14,8 @@
 
 namespace paymentCms\component;
 
+use ZipArchive;
+
 class file
 {
     private static $whereDirectory;
@@ -75,10 +77,10 @@ class file
         if (is_dir($folder)) {
             if ($safe) {
                 if (!is_file($pathIndex)) {
-                    File::generate_file($pathIndex, $data);
+                    file::generate_file($pathIndex, $data);
                 }
                 if (!is_file($pathHtaccess)) {
-                    File::generate_htaccess($folder);
+                    file::generate_htaccess($folder);
                 }
             }
             return true;
@@ -88,8 +90,8 @@ class file
         $f = @mkdir($folder, $chmod, $multi);
 
         if ($safe) {
-            File::generate_file($pathIndex, $data);
-            File::generate_htaccess($folder);
+            file::generate_file($pathIndex, $data);
+            file::generate_htaccess($folder);
         }
 
         return $f ? true : false;
@@ -346,9 +348,11 @@ class file
 
     public static function get_name_folders($dir)
     {
+    	if ( ! is_dir($dir))
+    		return [] ;
         $get_folders = scandir($dir);
-        $get_folders = array_filter($get_folders);
-        $get_folders = array_diff($get_folders, array(".", ".."));
+        $get_folders = array_filter((array)$get_folders);
+        $get_folders = array_diff((array)$get_folders, array(".", ".."));
 
         $result = [];
         if ( is_array($get_folders) ) {
@@ -621,5 +625,40 @@ class file
         #generate the file
         $file = @fopen($path, "w");
         return (@fwrite($file, $data)) ? true : false;
+    }
+
+
+	/**
+	 * @param      $source
+	 * @param null $path
+	 *
+	 * @return bool
+	 */
+	public static function unzip($source, $path = null ){
+	    if ( $path == null )
+	        $path = pathinfo( realpath( $source ), PATHINFO_DIRNAME );
+
+	    $zip = new ZipArchive;
+	    $res = $zip->open($source);
+	    if ($res === TRUE) {
+		    $zip->extractTo( $path );
+		    $zip->close();
+		    return true;
+	    }
+	    else {
+		    return false ;
+	    }
+    }
+
+
+	/**
+	 * @param $url
+	 *
+	 * @return string
+	 */
+	public static function getBaseFileNameOfUrl($url){
+	    $parts = parse_url($url);
+	    $filename = basename($parts["path"]);
+	    return $filename ;
     }
 }

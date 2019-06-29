@@ -29,7 +29,7 @@ class session extends \SessionHandler
 	}
 
 
-	public function __init(){
+	public static function __init(){
 		ini_set('session.cookie_httponly', 1);
 		ini_set('session.use_only_cookies', 1);
 		if (!empty(self::$lifeTime) and self::$lifeTime > 0) {
@@ -40,20 +40,27 @@ class session extends \SessionHandler
 		ini_set('session.gc_probability', self::$gc_probability);
 		ini_set('session.gc_divisor', self::$gc_divisor);
 
+		self::$object = new session();
 		if (self::$manualSession) {
 			// Set handler to override SESSION
 			session_set_save_handler(
-				array($this, "_open"),
-				array($this, "_close"),
-				array($this, "_read"),
-				array($this, "_write"),
-				array($this, "_destroy"),
-				array($this, "_gc")
+				array(self::$object, "_open"),
+				array(self::$object, "_close"),
+				array(self::$object, "_read"),
+				array(self::$object, "_write"),
+				array(self::$object, "_destroy"),
+				array(self::$object, "_gc")
 			);
 		}
-		if(session_id() == '')
+		if (session_status() == PHP_SESSION_NONE) {
 			session_start();
-		self::$object = new session();
+		}
+		if ( session::has('SessionLifeTime','SessionLifeTimeEndedIn') ){
+			if ( session::get('SessionLifeTimeEndedIn')  < time() )
+				session::clear();
+			else
+				session::set('SessionLifeTimeEndedIn' ,   session::get('SessionLifeTime') + time() )  ;
+		}
 	}
 
 	/**
@@ -77,9 +84,13 @@ class session extends \SessionHandler
 		if ($type == 'hour') $lifeTime = $lifeTime * 60 * 60;
 		if ($type == 'day') $lifeTime = $lifeTime * 60 * 60 * 24;
 		self::$lifeTime = $lifeTime;
-		session_set_cookie_params(self::$lifeTime);
-		ini_set('session.cookie_lifetime', self::$lifeTime);
-		ini_set('session.gc_maxlifetime', self::$lifeTime);
+		if (session_status() == PHP_SESSION_NONE) {
+//			session_set_cookie_params(self::$lifeTime);
+//			ini_set('session.cookie_lifetime', self::$lifeTime);
+//			ini_set('session.gc_maxlifetime', self::$lifeTime);
+		}
+		session::set('SessionLifeTime' , self::$lifeTime);
+		session::set('SessionLifeTimeEndedIn' , time() + self::$lifeTime);
 		return self::$object;
 	}
 

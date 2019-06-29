@@ -1,0 +1,92 @@
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5 mb-5">
+        <div class="row mt-5">
+            <div class="col-md-8 ml-auto mr-auto">
+                <form id="LoginValidation" action="{url}{$service.serviceId}" method="post">
+                    <div class="card img-fluid">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="material-icons">account_balance_wallet</i>
+                            </div>
+                        </div>
+                        <div class="card-body rtl text-right">
+                            <div class="col-md-4 text-large text-bold text-center" >
+                                <div class="position-fixed-grid">
+                                    <img class="hidden-sm mb-3" src="./undraw_mobile_payments_edgf.png" style="max-width: 100%">
+                                    <span class="text-center title">وبسایت شخصی عرفان ابراهیمی</span>
+                                    {if count($fields) > 0 }
+                                    <div class="col-md-12 form-group mt-5">
+                                        <span class="text-center title">{$service.description}</span>
+                                    </div>
+                                    <div class="col-md-12 form-group mt-5">
+                                        <span class="text-center title text-danger">{$service.price|number_format} {_ "toman"}</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-info col-md-12 hidden-sm ">{_ "pay"}</button>
+                                    {/if}
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-sm-12">
+                                {foreach from=$alert key=key value=alert}
+                                <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
+                                    {if isset($alert.icon)}
+                                    <i class="material-icons" data-notify="icon">{$alert.icon}</i>
+                                    {/if}
+                                    {if $alert.canClose}
+                                    <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                    {/if}
+                                    <span  class="text-{$text_align}">
+                                        {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}</span>
+                                </div>
+                                {/foreach}
+                                {call alertHeader}
+                                {if $service.firstNameStatus != 'invisible' or $service.firstNameStatus != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="firstName" class="bmd-label-floating">{_ "firstName"} {if $service.firstNameStatus == 'required'}<span class="text-danger">*</span>{/if}</label>
+                                    <input type="text" class="form-control" id="firstName" {if $service.firstNameStatus == 'required'}required{/if} name="firstName">
+                                </div>
+                                {/if}
+                                {if $service.lastNameStatus != 'invisible' or $service.lastNameStatus != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="lastName" class="bmd-label-floating">{_ "lastName"} {if $service.lastNameStatus == 'required'}<span class="text-danger">*</span>{/if}</label>
+                                    <input type="text" class="form-control" id="lastName" {if $service.lastNameStatus == 'required'}required{/if} name="lastName">
+                                </div>
+                                {/if}
+                                {if $service.phoneStatus != 'invisible' or $service.phoneStatus != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="email" class="bmd-label-floating">{_ "email"} {if $service.phoneStatus == 'required'}<span class="text-danger">*</span>{/if}</label>
+                                    <input type="email" class="form-control" id="email" {if $service.phoneStatus == 'required'}required{/if} name="email">
+                                </div>
+                                {/if}
+                                {if $service.phoneStatus != 'invisible' or $service.phoneStatus != 'admin' }
+                                <div class="col-md-6 form-group">
+                                    <label for="phone" class="bmd-label-floating">{_ "phone"} {if $service.phoneStatus == 'required'}<span class="text-danger">*</span>{/if}</label>
+                                    <input type="text" class="form-control" id="phone" {if $service.phoneStatus == 'required'}required{/if} name="phone">
+                                </div>
+                                {/if}
+                                {if count($fields) == 0 }
+                                <div class="col-md-12 form-group mt-5">
+                                    <span class="text-center title">{$service.description}</span>
+                                </div>
+                                <div class="col-md-12 form-group mt-5">
+                                    <label for="price" class="bmd-label-floating">{_ "price"}</label>
+                                    <input type="text"  range="[0,9999999]" class="form-control text-center text-large text-bold" id="price" required name="price">
+                                </div>
+                                <button type="submit" class="btn btn-info col-md-12">Login</button>
+                                {/if}
+                                {call fillOutFieldServiceForm}
+                                <div class="category form-category"><span class="text-danger">*</span> Required fields</div>
+                                {if count($fields) > 0 }
+                                <button type="submit" class="btn btn-info col-md-12 hidden-un-sm ">{_ "pay"}</button>
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="card-footer ml-auto mr-auto">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

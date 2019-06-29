@@ -348,6 +348,12 @@ class MoldRendering {
 			return ;
 		$this->replace($data['find'], ' } ');
 	}
+
+	private function _rand($data){
+		if ( !$this->engineStatus )
+			return rand();
+		$this->replace($data['find'], 'echo rand();' );
+	}
 	private function _foreach($data){
 		if ( !$this->engineStatus )
 			return ;
@@ -598,6 +604,13 @@ class MoldRendering {
 				$link = \app::getAppLink('theme/' . $this->fileInfo['folder'], $this->fileInfo['app']);
 				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
 				break;
+			case 'themebase':
+				$link = \app::getCurrentBaseLink('theme/' . $this->fileInfo['folder']);
+				$link =  strings::strLastHas($link,'/') ? $link : $link.'/';
+				break;
+			case 'themebasepath':
+				$link = themebasepath.DIRECTORY_SEPARATOR.'theme' .DIRECTORY_SEPARATOR. $this->fileInfo['folder'].DIRECTORY_SEPARATOR;
+				break;
 			case 'patch':
 				$listDirToFile = explode(DIRECTORY_SEPARATOR, $this->fileInfo['path']);
 				$fileName = array_pop($listDirToFile);
@@ -667,6 +680,18 @@ class MoldRendering {
 		if ( !$this->engineStatus )
 			return ;
 		return 'str_replace('.$search.' ,'.$replace.','.$value.' )' ;
+	}
+
+	private function ___url_encode($value ){
+		if ( !$this->engineStatus )
+			return ;
+		return 'urlencode('.$value.' )' ;
+	}
+
+	private function ___asciiToChar($value ){
+		if ( !$this->engineStatus )
+			return ;
+		return 'chr('.$value.' )' ;
 	}
 
 	private function ___date_format($value,$format){

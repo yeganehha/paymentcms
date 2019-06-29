@@ -93,6 +93,8 @@ class menu {
 		$fatherKeyOfFather = self::$menuFatherKeys[$fatherKey] ;
 		$menuItem = $this->creatMenuItem($key,$title,$link,$icon ,$target);
 		$childKeyName = $this->generateChildName ($fatherKey) ;
+		if ( isset(self::$menuKeys[$childKeyName][$key]))
+			return ;
 		self::$menu[$childKeyName][] = $menuItem ;
 		self::$menu[$fatherKeyOfFather][ self::$menuKeys[$fatherKeyOfFather][$fatherKey] ] ->setChild($childKeyName) ;
 		self::$menuKeys[$childKeyName][$key] = count(self::$menu[$childKeyName]) - 1 ;

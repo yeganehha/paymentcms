@@ -18,10 +18,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 
 class home extends \controller {
-
-	public function __construct() {
-
-	}
+	
 
 	public function index($params = null){
 		//parent::view('home',$params);

@@ -1,0 +1,111 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-info card-header-icon">
+                        <div class="card-icon">
+                            <i class="fa fa-wpforms fa-2x"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "answer"} #{$answer->getFillId()}</h4>
+                        <div class="card-title float-{if $float == 'right'}left{else}right{/if}  m-3 btn-group btn-group-sm">
+                            <!--<button class="btn btn-outline">-->
+                                <!--<i class="fa fa-download"></i> {_ "download"}-->
+                            <!--</button>-->
+                            <button onclick="jQuery('.printButtonGoToMoreInfo').trigger('click');window.print();" class="btn btn-outline">
+                                <i class="fa fa-print"></i> {_ "print"}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive table-striped">
+                            <table class="table text-{$text_align}">
+                                <tbody>
+                                <tr>
+                                    <td colspan="4" class="text-large text-info text-center">{_ "eForm"} <a href="{url}eForms/edit/{$form->getFormId()}" target="_blank"><i class="material-icons">remove_red_eye</i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "name"} :
+                                    </td>
+                                    <td>
+                                        {$form->getName()}
+                                    </td>
+                                    <td>
+                                        {_ "oneTime"} :
+                                    </td>
+                                    <td>
+                                        {if $form->getOneTime() == 1 }<i class="material-icons">check_circle</i>{else}---{/if}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-large text-info text-center">{_ "user"} <a href="{url}users/profile/{$user->getUserId()}" target="_blank"><i class="material-icons">remove_red_eye</i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "name"} {_ "client"} :
+                                    </td>
+                                    <td>
+                                        {$user->getFName()} {$user->getLName()}
+                                    </td>
+                                    <td>
+                                        {_ "phone"} :
+                                    </td>
+                                    <td>
+                                        {$user->getPhone()}
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-large text-info text-center">{_ "answer"}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {_ "fillStart"} :
+                                    </td>
+                                    <td>
+                                        {$answer->getFillStart()|jDate:"Y/n/j , H-i-s"}<br>
+                                    </td>
+                                    <td>
+                                        {_ "fillEnd"} :
+                                    </td>
+                                    <td>
+                                        {$answer->getFillEnd()|jDate:"Y/n/j , H-i-s"}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        ip :
+                                    </td>
+                                    <td>
+                                        {$answer->getIp()}
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                {foreach from=$allFields key=key value=field}
+                                {if ( $key % 2 ) == 0 }<tr>{/if}
+                                    <td>
+                                        {$field.title} :
+                                    </td>
+                                    <td>
+                                        {if isset($field.value) }
+                                        {$field.value}
+                                        {else}
+                                        ---
+                                        {/if}
+                                    </td>
+                                {if ( $key % 2 ) == 1 }</tr>{/if}
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

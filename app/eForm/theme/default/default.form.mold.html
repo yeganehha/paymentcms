@@ -1,0 +1,59 @@
+{view "[url patch]header.mold.html"}
+{view "[url patch]menue.mold.html"}
+{view "[url patch]navbar.mold.html"}
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5 mb-5">
+        <div class="row mt-5">
+            <div class="col-md-8 ml-auto mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                {set loadDivID,"#listToGetFromServer"}
+                {set loadDivIDInHtml,"listToGetFromServer"}
+                <form action="{url current}" id="listToGetFromServerForm" method="post" onsubmit="return search('{url current}' ,'{$loadDivID}');" >
+                    <div class="card" id="listToGetFromServer">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="fa fa-wpforms fa-2x"></i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ "eForm"} : {$form->getName()}</h4>
+                        </div>
+                        <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                            {foreach from=$alert key=key value=alert}
+                            <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
+                                {if isset($alert.icon)}
+                                <i class="material-icons" data-notify="icon">{$alert.icon}</i>
+                                {/if}
+                                {if $alert.canClose}
+                                <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                    <i class="material-icons">close</i>
+                                </button>
+                                {/if}
+                                <span  class="text-{$text_align}">
+                      {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}</span>
+                            </div>
+                            {/foreach}
+                            {call alertHeader}
+                            {if isset($showField) }
+                            {call fillOutFieldServiceForm}
+                            {elseif isset($showDone)}
+                            {$form->getLastNote()}
+                            {else}
+                            {$form->getDescription()}
+                            {/if}
+                        </div>
+                        <div class="card-footer">
+                            {if ! isset($showDone) }
+                            <input type="hidden" value="{if isset($showField) }finish{else}start{/if}" name="step">
+                            <input type="submit" class="btn btn-fill btn-info w-100" value="{if isset($showField) }{_ 'finish'}{else}{_ 'start'}{/if}" >
+                            {else}
+                            <a href="{$BackUrl}" class="btn btn-fill btn-info w-100">{_ "back"}</a>
+                            {/if}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{map footerjs}
+<script src="{url themeBase}/assets/js/pagination.js"></script>
+{/map}
+{view "[url patch]footer.mold.html"}

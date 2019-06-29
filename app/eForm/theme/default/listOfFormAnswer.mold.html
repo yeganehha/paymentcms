@@ -1,0 +1,224 @@
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {if ! isset($user) }
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon pointer"  data-toggle="collapse" data-target="#fileUpload" aria-expanded="false" aria-controls="fileUpload">
+                        <div class="card-icon" >
+                            <i class="fa fa-file-excel-o fa-2x"></i>
+                        </div><!-- {rand} -->
+                        <h4 class="card-title float-{$float} m-3">{_ "importFile"}</h4>
+                    </div>
+                    <div class="collapse"  id="fileUpload">
+                        <div class="card-body">
+                            <form class="form-horizontal" method="post" action="{url current}" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "file"}</label>
+                                        <div class="col-md-9">
+                                            <input type="file" name="importFile" accept=".csv">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button type="reset" class="btn btn-link" data-toggle="collapse" data-target="#fileUpload" aria-expanded="false" aria-controls="fileUpload">{_ "close"}</button>
+                                        <a href="{url admin}export/{$formId}" target="_blank" class="btn btn-fill btn-info"><i class="fa fa-download"></i> {_ "downloadSampleCsv"}</a>
+                                        <button type="submit" class="btn btn-fill btn-info">{_ "upload"}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon pointer"  data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">
+                        <div class="card-icon" >
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "eForms"}</h4>
+                    </div>
+                    <div class="collapse" id="searchUsers">
+                        <div class="card-body">
+                            {set loadDivID,"#listToGetFromServer"}
+                            {set loadDivIDInHtml,"listToGetFromServer"}
+                            <form class="form-horizontal" id="listToGetFromServerForm" onsubmit="return search('{url current}' ,'{$loadDivID}');">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "firstName"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="fname" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div><div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "lastName"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="lname" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div><div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "phone"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="phone" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div><div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "email"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" name="email" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "from"} {_ "date"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" autocomplete="off" class="form-control persianDatepicker-from">
+                                                <input type="hidden" name="StartTime" class="form-control persianDatepicker-from-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "toDate"} {_ "date"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" autocomplete="off" class="form-control persianDatepicker-to">
+                                                <input type="hidden" name="EndTime" class="form-control persianDatepicker-to-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    {if is_array($fields)}
+                                    {foreach from=$fields key=key value=field}
+                                    {if $field.type == 'textarea'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-check">
+                                                <textarea class="form-control" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" >{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {elseif $field.type == 'checkbox'}
+                                    <div class="col-md-4">
+                                        <label class="col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                            {foreach from=$field.valuesDe key=keyValue value=value}
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]"  {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if} > {$value}
+                                                    <span class="form-check-sign"><span class="check"></span></span>
+                                                </label>
+                                            </div>
+                                            {/foreach}
+                                    </div>
+                                    {elseif $field.type == 'radio'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            {foreach from=$field.valuesDe key=keyValue value=value}
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if} > {$value}
+                                                    <span class="circle"><span class="check"></span></span>
+                                                </label>
+                                            </div>
+                                            {/foreach}
+                                        </div>
+                                    </div>
+                                    {elseif $field.type == 'select'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
+                                            {foreach from=$field.valuesDe key=keyValue value=value}
+                                            <option value="{$value}" {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}selected{/if}{/if} >{$value}</option>
+                                            {/foreach}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {else}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <input type="{$field.type}"  id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" value="{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}" class="form-control">
+                                        </div>
+                                    </div>
+                                    {/if}
+                                    {/foreach}
+                                    {/if}
+
+
+                                    <div class="col-md-12">
+                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">{_ "close"}</button>
+                                        <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" id="listToGetFromServer">
+                    <div class="card-header card-header-info card-header-icon">
+                        <div class="card-icon">
+                            <i class="fa fa-wpforms fa-2x"></i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "eForms"}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table text-{$text_align}">
+                                <thead>
+                                <tr>
+                                    <th class="text-center"></th>
+                                    <th>{_ "eForm"}</th>
+                                    <th>{_ "user"}</th>
+                                    <th>{_ "fillEnd"}</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$answers key=key value=answer}
+                                <tr>
+                                    <td class="text-center">{$answer.fillId}</td>
+                                    <td><a href="{url}eForms/edit/{$answer.formId}" target="_blank">{$answer.name}</a></td>
+                                    <td><a href="{url}users/profile/{$answer.userId}" target="_blank">{$answer.fname} {$answer.lname}</a></td>
+                                    <td class="{if $float == 'right'}rtl{else}ltr{/if}">{$answer.fillEnd|jDate:"H-i-s ; jS F, Y"}</td>
+                                    <td class="td-actions text-right">
+                                        <a class="btn btn-info btn-link" href="{url}eFormsAnswer/answer/{$answer.fillId}">
+                                            <i class="material-icons">remove_red_eye</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {foreachelse}
+                                <tr>
+                                    <td class="text-center" colspan="4">{_ "hasNotDataYet"}</td>
+                                </tr>
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                        {view "[url patch]pagination.mold.html"}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{map footerjs}
+<script src="{url theme}assets/js/persian-date.min.js"></script>
+<script src="{url theme}assets/js/persian-datepicker.min.js"></script>
+<script src="{url theme}assets/js/input-persian-datepicker.js"></script>
+<link rel="stylesheet" href="{url theme}assets/css/persian-datepicker.min.css"/>
+{/map}

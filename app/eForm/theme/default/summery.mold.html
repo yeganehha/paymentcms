@@ -1,0 +1,201 @@
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5 mb-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info card-header-icon pointer"  data-toggle="collapse" data-target="#searchUsers" aria-expanded="false" aria-controls="searchUsers">
+                        <div class="card-icon" >
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h4 class="card-title float-{$float} m-3">{_ "searchIn"} {_ "eForms"}</h4>
+                    </div>
+                    <div class="collapse" id="searchUsers">
+                        <div class="card-body">
+                            <form class="form-horizontal" method="post">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "from"} {_ "date"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" autocomplete="off" class="form-control persianDatepicker-from">
+                                                <input type="hidden" name="StartTime" value="{if isset($Mold.post.StartTime)}{$Mold.post.StartTime}{/if}"  class="form-control persianDatepicker-from-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label">{_ "toDate"} {_ "date"}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-group has-default">
+                                                <input type="text" autocomplete="off" class="form-control persianDatepicker-to">
+                                                <input type="hidden" name="EndTime" value="{if isset($Mold.post.EndTime)}{$Mold.post.EndTime}{/if}" class="form-control persianDatepicker-to-alt">
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    {if is_array($fields)}
+                                    {foreach from=$fields key=key value=field}
+                                    {if $field.type == 'textarea'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <div class="form-check">
+                                                <textarea class="form-control" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" >{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {elseif $field.type == 'checkbox'}
+                                    <div class="col-md-4">
+                                        <label class="col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        {foreach from=$field.valuesDe key=keyValue value=value}
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]"  {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if} > {$value}
+                                                <span class="form-check-sign"><span class="check"></span></span>
+                                            </label>
+                                        </div>
+                                        {/foreach}
+                                    </div>
+                                    {elseif $field.type == 'radio'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            {foreach from=$field.valuesDe key=keyValue value=value}
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if} > {$value}
+                                                    <span class="circle"><span class="check"></span></span>
+                                                </label>
+                                            </div>
+                                            {/foreach}
+                                        </div>
+                                    </div>
+                                    {elseif $field.type == 'select'}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
+                                                {foreach from=$field.valuesDe key=keyValue value=value}
+                                                <option value="{$value}" {if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}selected{/if}{/if} >{$value}</option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {else}
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 col-form-label" for="field_{$field.fieldId}">{$field.title}  {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
+                                        <div class="col-md-9">
+                                            <input type="{$field.type}"  id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" value="{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}" class="form-control">
+                                        </div>
+                                    </div>
+                                    {/if}
+                                    {/foreach}
+                                    {/if}
+
+
+                                    <div class="col-md-4">
+                                        <a class="btn btn-link"  href="{url current}">{_ "close"}</a>
+                                        <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div><div><div><div><div>
+            {set lastIdOfField,""}
+            {foreach from=$answers key=key value=answer}
+            {if $lastIdOfField != $answer.fieldId}
+            {set index,96}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-chart">
+                    <div class="card-header card-header-icon card-header-info">
+                        <div class="card-icon">
+                            <i class="material-icons">pie_chart</i>
+                        </div>
+                        <h4 class="card-title float-{$float}">{$answer.title}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="chartPreferences{$answer.fieldId}" class="ct-chart"></div>
+                    </div>
+                    <div class="card-footer text-{$float} float-{$float}">
+                        <div class="row text-{$float}">
+                            <div class="col-md-12 text-{$float}">
+                                {set lastIdOfField,$answer.fieldId}
+            {/if}
+                                {math format="x + 1 " set="index" x=$index }
+                                <i class="fa fa-circle text-color-{$index|asciiToChar}"></i> {$answer.value} ({$answer.co})
+            {foreachelse}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mr-auto ml-auto">
+                <div class="card card-chart">
+                    <div class="card-header card-header-icon card-header-info">
+                        <div class="card-icon">
+                            <i class="material-icons">pie_chart</i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center">{_ "hasNotDataYet"}<br><br></div>
+                    </div>
+                    <div class="row text-{$float}">
+                    <div class="col-md-12 text-{$float}">
+                        <div>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{map footerjs}
+<script src="{url theme}assets/js/persian-date.min.js"></script>
+<script src="{url theme}assets/js/persian-datepicker.min.js"></script>
+<script src="{url theme}assets/js/input-persian-datepicker.js"></script>
+<link rel="stylesheet" href="{url theme}assets/css/persian-datepicker.min.css"/>
+<script src="{url themeBase}/assets/js/pagination.js"></script>
+<script src="{url themeBase}/assets/js/plugins/chartist.min.js"></script>
+<script>
+    var dataPreferences = {} ;
+    var index = 0 ;
+    {set lastIdOfField,""}
+    {set index,96}
+    {foreach from=$answers key=key value=answer}
+    {if $lastIdOfField != $answer.fieldId}
+    {if $lastIdOfField != "" }
+    Chartist.Pie('#chartPreferences{$lastIdOfField}', dataPreferences['ss_{$lastIdOfField}'], {height:'230px'});
+    {/if}
+    index = 0 ;
+    dataPreferences['ss_{$answer.fieldId}'] = {
+        labels: [],
+        series: []
+    };
+    {set lastIdOfField,$answer.fieldId}
+    {/if}
+        dataPreferences['ss_{$answer.fieldId}']['labels'][index] = {$answer.co};
+        dataPreferences['ss_{$answer.fieldId}']['series'][index] = {$answer.co};
+        index++;
+    {/foreach}
+    {if $lastIdOfField != "" }
+        Chartist.Pie('#chartPreferences{$lastIdOfField}', dataPreferences['ss_{$lastIdOfField}'], {height:'230px'});
+    {/if}
+
+</script>
+{/map}
+{map navBarButton}
+<button onclick="jQuery('.printButtonGoToMoreInfo').trigger('click');window.print();" class="btn btn-outline">
+    <i class="fa fa-print"></i> {_ "print"}
+</button>
+{/map}

@@ -1,0 +1,42 @@
+{view "[url patch]header.mold.html"}
+<div class="content mt-5  mb-5">
+    <div class="container-fluid mt-5 mb-5">
+            <div class="row mt-5" id="listToGetFromServer">
+                <div class="col-md-8 ml-auto mr-auto {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                    <div class="card">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="fa  fa-floppy-o fa-2x"></i>
+                            </div>
+                            <h4 class="card-title float-{$float} m-3">{_ 'installed'}</h4>
+                        </div>
+                        <div class="card-body {if $float == 'right'}rtl{else}ltr{/if} text-{$text_align}">
+                            {foreach from=$alert key=key value=alert}
+                            <div class="alert alert-{$alert.type}  alert-with-icon"  data-notify="container">
+                                {if isset($alert.icon)}
+                                <i class="material-icons" data-notify="icon">{$alert.icon}</i>
+                                {/if}
+                                {if $alert.canClose}
+                                <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                    <i class="material-icons">close</i>
+                                </button>
+                                {/if}
+                                <span  class="text-{$text_align}">
+                                    {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}
+                                </span>
+                            </div>
+                            {/foreach}
+                            {call alertHeader}
+
+                            <strong class="text-info">{$user.fname} {$user.lname}</strong> {_ "dear"}<br>
+                            {_ "yourAccount"} <strong class="text-info">{$user.email}</strong> {_ "yourPhone"} <strong class="text-info">{$user.phone}</strong> {_ "andPassword"} <strong class="text-info">{$user.pass}</strong><br><br>
+                        </div>
+                        <div class="card-footer">
+                             <a href="{$adminLink}" class="btn btn-fill btn-success w-100">{_ "login"}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{view "[url patch]footer.mold.html"}

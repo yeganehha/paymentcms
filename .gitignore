@@ -1,5 +1,5 @@
 .idea/*
 templates_c/*
-app/*/cache
-plugins/*/cache
-core/cache
+app/*/cache/theme
+plugins/*/cache/theme
+core/cache/theme

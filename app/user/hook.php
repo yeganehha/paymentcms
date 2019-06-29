@@ -32,7 +32,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 class hook extends pluginController {
 
 	public function _adminHeaderNavbar($vars2){
-		$this->menu->after('dashboard','users' , rlang(['list','users'] ) , \app::getBaseAppLink('users/lists') , 'fa fa-users' );
+		$this->menu->after('dashboard','users' , rlang(['list','users'] ) , \app::getBaseAppLink('users/lists','admin') , 'fa fa-users' );
 		$this->menu->addChild('configuration' ,'permission', rlang('permission' ) , \app::getBaseAppLink('permissions','admin') , 'fa fa-lock' );
 		$this->mold->path('default','user');
 		$this->mold->view('adminHeaderNavItem.header.mold.html');
@@ -83,28 +83,22 @@ class hook extends pluginController {
 
 	private function getPermissionOfGroupId($page , $groupId = null){
 		if ( ! cache::hasLifeTime('userPermissions' , 'user')) {
-			model::join('user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
-			if ( $groupId == null )
-				return model::searching($page, 'user_group_permission.accessPage = ? and user_group.loginRequired = 0 ', 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
-			else
-				return model::searching([$page,$groupId], 'user_group_permission.accessPage = ? and user_group_permission.user_groupId = ? ' , 'user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
-
-		} else {
-			$permission = cache::get('userPermissions',null , 'user');
-			$result = null ;
-			for ( $i = 0 ; $i < count($permission) ; $i ++ ){
-				if ( $groupId != null and $permission[$i]['user_groupId'] == $groupId and $permission[$i]['accessPage']  == $page )
-						return $permission[$i];
-				elseif ( $groupId == null and $permission[$i]['accessPage']  == $page ) {
-					$result[$permission[$i]['loginRequired']] = $permission[$i];
-				}
-			}
-			if ( isset($result[0]))
-				return $result[0];
-			elseif ( isset($result[1]))
-				return $result[1];
-			return null;
+			$this->savePermissionOfGroupId();
 		}
+		$permission = cache::get('userPermissions',null , 'user');
+		$result = null ;
+		for ( $i = 0 ; $i < count($permission) ; $i ++ ){
+			if ( $groupId != null and $permission[$i]['user_groupId'] == $groupId and ( $permission[$i]['accessPage']  == $page or $permission[$i]['accessPage']  == '--FULL-ACCESS--') )
+					return $permission[$i];
+			elseif ( $groupId == null and ( $permission[$i]['accessPage']  == $page or $permission[$i]['accessPage']  == '--FULL-ACCESS--') ) {
+				$result[$permission[$i]['loginRequired']] = $permission[$i];
+			}
+		}
+		if ( isset($result[0]))
+			return $result[0];
+		elseif ( isset($result[1]))
+			return $result[1];
+		return null;
 	}
 	private static function checkCommentAccess($controllerClass, $method )
 	{
@@ -150,5 +144,10 @@ class hook extends pluginController {
 		}
 
 		return null ;
+	}
+	private function savePermissionOfGroupId(){
+		model::join('user_group as user_group' , 'user_group.user_groupId = user_group_permission.user_groupId');
+		$permission = model::searching(null, null, 'user_group_permission as user_group_permission' , 'user_group_permission.user_groupId,accessPage,loginRequired');
+		return cache::save($permission, 'userPermissions', PHP_INT_MAX , 'user');
 	}
 }

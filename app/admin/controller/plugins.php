@@ -48,6 +48,8 @@ class plugins extends \controller {
 			$this->alert('success' ,null ,rlang('appUninstalled'));
 		elseif ($status == 'pleaseTryAGain')
 			$this->alert('danger' ,null ,rlang('pleaseTryAGain'));
+		elseif ($status == 'appDownloadSuccessfully')
+			$this->alert('success' ,null ,rlang('appDownloadSuccessfully'));
 		$apps = \App::appsListWithConfig();
 		$plugins = \App::pluginsListWithConfig();
 		$this->mold->view('pluginLocalList.mold.html');
@@ -57,6 +59,46 @@ class plugins extends \controller {
 		$this->mold->set('plugins' , $plugins);
 	}
 
+
+	public function installFromStorage(){
+		$form = request::post('app,link,type=app,installType=none');
+		if ( $form['installType'] == 'install' or $form['installType'] == 'update'  ){
+			if ( $form['type'] == 'app')
+				$destinationFolder = payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR ;
+			else
+				$destinationFolder = payment_path.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR ;
+			if ( is_dir($destinationFolder.$form['app']) and  $form['installType'] == 'install' ) {
+				$appStatus = cache::get('appStatus', $form['app']  ,'paymentCms');
+				if ( $appStatus == null and  $form['type'] == 'app' ){
+					Response::redirect(\app::getBaseAppLink('plugins/installLocal/'.$form['app']));
+					return true ;
+				} elseif( $appStatus == null and  $form['type'] == 'app' ){
+					Response::redirect(\app::getBaseAppLink('plugins/installingPlugin/'.$form['app']));
+					return true ;
+				}
+			}
+			$folder = payment_path.'core'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'storage' .DIRECTORY_SEPARATOR ;
+			file::make_folder($folder);
+			$tempName = $form['app'].'_'.md5($form['app'].time().$form['type']).'.zip';
+			if ( copy($form['link'],$folder.$tempName ) ) {
+				if ( file::unzip($folder.$tempName,$destinationFolder) ){
+					file::remove_file($folder.$tempName);
+					Response::redirect(\app::getBaseAppLink('plugins/lists/appDownloadSuccessfully'));
+					return true ;
+				} else {
+					file::remove_file($folder.$tempName);
+					Response::redirect(\app::getBaseAppLink('plugins/install/extractError'));
+					return false ;
+				}
+			} else {
+				Response::redirect(\app::getBaseAppLink('plugins/install/downloadError'));
+				return false ;
+			}
+		} else {
+			Response::redirect(\app::getBaseAppLink('plugins/lists'));
+			return false ;
+		}
+	}
 	public function installLocal($app = null){
 		if ( is_null($app)){
 			Response::redirect(\app::getBaseAppLink('plugins/lists'));
@@ -68,13 +110,23 @@ class plugins extends \controller {
 			if ( file_exists($file_name) ) {
 				$appData = require_once $file_name;
 				if ( isset($appData['db']) and !  is_null($appData['db'])) {
-					$query = $this->generateQueryCreatTable($appData['db']);
+					$querys = $this->generateQueryCreatTable($appData['db']);
 					model::transaction();
 					try {
-						if ( model::queryUnprepared($query) ) {
+						$hasError = false ;
+						foreach ( $querys as $tabelName => $query){
+							if ( model::queryUnprepared($query) === false) {
+								$hasError = true ;
+							}
+						}
+						if ( $hasError === false ){
 							model::commit();
 							$this->changeCacheOfAppStatus($app,'deActive');
 							Response::redirect(\app::getBaseAppLink('plugins/lists/appInstalled#app_'.$app));
+							return true;
+						} else {
+							model::rollback();
+							Response::redirect(\app::getBaseAppLink('plugins/lists/pleaseTryAGain#app_'.$app));
 							return true;
 						}
 					} catch (Exception $exception){
@@ -150,7 +202,7 @@ class plugins extends \controller {
 			return false;
 		}
 		$appStatus = cache::get('appStatus', $app ,'paymentCms');
-		if ( $appStatus == 'active' ){
+		if ( $appStatus == 'active' and ( ! ($app == 'admin' or $app == 'core' or $app == 'api' or $app == 'user'))){
 			$this->changeCacheOfAppStatus($app,'deActive');
 			Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
 			return true;
@@ -169,14 +221,24 @@ class plugins extends \controller {
 		if ( file_exists($file_name) ) {
 			$appData = require_once $file_name;
 			if ( isset($appData['db']) and !  is_null($appData['db'])) {
-				$query = $this->generateQueryDropTable($appData['db']);
+				$querys = $this->generateQueryDropTable($appData['db']);
 				model::transaction();
 				try {
-					if ( model::queryUnprepared($query) ) {
+					$hasError = false ;
+					foreach ( $querys as $tabelName => $query){
+						if ( model::queryUnprepared($query) === false) {
+							$hasError = true ;
+						}
+					}
+					if ( $hasError === false ){
 						model::commit();
 						file::removedir(payment_path.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.$app);
 						$this->changeCacheOfAppStatus($app,null);
 						Response::redirect(\app::getBaseAppLink('plugins/lists/appUninstalled#app_'.$app));
+						return true;
+					} else {
+						model::rollback();
+						Response::redirect(\app::getBaseAppLink('plugins/lists/pleaseTryAGain#app_'.$app));
 						return true;
 					}
 				} catch (Exception $exception){
@@ -213,7 +275,11 @@ class plugins extends \controller {
 		}
 	}
 
-	public function install(){
+	public function install($massage = null){
+		if ( $massage == 'extractError')
+			$this->alert('danger' , '', rlang('extractError') );
+		if ( $massage == 'downloadError')
+			$this->alert('danger' , '', rlang('downloadError') );
 		$get = request::post('page=1,perEachPage=25,name' ,null);
 		$rules = [
 			"page" => ["required|match:>0", rlang('page')],
@@ -226,14 +292,14 @@ class plugins extends \controller {
 			//TODO:: add error is not valid data
 
 		} else {
-			//		$d="http://localhost/payment/api/update/version";
-			$appsApiLinks ="http://localhost/payment/api/apps/listApps";
+			//		$d="https://www.paymentcms.ir/api/update/version";
+			$appsApiLinks ="https://www.paymentcms.ir/api/apps/listApps";
 			$localData = array(
 				'page' => $get['page'] ,
 				'perEachPage' => $get['perEachPage'] ,
 				'name' => $get['name'] ,
 				'version' => PCVERSION ,
-				'siteUrl' => \App::getBaseAppLink(null,'core'),
+				'siteUrl' => \App::getCurrentBaseLink(),
 				'lang' => 'fa',
 				'theme' => 'default',
 				'app' => json_encode(\App::appsListWithConfig()),
@@ -250,44 +316,45 @@ class plugins extends \controller {
 
 
 	private function generateQueryCreatTable($tables){
-		$query = '';
+		$query = [];
 		if ( is_array($tables) ) {
 			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			foreach ( $tables as $tableName => $tableData) {
-				$query .= 'CREATE TABLE IF NOT EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ('.chr(10) ;
+				$query[$tableName] = 'CREATE TABLE IF NOT EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ('.chr(10) ;
 				foreach ( $tableData['fields'] as $fieldName => $fieldData) {
-					$query .= '  `'.$fieldName.'` '.$fieldData.','.chr(10) ;
+					$query[$tableName] .= '  `'.$fieldName.'` '.$fieldData.','.chr(10) ;
 				}
 				if ( isset($tableData['PRIMARY KEY']) and is_array($tableData['PRIMARY KEY']) and ! is_null($tableData['PRIMARY KEY'])) {
 					foreach ($tableData['PRIMARY KEY'] as $fieldName) {
-						$query .= ' PRIMARY KEY (`'.$fieldName.'`) USING BTREE,'.chr(10);
+						$query[$tableName] .= ' PRIMARY KEY (`'.$fieldName.'`) USING BTREE,'.chr(10);
 					}
 				}
 				if ( isset($tableData['KEY']) and is_array($tableData['KEY']) and ! is_null($tableData['KEY'])) {
 					foreach ($tableData['KEY'] as $fieldName) {
-						$query .= ' KEY `'.$fieldName.'` (`'.$fieldName.'`),'.chr(10);
+						$query[$tableName] .= ' KEY `'.$fieldName.'` (`'.$fieldName.'`),'.chr(10);
 					}
 				}
 				if ( isset($tableData['REFERENCES']) and is_array($tableData['REFERENCES']) and ! is_null($tableData['REFERENCES'])) {
 					foreach ($tableData['REFERENCES'] as $fieldName => $fieldData) {
-						$query .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
+						$query[$tableName] .= 'FOREIGN KEY (`'.$fieldName.'`) REFERENCES `'.$configDataBase['_dbTableStartWith'].$fieldData['table'].'`(`'.$fieldData['column'].'`) ON DELETE '.$fieldData['on_delete'].' ON UPDATE '.$fieldData['on_update'].','.chr(10);
 					}
 				}
-				$query = strings::deleteWordLastString($query,','.chr(10) ).chr(10);
-				$query .= ') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;'.chr(10).chr(10);
+				$query[$tableName] = strings::deleteWordLastString($query[$tableName],','.chr(10) ).chr(10);
+				$query[$tableName] .= ') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;'.chr(10).chr(10);
 
 			}
 		}
 		return $query ;
 	}
 	private function generateQueryDropTable($tables){
-		$query = '';
+		$query[] = 'SET FOREIGN_KEY_CHECKS = 0;';
 		if ( is_array($tables) ) {
 			$configDataBase = require_once payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
 			foreach ( $tables as $tableName => $tableData) {
-				$query .= 'DROP TABLE IF EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ;'.chr(10) ;
+				$query[$tableName] .= 'DROP TABLE IF EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ;'.chr(10) ;
 			}
 		}
+		$query[] = 'SET FOREIGN_KEY_CHECKS = 1;';
 		return $query ;
 	}
 	private function changeCacheOfAppStatus($app , $status , $name = 'appStatus'){

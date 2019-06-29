@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header card-header-rose card-header-icon pointer"  data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">
+                    <div class="card-header card-header-info card-header-icon pointer"  data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">
                         <div class="card-icon" >
                             <i class="material-icons">search</i>
                         </div>
@@ -25,7 +25,7 @@
                                    </div>
                                    <div class="col-md-4">
                                        <button class="btn btn-link" id="closeSearch" data-toggle="collapse" data-target="#searchServices" aria-expanded="false" aria-controls="searchServices">{_ "close"}</button>
-                                       <button type="submit" class="btn btn-fill btn-rose">{_ "search"}</button>
+                                       <button type="submit" class="btn btn-fill btn-info">{_ "search"}</button>
                                    </div>
                                 </div>
                             </form>
@@ -64,18 +64,31 @@
                             {$app.name}
                         </h4>
                         <div class="card-description">
-                            description come soon ...
+                            {$app.description}
                         </div>
                     </div>
                     <div class="card-footer">
-                        <div class="price">
-                            <a href="{url}plugins/installLocal/{$app.name}" class="btn btn-info">{_ "install"}</a>
-                        </div>
                         {func method="isAppActive" class="App\admin\controller\plugins_mold" set="setValue" app=$app.name version=$app.version}
+                        <div class="price">
+                            <form action="{url}plugins/installFromStorage" method="post">
+                                <input type="hidden" name="app" value="{$app.name}">
+                                <input type="hidden" name="link" value="{$app.insertLink}">
+                                <input type="hidden" name="type" value="{$app.type}">
+                            {if $setValue == 'notInstallYet' }
+                                <input type="hidden" name="installType" value="install">
+                                <input type="submit" value="{_ 'install'}" class="btn btn-info">
+                            {elseif $setValue == 'updated' }
+                                <input type="hidden" name="installType" value="none">
+                                <input type="submit" value="{_ 'install'}" class="btn tox-tbtn--disabled disabled" disabled>
+                            {elseif $setValue == 'needUpDate'}
+                                <input type="hidden" name="installType" value="update">
+                                <input type="submit" value="{_ 'update'}" class="btn btn-warning">
+                            {/if}
+                            </form>
+                        </div>
                         <div class="stats">
                             <p class="card-category"><i class="fa fa-user"></i> {$app.author} </p>
                             <p class="card-category mr-3 ml-3" > {_ "installedNumber"} : {$app.count} </p>
-                            <p class="card-category mr-3 ml-3" > {$setValue} </p>
                         </div>
                     </div>
                 </div>

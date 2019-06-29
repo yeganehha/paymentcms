@@ -14,6 +14,7 @@
 use paymentCms\component\cache;
 use paymentCms\component\file;
 use paymentCms\component\model;
+use paymentCms\component\request;
 use paymentCms\component\strings;
 
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
@@ -34,33 +35,36 @@ class App {
 	private static $pluginPatch = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR;
 
 	public static function init() {
+		if ( is_file(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config.php')) {
+			self::generateUrlPrams();
+			$appName = self::$app;
 
-		self::generateUrlPrams();
-		$appName = self::$app ;
-
-		$links = self::generateAllLinks();
-		if ( is_array($links) ) {
-			usort($links, ['App', 'sortArrayByLength']);
-			$fullAddress = self::getFullRequestUrl();
-			foreach ( $links as $link ){
-				if ( strings::strFirstHas($fullAddress,$link['link']) ){
-					if (  isset(self::$url[0])  and  strings::strLastHas($link['link'],'/'.self::$url[0]) ){
-						$appName =  $link['app'];
-						array_shift(self::$url);
+			$links = self::generateAllLinks();
+			if (is_array($links)) {
+				usort($links, ['App', 'sortArrayByLength']);
+				$fullAddress = self::getFullRequestUrl();
+				foreach ($links as $link) {
+					if (strings::strFirstHas($fullAddress, $link['link'])) {
+						if ( (isset(self::$url[0]) and strings::strLastHas($link['link'], '/' . self::$url[0])) or count(self::$url) == 0 ) {
+							$appName = $link['app'];
+							array_shift(self::$url);
+						}
 					}
 				}
+			} else {
+				if (isset(self::$url[0])) {
+					$appName = self::$url[0];
+					array_shift(self::$url);
+				}
 			}
-		} else {
-			if (  isset(self::$url[0]) ) {
-				$appName = self::$url[0];
-				array_shift(self::$url);
-			}
-		}
 
-		self::checkAppIsExist($appName);
-		self::checkControllerIsExist();
-		self::checkMethodIsExist();
-		self::getParamsFromUrl();
+			self::checkAppIsExist($appName);
+			self::checkControllerIsExist();
+			self::checkMethodIsExist();
+			self::getParamsFromUrl();
+		} else {
+			self::$app = 'install';
+		}
 
 		if ( self::$appProvider == null )
 			$className ='App\\'.self::$app.'\controller\\'.self::$controller ;
@@ -69,7 +73,7 @@ class App {
 		$methodName = self::$method ;
 		if (class_exists($className) and method_exists($className, $methodName)) {
 			$class = new $className ();
-			call_user_func_array([$class, $methodName], self::$params);
+			call_user_func_array([$class, $methodName], (array) self::$params);
 		} else {
 			$className ='App\core\controller\httpErrorHandler' ;
 			$methodName = 'E404' ;
@@ -91,7 +95,8 @@ class App {
 		if ( !isset($app))
 			return false ;
 		if ( !empty($app)) {
-			$app = trim(strtolower($app));
+//			$app = trim(strtolower($app));
+			$app = trim($app);
 			$appPatch = self::$appPatch.$app;
 			if (is_dir($appPatch)) {
 //				array_shift(self::$url);
@@ -195,7 +200,7 @@ class App {
 
 
 	private static function getParamsFromUrl(){
-		self::$params = array_merge(self::$params , self::$url) ;
+		self::$params = array_merge((array)self::$params , (array)self::$url) ;
 	}
 
 	/**
@@ -225,8 +230,13 @@ class App {
 		return file::get_name_folders(self::$appPatch);
 	}
 
-	public static function appsListWithConfig(){
-		$apps = file::get_name_folders(self::$appPatch);
+	public static function appsListWithConfig($app = null){
+		if ( is_array($app) )
+			$apps = $app;
+		elseif ( !is_array($app) and $app != null )
+			$apps = [$app];
+		else
+			$apps = file::get_name_folders(self::$appPatch);
 		$return = [];
 		if ( is_array($apps) ){
 			foreach ($apps as $app ){
@@ -294,10 +304,10 @@ class App {
 		if ( $app != null and $controller != null ){
 			if ( is_file(self::$appPatch.$app.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.$controller.'.php') ){
 				$methods =  get_class_methods( 'App\\'.$app.'\controller\\'.$controller );
-				for ( $i = count($methods) -1  ; $i >= 0 ; $i-- )
+				for ( $i = count( (array) $methods) -1  ; $i >= 0 ; $i-- )
 					if ( strings::strFirstHas($methods[$i],'__'))
 						unset($methods[$i]);
-					if ( count($methods) == 0 )
+					if ( count( (array) $methods) == 0 )
 						return false ;
 				return [ 'app' => $app ,'appProvider' => '', 'controller' => $controller,'methods' =>$methods];
 			} else {
@@ -377,6 +387,17 @@ class App {
 		return $baseUrl.'/'.(( ! is_null($path) ) ? $path : '' );
 	}
 
+	public static function getCurrentBaseLink($path = null ){
+		$server = request::server('HTTPS,HTTP_HOST,SCRIPT_NAME');
+		$httpProtocol = $server['HTTPS'] == 'on' ? 'https://':'http://' ;
+		$domain = $httpProtocol . $server['HTTP_HOST'].$server['SCRIPT_NAME'];
+		$baseUrl = strings::deleteWordLastString($domain,'/index.php' );
+		$path = str_replace(['\\','/','>'],'/',$path);
+		$path = str_replace('//','/',$path);
+		$path = ( substr($path,-1) != '/' and  ! is_null($path)) ? $path : $path.'/' ;
+		return $baseUrl.'/'.(( ! is_null($path) ) ? $path : '' );
+	}
+
 	private static function getAppLinkFromAppsLink($app){
 		$links = self::generateAllLinks();
 		$key = array_search($app, array_column($links, 'app'));
@@ -408,6 +429,6 @@ class App {
 	}
 
 	private static function sortArrayByLength($a,$b){
-		return strlen($b['link'])-strlen($a['link']);
+		return strlen($a['link'])-strlen($b['link']);
 	}
 }

@@ -61,9 +61,11 @@
                                                     <i class="material-icons">delete</i> {_ "delete"}
                                                 </a>
                                                 {elseif $app.status == 'active' }
+                                                {if ! ($appName == 'admin' or $appName == 'core' or $appName == 'api' or $appName == 'user') }
                                                 <a class="btn btn-danger m-1" href="{url}plugins/deActive/{$appName}">
                                                     <i class="fa fa-floppy-o mr-1 ml-1"></i> {_ "deActive"}
                                                 </a>
+                                                {/if}
                                                 {/if}
                                             </td>
                                         </tr>

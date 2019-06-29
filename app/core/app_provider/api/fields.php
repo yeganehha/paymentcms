@@ -29,16 +29,19 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class fields extends \App\api\controller\innerController {
 
+	public static $creatTable = true ;
+	public static $tableName = 'customFieldValue_' ;
+
 	public static function getFieldsToEdit($serviceId , $serviceType , $statusNotBe = null , $defineKeys = false , $fieldsId = null ){
 		/* @var \paymentCms\model\field $fieldModel */
 		$fieldModel = self::model('field') ;
 		$searchWhere = ' serviceType = ? and ( 0 ';
 		$searchValue[] = $serviceType ;
-		if ( $serviceId != null ){
-			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($serviceId)),', ').')' ;
+		if ( $serviceId !== null ){
+			$searchWhere .= ' or serviceId IN ('.strings::deleteWordLastString(str_repeat('? , ',count((array)$serviceId)),', ').')' ;
 			$searchValue = array_merge($searchValue,(array)$serviceId);
 		}
-		if ( $fieldsId != null ){
+		if ( $fieldsId !== null ){
 			$searchWhere .= ' or fieldId IN ('.strings::deleteWordLastString(str_repeat('? , ',count($fieldsId)),', ').')' ;
 			$searchValue = array_merge($searchValue,(array)$fieldsId);
 		}
@@ -79,8 +82,19 @@ class fields extends \App\api\controller\innerController {
 			return self::jsonError($valid->errorsIn(),500);
 		model::transaction();
 		try {
+			$tableCreated = false ;
+			if ( self::$creatTable and ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType)){
+				$query = self::generateQueryCreatTable(self::$tableName.$serviceId.'_'.$serviceType);
+				if ( model::queryUnprepared($query) === false) {
+					model::rollback();
+					return self::jsonError('cantCreatTable', 500);
+				}
+				$tableCreated = true ;
+			}
+
 			/* @var \paymentCms\model\field $modelField */
 			if (is_array($fields) and count($fields) > 0)
+				$idsOfItem = [];
 				foreach ($fields as $key => $field) {
 					if ($field['id'] > 0)
 						$modelField = self::model('field', $field['id']);
@@ -95,16 +109,40 @@ class fields extends \App\api\controller\innerController {
 					$modelField->setValues($field['value']);
 					$modelField->setServiceId($serviceId);
 					$modelField->setServiceType($serviceType);
-					if ($field['id'] > 0)
+					if ($field['id'] > 0) {
 						$modelField->upDateDataBase();
-					else
+						if ( $tableCreated )
+							$idsOfItem[] = $modelField->getFieldId() ;
+					} else {
 						$modelField->insertToDataBase();
+						$idsOfItem[] = $modelField->getFieldId() ;
+					}
+				}
+				if ( self::$creatTable and count($idsOfItem) > 0 ){
+					if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+						return self::json(null);
+					$query = self::addToTable(self::$tableName.$serviceId.'_'.$serviceType,(array)$idsOfItem);
+					if ( model::queryUnprepared($query) === false) {
+						model::rollback();
+						return self::jsonError('cantAddToTable',500);
+					}
 				}
 			if (is_array($deletedFields) and count($deletedFields) > 0) {
+				if ( $modelField == null )
+					$modelField = self::model('field');
 				$modelField->db()->where('fieldId', $deletedFields, 'IN');
 				$modelField->db()->where('serviceId', $serviceId);
 				$modelField->db()->where('serviceType', $serviceType);
 				$modelField->db()->delete('field');
+				if ( self::$creatTable and count($deletedFields) > 0 ){
+					if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+						return self::json(null);
+					$query = self::deleteFromTable(self::$tableName.$serviceId.'_'.$serviceType,(array)$deletedFields);
+					if ( model::queryUnprepared($query) === false) {
+						model::rollback();
+						return self::jsonError('cantDropToTable',500);
+					}
+				}
 			}
 			model::commit();
 			return self::json(null);
@@ -139,19 +177,106 @@ class fields extends \App\api\controller\innerController {
 		}
 		if ( is_array($data) and ! empty($data) ){
 			model::transaction();
+			$insertRow['objectId'] = $objectId ;
+			$insertRow['objectType'] = $objectType ;
 			foreach ( $data as $fieldId => $fieldValue){
-				if ( $fieldValue == null )
-					continue ;
-				/* @var \paymentCms\model\fieldvalue $fieldValueModel */
-				$fieldValueModel = self::model('fieldvalue') ;
-				$fieldValueModel->setObjectId($objectId);
-				$fieldValueModel->setObjectType($objectType);
-				$fieldValueModel->setFieldId($fieldId);
-				$fieldValueModel->setValue($fieldValue);
-				$fieldValueStatus = $fieldValueModel->insertToDataBase();
-				if ( ! $fieldValueStatus ) {
+				if ($fieldValue == null) continue;
+				if ( ! self::$creatTable ) {
+					/* @var \paymentCms\model\fieldvalue $fieldValueModel */
+					$fieldValueModel = self::model('fieldvalue');
+					$fieldValueModel->setObjectId($objectId);
+					$fieldValueModel->setObjectType($objectType);
+					$fieldValueModel->setFieldId($fieldId);
+					$fieldValueModel->setValue($fieldValue);
+					$fieldValueStatus = $fieldValueModel->insertToDataBase();
+					if (!$fieldValueStatus) {
+						model::rollback();
+						return self::jsonError(rlang('canNotInsertFieldValue'), 500);
+					}
+				} else {
+					$insertRow['f_'.$fieldId]=$fieldValue;
+				}
+			}
+			if ( self::$creatTable ) {
+				if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+					return self::json(null);
+				if ( ! model::insert(self::$tableName.$serviceId.'_'.$serviceType,$insertRow)){
 					model::rollback();
-					return self::jsonError(rlang('canNotInsertFieldValue'),500);
+					return self::jsonError(rlang('canNotInsertFieldValueRow'), 500);
+				}
+			}
+			model::commit();
+			return self::json(null);
+		}
+		return self::json(null);
+	}
+
+	public static function updateFillOutForm($serviceId , $serviceType , $data , $objectId , $objectType ){
+		$fields = self::getFieldsToEdit($serviceId,$serviceType , ['admin' , 'invisible'] , true);
+		if (!empty($fields) and is_array($fields)) {
+			foreach ($fields['result'] as $key => $field) {
+				$regix = null;
+				if ($field['regex'] != null) {
+					$regix = explode(',', $field['regex']);
+				}
+				if ($field['status'] == 'required') {
+					$regix[] = 'required';
+				}
+				if ($regix == null or count($regix) == 0)
+					continue;
+				$rules[$field['fieldId']] = [implode('|', array_unique(array_filter($regix))), $field['title']];
+			}
+		}
+		if (isset($rules)) {
+			$valid = validate::check($data, $rules);
+			if ($valid->isFail()) {
+				return self::jsonError($valid->errorsIn());
+			}
+		}
+		if ( is_array($data) and ! empty($data) ){
+			model::transaction();
+			$insertRow = [] ;
+			foreach ( $data as $fieldId => $fieldValue){
+				if ($fieldValue == null) continue;
+				if ( ! self::$creatTable ) {
+					/* @var \paymentCms\model\fieldvalue $fieldValueModel */
+					$fieldValueModel = self::model('fieldvalue' ,'objectId = ? and objectType = ? and fieldId = ?' , [$objectId,$objectType,$fieldId]);
+					if ( $fieldValueModel->getFieldId() !=  $fieldId ) {
+						$fieldValueModel->setObjectId($objectId);
+						$fieldValueModel->setObjectType($objectType);
+						$fieldValueModel->setFieldId($fieldId);
+						$fieldValueModel->setValue($fieldValue);
+						$fieldValueStatus = $fieldValueModel->insertToDataBase();
+						if (!$fieldValueStatus) {
+							model::rollback();
+							return self::jsonError(rlang('canNotInsertFieldValue'), 500);
+						}
+					} else {
+						$fieldValueModel->setValue($fieldValue);
+						$fieldValueStatus = $fieldValueModel->upDateDataBase();
+						if (!$fieldValueStatus) {
+							model::rollback();
+							return self::jsonError(rlang('canNotInsertFieldValue'), 500);
+						}
+					}
+				} else {
+					$insertRow['f_'.$fieldId]=$fieldValue;
+				}
+			}
+			if ( self::$creatTable ) {
+				if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+					return self::json(null);
+				$count = model::searching([$objectId,$objectType] ,'objectId = ? and objectType = ?',self::$tableName.$serviceId.'_'.$serviceType,$insertRow);
+				if ( $count == null ){
+					$insertRow['objectId'] = $objectId ;
+					$insertRow['objectType'] = $objectType ;
+					$result = model::insert(self::$tableName.$serviceId.'_'.$serviceType,$insertRow);
+				} else {
+					$result = model::update(self::$tableName.$serviceId.'_'.$serviceType,$insertRow,'objectId = ? and objectType = ?',[$objectId,$objectType]);
+				}
+				if ( ! $result ){
+					model::rollback();
+					return self::jsonError(rlang('canNotInsertFieldValueRow'), 500);
 				}
 			}
 			model::commit();
@@ -161,23 +286,75 @@ class fields extends \App\api\controller\innerController {
 	}
 
 	public static function showFilledOutForm($serviceId , $serviceType , $objectId , $objectType ,$statusNotBe = null ){
-		/* @var \paymentCms\model\fieldvalue $fieldValueModel */
-		$fieldValueModel = self::model('fieldvalue') ;
-		$fieldsFill = [] ;
-		$fieldsFillTemp = $fieldValueModel->search([$objectId,$objectType],'objectId = ? and objectType = ? ' ,'fieldvalue'  );
-		if ( is_array($fieldsFillTemp) )
-			foreach ( $fieldsFillTemp as $fieldFill) {
-				$fieldsFill[ $fieldFill['fieldId'] ] = $fieldFill ;
-			}
-		unset($fieldsFillTemp);
+		if ( ! self::$creatTable ) {
+			/* @var \paymentCms\model\fieldvalue $fieldValueModel */
+			$fieldValueModel = self::model('fieldvalue');
+			$fieldsFill = [];
+			$fieldsFillTemp = $fieldValueModel->search([$objectId, $objectType], 'objectId = ? and objectType = ? ', 'fieldvalue');
+			if (is_array($fieldsFillTemp))
+				foreach ($fieldsFillTemp as $fieldFill) {
+					$fieldsFill[$fieldFill['fieldId']] = $fieldFill;
+				}
+			unset($fieldsFillTemp);
 
-		$allFields = self::getFieldsToEdit($serviceId,$serviceType , $statusNotBe , true , array_keys($fieldsFill));
-		if ( is_array($allFields['result']) )
-			foreach ( $allFields['result'] as $index => $allField)
-				if ( isset($fieldsFill[$allField['fieldId']]))
-					$allFields['result'][$index]['value'] = $fieldsFill[$allField['fieldId']]['value'] ;
+			$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe, true, array_keys($fieldsFill));
+			if (is_array($allFields['result']))
+				foreach ($allFields['result'] as $index => $allField)
+					if (isset($fieldsFill[$allField['fieldId']]))
+						$allFields['result'][$index]['value'] = $fieldsFill[$allField['fieldId']]['value'];
 
+		} else {
+			if ( ! model::tableExist(self::$tableName.$serviceId.'_'.$serviceType) )
+				return self::json(null);
+			$fieldsFill = model::searching([$objectId, $objectType], 'objectId = ? and objectType = ? ', self::$tableName.$serviceId.'_'.$serviceType);
+			if ($fieldsFill == null){
+				$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe);
+			} else
+				$allFields = self::getFieldsToEdit($serviceId, $serviceType, $statusNotBe, true, array_keys($fieldsFill));
+			if (is_array($allFields['result']))
+				foreach ($allFields['result'] as $index => $allField)
+					if (isset($fieldsFill[0]['f_'.$allField['fieldId']]))
+						$allFields['result'][$index]['value'] = $fieldsFill[0]['f_'.$allField['fieldId']];
 
+		}
 		return self::json($allFields['result']);
+	}
+
+
+
+	private static function generateQueryCreatTable($tableName, $configDataBase= null){
+		if ( $configDataBase == null )
+			$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+		$query = 'CREATE TABLE IF NOT EXISTS `'.$configDataBase['_dbTableStartWith'].$tableName.'` ('.chr(10) ;
+		$query .= '  `objectId`  INT NOT NULL ,'.chr(10) ;
+		$query .= '  `objectType`  VARCHAR(65) CHARACTER SET utf8 COLLATE utf8_persian_ci NOT NULL '.chr(10) ;
+		$query .= ') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;'.chr(10).chr(10);
+		return $query ;
+	}
+
+	private static function addToTable($tableName,$ids, $configDataBase= null){
+		if ( ! is_array($ids) ) {
+			$ids = (array) $ids ;
+		}
+		if ( count($ids) == null ) return false ;
+
+		if ( $configDataBase == null )
+			$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+		$query = 'ALTER TABLE `'.$configDataBase['_dbTableStartWith'].$tableName.'` '.chr(10) ;
+		$query .= 'ADD `f_'.implode( '` TEXT CHARACTER SET utf8 COLLATE utf8_persian_ci NULL DEFAULT NULL ,'.chr(10).'ADD `f_' , $ids ).'` TEXT CHARACTER SET utf8 COLLATE utf8_persian_ci NULL DEFAULT NULL ;';
+		return $query ;
+	}
+
+	private static function deleteFromTable($tableName,$ids, $configDataBase= null){
+		if ( ! is_array($ids) ) {
+			$ids = (array) $ids ;
+		}
+		if ( count($ids) == null ) return false ;
+
+		if ( $configDataBase == null )
+			$configDataBase = require payment_path. 'core'.DIRECTORY_SEPARATOR. 'config.php';
+		$query = 'ALTER TABLE `'.$configDataBase['_dbTableStartWith'].$tableName.'` '.chr(10) ;
+		$query .= 'DROP `f_'.implode( '` ,'.chr(10).'DROP `f_' , $ids ).'` ;';
+		return $query ;
 	}
 }

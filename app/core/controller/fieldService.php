@@ -20,7 +20,7 @@ namespace App\core\controller;
 if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"><div class="container" style="margin-top: 20px;"><div id="msg_1" class="alert alert-danger"><strong>Error!</strong> Please do not set the url manually !! </div></div>');
 
 
-class fieldService extends \controller {
+class fieldService  {
 
 	public static function getFieldsToEdit($serviceId,$serviceType , &$mold = null ) {
 		$return = \App\core\app_provider\api\fields::getFieldsToEdit($serviceId,$serviceType);
@@ -55,11 +55,26 @@ class fieldService extends \controller {
 		return \App\core\app_provider\api\fields::fillOutForm($serviceId,$serviceType , $data , $objectId , $objectType);
 	}
 
+	public static function updateFillOutForm($serviceId,$serviceType,$data,$objectId , $objectType){
+		return \App\core\app_provider\api\fields::updateFillOutForm($serviceId,$serviceType , $data , $objectId , $objectType);
+	}
+
 	public static function showFilledOutForm($serviceId,$serviceType,$objectId , $objectType){
 		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType , ['admin' , 'invisible']);
 	}
 
-	public static function showFilledOutFormWithAllFields($serviceId,$serviceType,$objectId , $objectType){
-		return \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType );
+	public static function showFilledOutFormWithAllFields($serviceId,$serviceType,$objectId , $objectType , $editAble = false , &$mold = null){
+		$return =  \App\core\app_provider\api\fields::showFilledOutForm($serviceId,$serviceType , $objectId , $objectType );
+		if ( $editAble and $mold != null and isset($return['result']) ){
+			$getPath = $mold->getPath();
+			$mold->path('default', 'core');
+			$mold->view('fillOutFields.mold.html');
+			$mold->set('fields',$return['result']);
+			$mold->path($getPath['folder'], $getPath['app']);
+		}
+		return $return ;
+	}
+	public static function saveInTable(){
+		return \App\core\app_provider\api\fields::$creatTable;
 	}
 }

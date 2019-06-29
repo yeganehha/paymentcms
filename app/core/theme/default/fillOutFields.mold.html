@@ -6,7 +6,7 @@
     <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
     <div class="col-md-10">
         <div class="form-check">
-            <textarea rows="4" cols="50"  class="form-control" id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" >{$field.values}</textarea>
+            <textarea rows="4" cols="50"  class="form-control" id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" >{if isset($field.value)}{$field.value}{else}{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}{/if}</textarea>
         </div>
     </div>
 </div>
@@ -17,7 +17,7 @@
         {foreach from=$field.valuesDe key=keyValue value=value}
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]" > {$value}
+                <input class="form-check-input" type="checkbox" value="{$value}" name="customField[{$field.fieldId}][]"  {if isset($field.value)}checked{else}{if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if}{/if} > {$value}
                 <span class="form-check-sign"><span class="check"></span></span>
             </label>
         </div>
@@ -31,7 +31,7 @@
         {foreach from=$field.valuesDe key=keyValue value=value}
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" > {$value}
+                <input class="form-check-input" type="radio" value="{$value}" name="customField[{$field.fieldId}]" {if isset($field.value)}checked{else}{if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}checked{/if}{/if}{/if} > {$value}
                 <span class="circle"><span class="check"></span></span>
             </label>
         </div>
@@ -44,7 +44,7 @@
     <div class="col-md-10">
         <select class="selectpicker" id="field_{$field.fieldId}" name="customField[{$field.fieldId}]" {if $field.status  == 'required'}required{/if} data-size="7" data-style="btn btn-outline-info btn-round" title="{_ 'please'} {_ 'selecting'}">
         {foreach from=$field.valuesDe key=keyValue value=value}
-        <option value="{$value}"  >{$value}</option>
+        <option value="{$value}" {if isset($field.value)}selected{else}{if isset($Mold.post.customField.[$field.fieldId])}{if $Mold.post.customField.[$field.fieldId] == $value}selected{/if}{/if}{/if} >{$value}</option>
         {/foreach}
         </select>
     </div>
@@ -53,7 +53,7 @@
 <div class="col-md-12">
     <label class="col-md-2 col-form-label" for="field_{$field.fieldId}">{$field.title} {if $field.status == 'required'}<span class="text-danger">*</span>{/if} {if $field.description != ''}<span class="notification"> <i class="material-icons small pointer" onclick='tooltip("<span class=\"text-{$text_align}\">{$field.description}</span>");'>help</i> </span>{/if}</label>
     <div class="col-md-10">
-        <input type="{$field.type}"  id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" value="{$field.values}" class="form-control">
+        <input type="{$field.type}"  id="field_{$field.fieldId}" {if $field.status  == 'required'}required{/if} name="customField[{$field.fieldId}]" value="{if isset($field.value)}{$field.value}{else}{if isset($Mold.post.customField.[$field.fieldId])}{$Mold.post.customField.[$field.fieldId]}{else}{$field.values}{/if}{/if}" class="form-control">
     </div>
 </div>
 {/if}

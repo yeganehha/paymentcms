@@ -48,7 +48,8 @@ class cache {
 		self::$name = $name ;
 		self::$lifeTime = $lifeTime ;
 		self::$app = $app;
-		if ( self::checkDataIsValidOrNo(true) ) return true ;
+		self::getPatchOfFile();
+//		if ( self::checkDataIsValidOrNo(true) ) return true ;
 
 		return self::writeOnFile($data);
 	}
@@ -211,7 +212,7 @@ class cache {
 			$php .= "\t}\n\n";
 			$php .= "}";
 			if (is_file(self::$cacheFilePatch)) unlink(self::$cacheFilePatch);
-			File::generate_file(self::$cacheFilePatch, $php);
+			file::generate_file(self::$cacheFilePatch,$php);
 			return true;
 		} catch (\Exception $exception){
 			return false ;
@@ -257,6 +258,7 @@ class cache {
 			else
 				return false ;
 		}
+
 		$information =  call_user_func($functionName);
 		if ( $information['dataSize'] != self::$dataSize and $checkDataSize )
 			return false ;

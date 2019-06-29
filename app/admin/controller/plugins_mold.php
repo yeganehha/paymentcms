@@ -27,10 +27,13 @@ class plugins_mold {
 		$appStatus = cache::get('appStatus', $app  ,'paymentCms');
 		if ( $appStatus == null ){
 			return 'notInstallYet';
-		} elseif ( $version != '1.0.0.0') {
-			return 'requiredUpdate' ;
-		} elseif ( $appStatus == '1.0.0.0') {
-			return $version ;
+		} else {
+			$info = \App::appsListWithConfig($app);
+			$appVersion = $info[$app]['version'];
+			if ( version_compare($appVersion, $version, ">=") )
+				return 'updated';
+			else
+				return 'needUpDate';
 		}
 	}
 }

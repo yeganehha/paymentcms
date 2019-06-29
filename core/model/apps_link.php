@@ -25,7 +25,7 @@ use paymentCms\component\model ;
 class apps_link extends model implements modelInterFace  {
 
 	private $primaryKey = ['apps_linkId'];
-	private $primaryKeyShouldNotInsertOrUpdate = ['apps_linkId'];
+	private $primaryKeyShouldNotInsertOrUpdate = 'apps_linkId';
 	private $apps_linkId ;
 	private $link ;
 	private $app ;
