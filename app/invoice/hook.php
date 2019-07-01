@@ -30,5 +30,7 @@ class hook extends pluginController {
 		$this->menu->add('paidinvoices' , rlang(['invoicesOf','success'] ) , \app::getBaseAppLink('invoices/lists/paid' ,'admin') ,null,null,'invoices' );
 		$this->menu->add('failedinvoices' , rlang(['invoicesOf','fail'] ) , \app::getBaseAppLink('invoices/lists/failed' ,'admin') ,null,null,'invoices' );
 		$this->menu->add('pendinginvoices' , rlang(['invoicesOf','pending'] ) , \app::getBaseAppLink('invoices/lists/pending' ,'admin') ,null,null,'invoices' );
+		$this->menu->after('invoices','services' , rlang('services' ) , \app::getBaseAppLink('service/lists','admin') , 'fa fa-shopping-cart' );
+
 	}
 }
