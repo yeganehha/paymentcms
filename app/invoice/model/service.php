@@ -17,10 +17,11 @@
 // *************************************************************************
 
 
-namespace paymentCms\model;
+namespace App\invoice\model;
 
 
 use paymentCms\component\model ;
+use paymentCms\model\modelInterFace ;
 
 class service extends model implements modelInterFace  {
 

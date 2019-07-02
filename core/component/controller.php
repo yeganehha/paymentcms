@@ -42,7 +42,6 @@ class controller {
 		$menu = new menu('sideBar') ;
 		$this->menu = $menu ;
 		$menu->add('dashboard' , rlang('dashboard' ) , app::getBaseAppLink() , 'fa fa-home' );
-		$menu->add('services' , rlang('services' ) , app::getBaseAppLink('service/lists') , 'fa fa-shopping-cart' );
 //		$menu->add('otherFields' , rlang('fields' ) , app::getBaseAppLink('field/lists') , 'fa fa-wpforms' );
 		$menu->add('plugins' , rlang('plugins' ) , app::getBaseAppLink('plugins/lists') , 'fa fa-puzzle-piece' );
 		$menu->add('configuration' , rlang('configuration' ) , app::getBaseAppLink('configuration') , 'fa fa-cogs' );
@@ -128,6 +127,7 @@ class controller {
 				}
 			}
 		}
+		$return = [];
 		foreach ($files as $file) {
 			$controller = $file['controller'];
 			$aria = $file['aria'] ;
@@ -139,10 +139,11 @@ class controller {
 				else
 					$this->mold->path(null,$controller);
 				$Object = new $class($this->mold,$this->menu);
-				call_user_func_array([$Object,$method],$variable);
+				$return[$controller]  = call_user_func_array([$Object,$method],$variable);
 			}
 		}
 		$this->mold->path('default');
+		return $return ;
 	}
 
 	protected function alert($type , $title , $description ,$icon = null , $close = true ){

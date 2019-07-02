@@ -17,63 +17,97 @@
                     <div class="card-body">
 
                         <div class=" border rounded p-3 ">
-                            <div class="row d-print-none">
-                                <div class="col-md-6 float-left text-center">
-                                    <div class="text-center text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
-                                    {if $invoice.paidDate > 0 }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
-                                    <div class="text-center text-bold text-large">{_ "method"} {_ "pay"} : {$invoice.module}</div>
-                                    <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "paid"}</button>
-                                    <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "cancel"}</button>
+                            <div class="row">
+                                {foreach from=$alert key=key value=alert}
+                                <div class="alert alert-{$alert.type} col-md-12"  data-notify="container">
+                                    {if $alert.canClose}
+                                    <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                    {/if}
+                                    <span  class="text-{$text_align}">
+                                        {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}</span>
                                 </div>
+                                {/foreach}
                             </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <div class="text-center text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
+                                        {if $invoice.status == 'paid' }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
+                                        {if $invoice.status != 'paid' }<div class="text-center text-bold text-large d-print-none">
+                                        <form action="{$invoiceLink}" method="post">
+                                            <select onchange="this.form.submit()" class="selectpicker" required data-size="7" data-style="btn btn-outline-info btn-round" name="module" >
+                                                {foreach from=$module key=key value=item}
+                                                <option value="{$key}" {if $invoice.module == $key }selected{/if}>{$item}</option>
+                                                {/foreach}
+                                            </select>
+                                        </form>
+                                        {if $invoice.module != "" }<a href="{$invoiceLink}/{$invoice.module}" class="btn btn-info"> {_ "pay"} </a>{/if}
+                                        {if isset($goToBank) and $goToBank }
+                                        <form id="sendForm" action="{$link}" method="{$type}" >
+                                            {foreach from=$inputs key=key value=item}
+                                            <input value="{$item}" type="hidden" name="{$key}" >
+                                            {/foreach}
+                                        </form>
+                                        <script type="text/javascript">
+                                            window.onload=function(){
+                                                $("#sendForm").submit();
+                                            }
+                                        </script>
+                                        {/if}
+                                        </div>{/if}
+                                    </div>
+                                </div>
 
-                            <div class="table-responsive table-striped">
-                                <table class="table text-{$text_align}">
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            {_ "status"} :
-                                        </td>
-                                        <td>
-                                            <div class="text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
-                                        </td>
-                                        <td>
-                                            {_ "method"} {_ "pay"} :
-                                        </td>
-                                        <td>
-                                            {$invoice.module}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {_ "name"} {_ "client"} :
-                                        </td>
-                                        <td>
-                                            $client->getName()
-                                        </td>
-                                        <td>
-                                            {_ "invoice"} {_ "date"} :
-                                        </td>
-                                        <td>
-                                            {$invoice.createdDate|jDate:"Y/n/j , H-i-s"}
-                                        </td>
-                                    </tr>
-                                    {foreach from=$allFields key=key value=field}
-                                    {if ( $key % 2 ) == 0 }<tr>{/if}
-                                        <td>
-                                            {$field.title} :
-                                        </td>
-                                        <td>
-                                            {if isset($field.value) }
-                                            {$field.value}
-                                            {else}
-                                            ---
-                                            {/if}
-                                        </td>
-                                    {if ( $key % 2 ) == 1 }</tr>{/if}
-                                    {/foreach}
-                                    </tbody>
-                                </table>
+                                <div class=" col-md-8 table-responsive table-striped">
+                                    <table class="table text-{$text_align}">
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                {_ "status"} :
+                                            </td>
+                                            <td>
+                                                <div class="text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
+                                            </td>
+                                            <td>
+                                                {_ "method"} {_ "pay"} :
+                                            </td>
+                                            <td>
+                                                {$invoice.module}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                {_ "name"} {_ "client"} :
+                                            </td>
+                                            <td>
+                                                {$client->getName()}
+                                            </td>
+                                            <td>
+                                                {_ "invoice"} {_ "date"} :
+                                            </td>
+                                            <td>
+                                                {$invoice.createdDate|jDate:"Y/n/j , H-i-s"}
+                                            </td>
+                                        </tr>
+                                        {foreach from=$allFields key=key value=field}
+                                        {if ( $key % 2 ) == 0 }<tr>{/if}
+                                            <td>
+                                                {$field.title} :
+                                            </td>
+                                            <td>
+                                                {if isset($field.value) }
+                                                {$field.value}
+                                                {else}
+                                                ---
+                                                {/if}
+                                            </td>
+                                        {if ( $key % 2 ) == 1 }</tr>{/if}
+                                        {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
 
@@ -96,7 +130,7 @@
                                         {$item.description}
                                     </td>
                                     <td class="border-left rounded text-center" style="border-left: 1px solid white !important;">
-                                        {$item.price|number_format:0:'':''} {_ "toman"}
+                                        {$item.price|number_format} {_ "toman"}
                                     </td>
                                 </tr>
                                 {math format="x + y" x=$tempPrice y=$item.price set="tempPrice"}
@@ -126,23 +160,27 @@
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "date"}</th>
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "method"} {_ "pay"}</th>
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "transactionId"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "status"}</th>
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "price"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {foreach from=$invoices key=key value=invoice}
-                                <tr class="border-bottom border-top">
+                                {foreach from=$transactions key=key value=transaction}
+                                <tr class="border-bottom border-top text-center">
                                     <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        2019/03/19
+                                        {$transaction.time|jDate:"Y/n/j , H-i-s"}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.module}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.transactionCodeOne}<br>{$transaction.transactionCodeTwo}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" title="{$transaction.description}" style="border-left: 1px solid white !important;">
+                                        {_ $transaction.status}
+                                    </td>
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.price|number_format} {_ "toman"}
                                     </td>
                                 </tr>
                                 {foreachelse}

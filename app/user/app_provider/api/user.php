@@ -37,6 +37,17 @@ class user extends \App\api\controller\innerController  {
 		return self::model('user',$whereValue , $whereClause ) ;
 	}
 
+	/**
+	 * @param $userId
+	 *
+	 * @return \paymentCms\model\user|\App\model\model
+	 *
+	 *                               [no-access]
+	 */
+	public static function getUserById($userId) {
+		return self::model('user',$userId  ) ;
+	}
+
 
 	public static function editUser($userId,$data){
 		$get = request::getFromArray($data,'fname,lname,email,phone,password,groupId,block=0,admin_note,customField' ,null);

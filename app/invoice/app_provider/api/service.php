@@ -1,9 +1,10 @@
 <?php
 
 
-namespace App\api\controller;
+namespace App\invoice\app_provider\api;
 
 
+use App\api\controller\innerController;
 use App\core\controller\fieldService;
 
 /**
@@ -28,9 +29,12 @@ class service extends innerController {
 		return $this->info($serviceId);
 	}
 
-	public static function info($serviceId,&$mold = null){
-		/* @var \paymentCms\model\service $model */
-		$model = self::model('service',$serviceId);
+	public static function info($serviceId,&$mold = null,$isLink = false){
+		/* @var  \App\invoice\model\service $model */
+		if ( $isLink )
+			$model = self::model('service',$serviceId , 'link = ?');
+		else
+			$model = self::model('service',$serviceId);
 		if ( is_null($model->getServiceId()) ){
 			return self::jsonError('service not found!' ,404 );
 		}
@@ -38,7 +42,7 @@ class service extends innerController {
 			return self::jsonError('service not found!' ,403 );
 		}
 
-		$fields = fieldService::getFieldsToFillOut($serviceId,'service' ,$mold);
+		$fields = fieldService::getFieldsToFillOut($model->getServiceId(),'service' ,$mold);
 
 		return self::json(['service' => $model->returnAsArray() , 'fields' => $fields]);
 	}

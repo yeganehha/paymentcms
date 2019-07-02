@@ -1,10 +1,11 @@
 <?php
 
 
-namespace App\admin\controller;
+namespace App\invoice\app_provider\admin;
 
 
 use App\core\controller\fieldService;
+use App\invoice\model\invoice;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -68,6 +69,7 @@ class service extends \controller {
 		$numberOfAll = ($model->search( (array) $value  , ( count($variable) == 0 ) ? null : implode('or' , $variable) , 'service', 'COUNT(serviceId) as co' )) [0]['co'];
 		$pagination = parent::pagination($numberOfAll,$get['page'],$get['perEachPage']);
 		$search = $model->search( (array) $value  , ( ( count($variable) == 0 ) ? null : implode('or' , $variable) )  , 'service', '*'  , ['column' => 'serviceId' , 'type' =>'desc'] , [$pagination['start'] , $pagination['limit'] ] );
+		$this->mold->path('default', 'invoice');
 		$this->mold->view('serviceList.mold.html');
 		$this->mold->setPageTitle(rlang('services'));
 		$this->mold->set('activeMenu' , 'services');
@@ -78,6 +80,7 @@ class service extends \controller {
 		if ( request::isPost() ){
 			$this->checkBaseData();
 		}
+		$this->mold->path('default', 'invoice');
 		$this->mold->set('newService',true);
 		$this->mold->view('serviceProfile.mold.html');
 		$this->mold->setPageTitle(rlang(['add','services']));
@@ -97,11 +100,16 @@ class service extends \controller {
 			$this->alert('warning' , null,$valid->errorsIn(),'error');
 			$this->mold->set('post',$form);
 		} else {
-			/* @var \paymentCms\model\service $model */
+			/* @var invoice $model */
 			if ( $form['id'] > 0 )
 				$model = $this->model('service' , $form['id']) ;
-			else
-				$model = $this->model('service') ;
+			else {
+				$model = $this->model('service');
+				$model->setFirstNameStatus('visible');
+				$model->setLastNameStatus('visible');
+				$model->setEmailStatus('visible');
+				$model->setPhoneStatus('required');
+			}
 			$model->setPrice($form['price']);
 			$model->setDescription($form['description']);
 			$model->setLink($form['link']);
@@ -195,6 +203,7 @@ class service extends \controller {
 		}
 
 		fieldService::getFieldsToEdit($serviceId,'service',$this->mold);
+		$this->mold->path('default', 'invoice');
 		$this->mold->set('service',$model);
 		$this->mold->view('serviceProfile.mold.html');
 		$this->mold->setPageTitle(rlang(['profile','services']). ': '.$model->getName());
@@ -217,6 +226,7 @@ class service extends \controller {
 
 
 		$fields = fieldService::getFieldsToEdit($serviceId,'service',$this->mold);
+		$this->mold->path('default', 'invoice');
 		$this->mold->set('service',$model);
 		$this->mold->set('fields',$fields);
 		$this->mold->set('numberOfFields',count($fields));

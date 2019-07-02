@@ -19,5 +19,6 @@ return [
 	'canNotInsertInvoice' => 'در ثبت صورتحساب مشکلی پیش آمده!',
 	'service_add_helper_name' => 'نام سرویس فقط در ناحیه مدیریت و برای شناسیی سریع تر سرویس به استفاده می شود.',
 	'permission:api_service_info' => 'مشخصات سرویس در درگاه ارتباطی',
-	'permission:api_service_info' => 'مشخصات سرویس در درگاه ارتباطی',
+	'invoiceApp' => 'پرداخت یار',
+	'invoiceAppDescription' => 'مدیریت یکپارچه پرداخت های شما و صفحه پرداخت شخصی',
 ];

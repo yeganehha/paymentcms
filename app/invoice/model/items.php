@@ -17,9 +17,10 @@
 // *************************************************************************
 
 
-namespace paymentCms\model;
+namespace App\invoice\model;
 
 use paymentCms\component\model ;
+use paymentCms\model\modelInterFace ;
 
 class items extends model implements modelInterFace {
 

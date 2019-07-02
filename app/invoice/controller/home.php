@@ -4,9 +4,10 @@
 namespace App\invoice\controller;
 
 
-use App\core\controller\fieldService;
-use paymentCms\component\security;
-use paymentCms\component\strings;
+
+use App\invoice\app_provider\api\service;
+use paymentCms\component\request;
+use paymentCms\component\Response;
 
 /**
  * Created by Yeganehha .
@@ -25,30 +26,46 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class home extends \controller {
 
-	public function index($base64InvoiceId){
-		$invoiceId = security::decrypt(urldecode($base64InvoiceId),'base64');
-		/* @var \paymentcms\model\invoice $invoice */
-		$invoice = $this->model('invoice' , $invoiceId);
-		if ( $invoice->getInvoiceId() == null ){
-			$this->mold->offAutoCompile();
-			\App\core\controller\httpErrorHandler::E404();
-			return ;
+	public function index($serviceLink = null){
+		if ( request::isPost() ){
+			return $this->checkData($serviceLink);
 		}
-		$servicesId = [];
-		$items = $invoice->search($invoice->getInvoiceId(),'invoiceId = ?' ,'items' );
-		if ( is_array($items) )
-			$servicesId = array_column($items, 'serviceId');
+		if ( $serviceLink != null ) {
+			$service = service::info($serviceLink, $this->mold ,true);
+			if (!$service['status']) {
+				$this->mold->offAutoCompile();
+				\App\core\controller\httpErrorHandler::E404();
+				return;
+			}
+			$this->mold->set('service', $service['result']['service']);
+		}
+		$this->mold->set('service', ['firstNameStatus' => 'required','lastNameStatus' => 'required','phoneStatus' => 'required']);
+		$this->mold->view('home.mold.html');
+	}
 
-		$allFields = fieldService::showFilledOutForm($servicesId , 'service' ,$invoice->getInvoiceId() , 'invoice' );
-
-		//		$this->mold->offAutoCompile();
-		//		show($allFields);
-		$this->mold->set('invoice' , $invoice->returnAsArray());
-		$this->mold->set('items' , $items);
-		$this->mold->set('allFields' , $allFields['result']);
-		$this->mold->path('default', 'invoice');
-		$this->mold->view('invoiceClient.mold.html');
-		$this->mold->setPageTitle(rlang('invoice'));
+	public function checkData($serviceLink){
+		if ( $serviceLink != null ) {
+			$service = service::info($serviceLink, $this->mold, true);
+			if (!$service['status']) {
+				$this->mold->offAutoCompile();
+				\App\core\controller\httpErrorHandler::E404();
+				return;
+			}
+			$serviceId = $service['result']['service']['serviceId'];
+		} else
+			$serviceId = null ;
+		$result = invoice::generate($serviceId,$_POST);
+		if ( $result['status'] ) {
+			$this->mold->offAutoCompile();
+			Response::redirect($result['result']['link']);
+		} else {
+			$this->alert('danger' , '',$result['massage']);
+			if ( $serviceLink != null )
+				$this->mold->set('service',$service['result']['service']);
+			else
+				$this->mold->set('service', ['firstNameStatus' => 'required','lastNameStatus' => 'required','phoneStatus' => 'required']);
+			$this->mold->view('home.mold.html');
+		}
 	}
 
 }
