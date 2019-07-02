@@ -5,6 +5,7 @@ namespace App\invoice\app_provider\admin;
 
 
 use App\core\controller\fieldService;
+use App\user\app_provider\api\user;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\Response;
@@ -47,6 +48,10 @@ class invoices extends \controller {
 
 //		$this->mold->offAutoCompile();
 //		show($allFields);
+		$transactions = $invoice->search($invoice->getInvoiceId(),'invoiceId = ?' ,'transactions' );
+		$this->mold->set('transactions' , $transactions);
+		$client  = user::getUserById($invoice->getUserId());
+		$this->mold->set('client' , $client);
 		$this->mold->set('invoice' , $invoice->returnAsArray());
 		$this->mold->set('items' , $items);
 		$this->mold->set('allFields' , $allFields['result']);
@@ -103,4 +108,42 @@ class invoices extends \controller {
 		$this->mold->set('invoices' , $search);
 	}
 
+	public function deleteTransaction($transactionId){
+		/* @var \App\invoice\model\transactions $transactions */
+		$transactions = $this->model('transactions' , $transactionId);
+		if ( $transactions->getTransactionId() == null ){
+			$this->mold->offAutoCompile();
+			\App\core\controller\httpErrorHandler::E404();
+			return ;
+		}
+		$transactions->deleteFromDataBase();
+		$this->alert('success' ,'' ,rlang('deletedTransaction'));
+		Response::redirect(\App::getBaseAppLink('invoices/'.$transactions->getInvoiceId() , 'admin') );
+	}
+
+	public function deleteItem($itemId){
+		/* @var \App\invoice\model\items $item */
+		$item = $this->model('items' , $itemId);
+		if ( $item->getItemId() == null ){
+			$this->mold->offAutoCompile();
+			\App\core\controller\httpErrorHandler::E404();
+			return ;
+		}
+		/* @var \App\invoice\model\invoice $invoice */
+		$invoice = $this->model('invoice' , $item->getInvoiceId());
+		if ( $invoice->getInvoiceId() == null ){
+			$this->mold->offAutoCompile();
+			\App\core\controller\httpErrorHandler::E404();
+			return ;
+		}
+		if ( $invoice->getStatus() != 'paid' ) {
+			$invoice->setPrice($invoice->getPrice() - $item->getPrice() );
+			if ( $invoice->getPrice()  == 0 )
+				$invoice->setStatus('canceled') ;
+			if ( $invoice->upDateDataBase() ) {
+				$item->deleteFromDataBase();
+			}
+		}
+		Response::redirect(\App::getBaseAppLink('invoices/'.$item->getInvoiceId() , 'admin') );
+	}
 }
