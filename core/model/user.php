@@ -68,6 +68,10 @@ class user extends model implements modelInterFace {
 	}
 
 
+	public function getName($explode = " "){
+		return $this->fname . $explode . $this->lname ;
+	}
+
 	public function setEmail( $email = null ) {
 		$this->email = $email ;
 	}

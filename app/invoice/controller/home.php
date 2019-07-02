@@ -5,6 +5,7 @@ namespace App\invoice\controller;
 
 
 use App\core\controller\fieldService;
+use App\user\app_provider\api\user;
 use paymentCms\component\security;
 use paymentCms\component\strings;
 
@@ -27,7 +28,7 @@ class home extends \controller {
 
 	public function index($base64InvoiceId){
 		$invoiceId = security::decrypt(urldecode($base64InvoiceId),'base64');
-		/* @var \paymentcms\model\invoice $invoice */
+		/* @var \App\invoice\model\invoice $invoice */
 		$invoice = $this->model('invoice' , $invoiceId);
 		if ( $invoice->getInvoiceId() == null ){
 			$this->mold->offAutoCompile();
@@ -41,8 +42,10 @@ class home extends \controller {
 
 		$allFields = fieldService::showFilledOutForm($servicesId , 'service' ,$invoice->getInvoiceId() , 'invoice' );
 
-		//		$this->mold->offAutoCompile();
-		//		show($allFields);
+		$module = parent::callHooks('invoiceGateWays') ;
+		show($module);
+		$client  = user::getUserById($invoice->getUserId());
+		$this->mold->set('client' , $client);
 		$this->mold->set('invoice' , $invoice->returnAsArray());
 		$this->mold->set('items' , $items);
 		$this->mold->set('allFields' , $allFields['result']);

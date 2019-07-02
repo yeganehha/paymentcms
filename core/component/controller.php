@@ -127,6 +127,7 @@ class controller {
 				}
 			}
 		}
+		$return = [];
 		foreach ($files as $file) {
 			$controller = $file['controller'];
 			$aria = $file['aria'] ;
@@ -138,10 +139,11 @@ class controller {
 				else
 					$this->mold->path(null,$controller);
 				$Object = new $class($this->mold,$this->menu);
-				call_user_func_array([$Object,$method],$variable);
+				$return[$controller]  = call_user_func_array([$Object,$method],$variable);
 			}
 		}
 		$this->mold->path('default');
+		return $return ;
 	}
 
 	protected function alert($type , $title , $description ,$icon = null , $close = true ){
