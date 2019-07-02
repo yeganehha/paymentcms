@@ -35,4 +35,5 @@ return [
 	'refused' => 'برگشت خورده',
 	'canceled' => 'لغو شده',
 	'RequiredFields' => 'فیلد های اجباری',
+	'deletedTransaction' => 'تراکنش با موفقیت حذف شد.'
 ];

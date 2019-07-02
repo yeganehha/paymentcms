@@ -35,16 +35,16 @@
                                         {_ "info"} {_ "more"}
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#link3" role="tablist">
-                                        {_ "configuration"}
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#link4" role="tablist">
-                                        {_ "note"}
-                                    </a>
-                                </li>
+                                <!--<li class="nav-item">-->
+                                    <!--<a class="nav-link" data-toggle="tab" href="#link3" role="tablist">-->
+                                        <!--{_ "configuration"}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                                <!--<li class="nav-item">-->
+                                    <!--<a class="nav-link" data-toggle="tab" href="#link4" role="tablist">-->
+                                        <!--{_ "note"}-->
+                                    <!--</a>-->
+                                <!--</li>-->
                             </ul>
                             <div class="tab-content tab-space">
                                 <div class="tab-pane active" id="link1">
@@ -53,8 +53,8 @@
                                             <div class="text-center text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
                                             {if $invoice.paidDate > 0 }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
                                             <div class="text-center text-bold text-large">{_ "method"} {_ "pay"} : {$invoice.module}</div>
-                                            <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "paid"}</button>
-                                            <button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "cancel"}</button>
+                                            <!--<button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "paid"}</button>-->
+                                            <!--<button class="btn btn-outline">{_ "edit"} {_ "status"} {_ "to"} {_ "cancel"}</button>-->
                                         </div>
                                         <div class="col-md-6 float-left">
                                             <div class="table-responsive table-striped rounded border p-1">
@@ -65,7 +65,7 @@
                                                             {_ "name"} {_ "client"} :
                                                         </td>
                                                         <td>
-                                                            $client->getName()
+                                                            {$client->getName()}
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -121,7 +121,7 @@
                                                     {_ "name"} {_ "client"} :
                                                 </td>
                                                 <td>
-                                                    $client->getName()
+                                                    {$client->getName()}
                                                 </td>
                                                 <td>
                                                     {_ "due"} {_ "date"} :
@@ -163,7 +163,7 @@
                                                     {_ "webservice"} :
                                                 </td>
                                                 <td>
-                                                    $client->getName()
+                                                    {$invoice.apiId}
                                                 </td>
                                                 <td>
                                                     {_ "ip"} {_ "creator"} {_ "invoice"} :
@@ -255,13 +255,15 @@
                                 {foreach from=$items key=key value=item}
                                 <tr class="border-bottom border-top">
                                     <td class="border-left rounded" style="border-left: 1px solid white !important;">
-                                        <textarea name="description[{$item.itemId}]" class="form-control border bg-white rounded p-1">{$item.description}</textarea>
+                                        <!--<textarea name="description[{$item.itemId}]" class="form-control border bg-white rounded p-1">{$item.description}</textarea>-->
+                                        {$item.description}
                                     </td>
                                     <td class="border-left rounded" style="border-left: 1px solid white !important;">
-                                        <input name="price[{$item.itemId}]" class="form-control text-center bg-white rounded" dir="ltr" value="{$item.price|number_format:0:'':''}" >
+                                        <!--<input name="price[{$item.itemId}]" class="form-control text-center bg-white rounded" dir="ltr" value="{$item.price|number_format:0:'':''}" >-->
+                                        {$item.price|number_format}
                                     </td>
                                     <td class="td-actions text-center rounded">
-                                        <a class="btn btn-danger btn-link" href="{url}invoices/{$invoice.invoiceId}/deleteItem/{$item.itemId}">
+                                        <a class="btn btn-danger btn-link" href="{url}invoices/deleteItem/{$item.itemId}">
                                             <i class="material-icons">delete</i>
                                         </a>
                                     </td>
@@ -285,14 +287,14 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row">
-                            <div class="text-center">
-                                <div class="btn-group text-center">
-                                    <button type="submit" class="btn btn-outline-success btn-success">{_ "save"}</button>
-                                    <button type="reset" class="btn btn-outline-secondary btn-secondary">{_ "refresh"}</button>
-                                </div>
-                            </div>
-                        </div>
+                        <!--<div class="row">-->
+                            <!--<div class="text-center">-->
+                                <!--<div class="btn-group text-center">-->
+                                    <!--<button type="submit" class="btn btn-outline-success btn-success">{_ "save"}</button>-->
+                                    <!--<button type="reset" class="btn btn-outline-secondary btn-secondary">{_ "refresh"}</button>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
                         </form>
                         <div class="card-header mt-5 float-{$float}">
                             <h4 class="card-title">{_ "transactions"}</h4>
@@ -310,29 +312,27 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {foreach from=$invoices key=key value=invoice}
+                                {foreach from=$transactions key=key value=transaction}
                                 <tr class="border-bottom border-top">
                                     <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        2019/03/19
+                                        {$transaction.time|jDate:"Y/n/j , H-i-s"}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.module}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.transactionCodeOne}<br>{$transaction.transactionCodeTwo}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.price|number_format} {_ "toman"}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {_ $transaction.status} <br>
+                                        {$transaction.description}
                                     </td>
                                     <td class="td-actions text-center rounded">
-                                        <a class="btn btn-danger btn-link" href="{url}invoices/{$invoice.invoiceId}">
+                                        <a class="btn btn-danger btn-link" href="{url}invoices/deleteTransaction/{$transaction.transactionId}">
                                             <i class="material-icons">delete</i>
-                                        </a>
-                                        <a class="btn btn-info btn-link" href="{url}invoices/{$invoice.invoiceId}">
-                                            <i class="material-icons">remove_red_eye</i>
                                         </a>
                                     </td>
                                 </tr>
