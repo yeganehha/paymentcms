@@ -1,9 +1,10 @@
 <?php
 
 
-namespace App\api\controller;
+namespace App\invoice\app_provider\api;
 
 
+use App\api\controller\innerController;
 use App\core\controller\fieldService;
 
 /**
@@ -29,7 +30,7 @@ class service extends innerController {
 	}
 
 	public static function info($serviceId,&$mold = null){
-		/* @var \paymentCms\model\service $model */
+		/* @var  \App\invoice\model\service $model */
 		$model = self::model('service',$serviceId);
 		if ( is_null($model->getServiceId()) ){
 			return self::jsonError('service not found!' ,404 );

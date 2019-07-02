@@ -4,7 +4,6 @@
 namespace App\invoice\app_provider\api;
 
 
-use App\api\controller\service;
 use App\core\controller\fieldService;
 use paymentCms\component\model;
 use paymentCms\component\request;

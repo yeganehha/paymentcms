@@ -4,7 +4,6 @@
 namespace App\core\app_provider\api;
 
 
-use App\api\controller\service;
 use mysql_xdevapi\Exception;
 use paymentCms\component\model;
 use paymentCms\component\request;
