@@ -13,7 +13,7 @@
                             <div class="col-md-4 text-large text-bold text-center" >
                                 <div class="position-fixed-grid">
                                     <img class="hidden-sm mb-3" src="{url}../undraw_mobile_payments_edgf.png" style="max-width: 100%">
-                                    <span class="text-center title">وبسایت شخصی عرفان ابراهیمی</span>
+                                    <!--<span class="text-center title">وبسایت شخصی عرفان ابراهیمی</span>-->
                                     {if count($fields) > 0 }
                                     <div class="col-md-12 form-group mt-5">
                                         <span class="text-center title">{$service.description}</span>
@@ -76,7 +76,7 @@
                                 <button type="submit" class="btn btn-info col-md-12">Login</button>
                                 {/if}
                                 {call fillOutFieldServiceForm}
-                                <div class="category form-category"><span class="text-danger">*</span> Required fields</div>
+                                <div class="col-md-12 mt-5"><span class="text-danger">*</span> {_ "RequiredFields"}</div>
                                 {if count($fields) > 0 }
                                 <button type="submit" class="btn btn-info col-md-12 hidden-un-sm ">{_ "pay"}</button>
                                 {/if}

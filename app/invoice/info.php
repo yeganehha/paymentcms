@@ -60,7 +60,7 @@ return [
 		],
 		'items' => [
 			'fields' => [
-				'itemId' => 'int(11) NOT NULL',
+				'itemId' => 'int(11) NOT NULL AUTO_INCREMENT',
 				'invoiceId' => 'int(11) NOT NULL',
 				'price' => 'decimal(10,2) DEFAULT NULL',
 				'description' => 'varchar(255) COLLATE utf8_persian_ci DEFAULT NULL',
@@ -79,7 +79,7 @@ return [
 		],
 		'transactions' => [
 			'fields' => [
-				'transactionId' => 'int(11) NOT NULL',
+				'transactionId' => 'int(11) NOT NULL AUTO_INCREMENT',
 				'invoiceId' => 'int(11) DEFAULT NULL',
 				'price' => 'decimal(10,2) DEFAULT NULL',
 				'time' => 'datetime DEFAULT NULL',

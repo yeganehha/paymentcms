@@ -18,19 +18,44 @@
 
                         <div class=" border rounded p-3 ">
                             <div class="row">
-                                <div class="col-md-4 d-print-none">
+                                {foreach from=$alert key=key value=alert}
+                                <div class="alert alert-{$alert.type} col-md-12"  data-notify="container">
+                                    {if $alert.canClose}
+                                    <button type="button" class="close float-{if $float == 'right' }left{else}right{/if}" data-dismiss="alert" aria-label="Close">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                    {/if}
+                                    <span  class="text-{$text_align}">
+                                        {if isset($alert.title)}<b> {$alert.title} - </b> {/if}{$alert.description}</span>
+                                </div>
+                                {/foreach}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
                                     <div class="text-center">
                                         <div class="text-center text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
-                                        {if $invoice.paidDate > 0 }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
-                                        {if $invoice.status != 'paid' }<div class="text-center text-bold text-large">
-                                        <form method="post">
+                                        {if $invoice.status == 'paid' }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
+                                        {if $invoice.status != 'paid' }<div class="text-center text-bold text-large d-print-none">
+                                        <form action="{$invoiceLink}" method="post">
                                             <select onchange="this.form.submit()" class="selectpicker" required data-size="7" data-style="btn btn-outline-info btn-round" name="module" >
                                                 {foreach from=$module key=key value=item}
                                                 <option value="{$key}" {if $invoice.module == $key }selected{/if}>{$item}</option>
                                                 {/foreach}
                                             </select>
                                         </form>
-                                        <a href="{url current}/{$invoice.module}" class="btn btn-info"> {_ "pay"} </a>
+                                        <a href="{$invoiceLink}/{$invoice.module}" class="btn btn-info"> {_ "pay"} </a>
+                                        {if isset($goToBank) and $goToBank }
+                                        <form id="sendForm" action="{$link}" method="{$type}" >
+                                            {foreach from=$inputs key=key value=item}
+                                            <input value="{$item}" type="hidden" name="{$key}" >
+                                            {/foreach}
+                                        </form>
+                                        <script type="text/javascript">
+                                            window.onload=function(){
+                                                $("#sendForm").submit();
+                                            }
+                                        </script>
+                                        {/if}
                                         </div>{/if}
                                     </div>
                                 </div>
@@ -135,23 +160,27 @@
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "date"}</th>
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "method"} {_ "pay"}</th>
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "transactionId"}</th>
+                                    <th class="bg-info text-white border-white border rounded text-center">{_ "status"}</th>
                                     <th class="bg-info text-white border-white border rounded text-center">{_ "price"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {foreach from=$invoices key=key value=invoice}
-                                <tr class="border-bottom border-top">
+                                {foreach from=$transactions key=key value=transaction}
+                                <tr class="border-bottom border-top text-center">
                                     <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        2019/03/19
+                                        {$transaction.time|jDate:"Y/n/j , H-i-s"}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.module}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.transactionCodeOne}<br>{$transaction.transactionCodeTwo}
                                     </td>
-                                    <td class="border-left rounded p-1" style="border-left: 1px solid white !important;">
-                                        module
+                                    <td class="border-left rounded p-1 text-center" title="{$transaction.description}" style="border-left: 1px solid white !important;">
+                                        {_ $transaction.status}
+                                    </td>
+                                    <td class="border-left rounded p-1 text-center" style="border-left: 1px solid white !important;">
+                                        {$transaction.price|number_format} {_ "toman"}
                                     </td>
                                 </tr>
                                 {foreachelse}

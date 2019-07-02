@@ -5,6 +5,7 @@ namespace App\invoice\app_provider\api;
 
 
 use App\core\controller\fieldService;
+use App\invoice\model\transactions;
 use paymentCms\component\model;
 use paymentCms\component\request;
 use paymentCms\component\security;
@@ -126,10 +127,127 @@ class invoice extends \App\api\controller\innerController {
 		}
 		if ( $error === false ){
 			model::commit();
-			return self::json(['id' => $invoiceModel->getInvoiceId() , 'link' => \App::getBaseAppLink( urlencode(security::encrypt($invoiceModel->getInvoiceId(),'base64',true)) , 'invoice') ]);
+			return self::json(['id' => $invoiceModel->getInvoiceId() , 'link' => self::generateUrlEncode($invoiceModel->getInvoiceId()) ]);
 		} else {
 			model::rollback();
 			return self::jsonError($error,500);
+		}
+	}
+
+	/**
+	 * @param $invoiceId
+	 *
+	 * @return string
+	 *               [no-access]
+	 */
+	public  static function generateUrlEncode($invoiceId){
+		return \App::getBaseAppLink( urlencode(security::encrypt($invoiceId,'base64',true)) , 'invoice') ;
+	}
+
+	/**
+	 * @param $transactionId
+	 *
+	 * @return string
+	 *               [no-access]
+	 */
+	public  static function generateCallBackUrl($transactionId){
+		return \App::getBaseAppLink( 'callBack/'.urlencode(security::encrypt($transactionId,'base64',true)) , 'invoice') ;
+	}
+
+	public static function startTransAction($invoice ){
+		if ( is_int($invoice) ){
+			/* @var \App\invoice\model\invoice $invoice */
+			$invoice = self::model('invoice' , $invoice);
+			if ( $invoice->getInvoiceId() == null ){
+				return self::jsonError( rlang('canNotFindInvoice'),500);
+			}
+		}
+		if ( $invoice->getStatus() == 'paid')
+			return self::jsonError( rlang('invoicePaidBefore'),500);
+
+		$moduleName = $invoice->getModule();
+		model::transaction();
+		$transaction = new transactions();
+		$transaction->setModule($moduleName);
+		$transaction->setIp(security::getIp());
+		$transaction->setTime(date('Y-m-d H:i:s'));
+		$transaction->setPrice($invoice->getPrice());
+		$transaction->setStatus('pending');
+		$transaction->setInvoiceId($invoice->getInvoiceId());
+		if ( $transaction->insertToDataBase() ){
+			/* @var \App\invoice\model\transactions $transaction */
+			$module = self::callHooks($moduleName.'_startTransaction',[$transaction]);
+			if ( count($module) == 0 ) {
+				model::rollback();
+				return self::jsonError( rlang('selectOtherGateWay'),500);
+			}
+			if ( $module[$moduleName]['status'] == false ){
+				model::rollback();
+				return self::jsonError( $module[$moduleName]['massage'],500);
+			}
+			$transaction->setTransactionCodeOne($module[$moduleName]['codeOne']);
+			$transaction->setTransactionCodeTwo($module[$moduleName]['codeTwo']);
+			$transaction->setDescription($module[$moduleName]['massage']);
+			$transaction->upDateDataBase();
+			model::commit();
+			return self::json($module[$moduleName]) ;
+		}
+		model::rollback();
+		return self::jsonError( rlang('cantInsertTransaction'),500);
+	}
+
+	public static function checkTransAction($transaction ){
+		if ( is_int($transaction) ){
+			/* @var \App\invoice\model\transactions $transaction */
+			$transaction = self::model('transactions' , $transaction);
+			if ( $transaction->getTransactionId() == null ){
+				return self::jsonError( rlang('canNotFindTransaction'),500);
+			}
+		}
+		/* @var \App\invoice\model\invoice $invoice */
+		$invoice = self::model('invoice' , $transaction->getInvoiceId());
+		if ( $invoice->getStatus() == 'paid')
+			return self::jsonError( rlang('invoicePaidBefore'),500);
+
+		$moduleName = $invoice->getModule();
+
+		/* @var \App\invoice\model\transactions $transaction */
+		$module = self::callHooks($moduleName.'_checkTransaction',[$transaction]);
+		if ( count($module) == 0 ) {
+			$transaction->setDescription(rlang('selectOtherGateWay'));
+			$transaction->setStatus('feiled');
+			$transaction->upDateDataBase();
+			return self::jsonError( rlang('selectOtherGateWay'),500);
+		}
+		if ( $module[$moduleName]['status'] == false ){
+			$transaction->setDescription( $module[$moduleName]['massage'] );
+			$transaction->setStatus('feiled');
+			$transaction->upDateDataBase();
+			return self::jsonError( $module[$moduleName]['massage'],500);
+		}
+		$transaction->setTransactionCodeOne($module[$moduleName]['codeOne']);
+		$transaction->setTransactionCodeTwo($module[$moduleName]['codeTwo']);
+		$transaction->setDescription($module[$moduleName]['massage']);
+		if ( $module[$moduleName]['payStatus'] ) {
+			$transaction->setStatus('seucced');
+			if ( $transaction->upDateDataBase() ) {
+				$invoice->setPaidDate(date('Y-m-d H:i:s'));
+				$invoice->setStatus('paid');
+				if ( $invoice->upDateDataBase() ) {
+					self::callHooks('paidInvoice' , [$invoice]);
+					return self::json(null) ;
+				} else {
+					self::callHooks('paidInvoiceButErrorOccurred' , [$invoice]);
+					return self::jsonError(rlang('callAdmin')) ;
+				}
+			} else {
+				self::callHooks('paidInvoiceButErrorOccurred' , [$invoice]);
+				return self::jsonError(rlang('callAdmin')) ;
+			}
+		} else {
+			$transaction->setStatus($module[$moduleName]['payStatusType']);
+			$transaction->upDateDataBase();
+			return self::jsonError( $module[$moduleName]['massage'],500);
 		}
 	}
 }
