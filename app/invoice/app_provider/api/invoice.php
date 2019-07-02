@@ -99,7 +99,7 @@ class invoice extends \App\api\controller\innerController {
 		}
 		$module = parent::callHooks('invoiceGateWays') ;
 		if ( count($module) > 0 )
-			$moduleSelect = $module[0];
+			$moduleSelect = array_keys($module)[0];
 		else
 			$moduleSelect = null ;
 
@@ -141,7 +141,7 @@ class invoice extends \App\api\controller\innerController {
 	 *               [no-access]
 	 */
 	public  static function generateUrlEncode($invoiceId){
-		return \App::getBaseAppLink( urlencode(security::encrypt($invoiceId,'base64',true)) , 'invoice') ;
+		return \App::getBaseAppLink( 'invoice/'.urlencode(security::encrypt($invoiceId,'base64',true)) , 'invoice') ;
 	}
 
 	/**
@@ -151,7 +151,7 @@ class invoice extends \App\api\controller\innerController {
 	 *               [no-access]
 	 */
 	public  static function generateCallBackUrl($transactionId){
-		return \App::getBaseAppLink( 'callBack/'.urlencode(security::encrypt($transactionId,'base64',true)) , 'invoice') ;
+		return \App::getBaseAppLink( 'invoice/callBack/'.urlencode(security::encrypt($transactionId,'base64',true)) , 'invoice') ;
 	}
 
 	public static function startTransAction($invoice ){

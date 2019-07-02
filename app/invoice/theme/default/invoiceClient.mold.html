@@ -43,7 +43,7 @@
                                                 {/foreach}
                                             </select>
                                         </form>
-                                        <a href="{$invoiceLink}/{$invoice.module}" class="btn btn-info"> {_ "pay"} </a>
+                                        {if $invoice.module != "" }<a href="{$invoiceLink}/{$invoice.module}" class="btn btn-info"> {_ "pay"} </a>{/if}
                                         {if isset($goToBank) and $goToBank }
                                         <form id="sendForm" action="{$link}" method="{$type}" >
                                             {foreach from=$inputs key=key value=item}
