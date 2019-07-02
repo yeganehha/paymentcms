@@ -4,6 +4,8 @@
 namespace plugin\gateway;
 
 
+use App\invoice\app_provider\api\invoice;
+
 /**
  * Created by Yeganehha .
  * User: Erfan Ebrahimi (http://ErfanEbrahimi.ir)
@@ -28,5 +30,37 @@ class hook extends \pluginController {
 
 	public function _invoiceGateWays(){
 		return rlang('gateWayTest') ;
+	}
+
+
+	public function _gateway_startTransaction($transaction){
+		/* @var \App\invoice\model\transactions $transaction */
+		$show['status'] = true ;
+		$show['massage'] = 'send' ;
+		$show['link'] = \App::getCurrentBaseLink('plugins/gateway/test.php');
+		$show['type'] ='post';
+		$show['inputs']['CallbackURL'] = invoice::generateCallBackUrl($transaction->getTransactionId()) ;
+		$show['inputs']['price'] = $transaction->getPrice();
+		$show['codeOne'] = time() ;
+		$show['codeTwo'] = '' ;
+		return $show;
+	}
+	public function _gateway_checkTransaction($transaction){
+		/* @var \App\invoice\model\transactions $transaction */
+		if($_GET['Status'] == 'OK'){
+			$show['status'] = true ;
+			$show['payStatus'] = true ;
+			$show['massage'] = 'done' ;
+			$show['codeOne'] = time() ;
+			$show['codeTwo'] = $_GET['Authority']  ;
+		} else {
+			$show['status'] = true ;
+			$show['payStatus'] = false ;
+			$show['payStatusType'] = 'canceled';
+			$show['massage'] =  'ERROR!(canceled)' ;
+			$show['codeOne'] = null ;
+			$show['codeTwo'] = $_GET['Authority']  ;
+		}
+		return $show;
 	}
 }
