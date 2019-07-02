@@ -6,6 +6,8 @@ namespace App\invoice\controller;
 
 use App\core\controller\fieldService;
 use App\user\app_provider\api\user;
+use paymentCms\component\request;
+use paymentCms\component\Response;
 use paymentCms\component\security;
 use paymentCms\component\strings;
 
@@ -26,7 +28,7 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class home extends \controller {
 
-	public function index($base64InvoiceId){
+	public function index($base64InvoiceId,$modulePay = null){
 		$invoiceId = security::decrypt(urldecode($base64InvoiceId),'base64');
 		/* @var \App\invoice\model\invoice $invoice */
 		$invoice = $this->model('invoice' , $invoiceId);
@@ -34,6 +36,12 @@ class home extends \controller {
 			$this->mold->offAutoCompile();
 			\App\core\controller\httpErrorHandler::E404();
 			return ;
+		}
+		if ( request::isPost("module") ){
+			$module = request::postOne("module");
+			$invoice->setModule($module);
+			$invoice->upDateDataBase();
+			Response::redirect(\App::getFullRequestUrl());
 		}
 		$servicesId = [];
 		$items = $invoice->search($invoice->getInvoiceId(),'invoiceId = ?' ,'items' );
@@ -43,9 +51,9 @@ class home extends \controller {
 		$allFields = fieldService::showFilledOutForm($servicesId , 'service' ,$invoice->getInvoiceId() , 'invoice' );
 
 		$module = parent::callHooks('invoiceGateWays') ;
-		show($module);
 		$client  = user::getUserById($invoice->getUserId());
 		$this->mold->set('client' , $client);
+		$this->mold->set('module' , $module);
 		$this->mold->set('invoice' , $invoice->returnAsArray());
 		$this->mold->set('items' , $items);
 		$this->mold->set('allFields' , $allFields['result']);

@@ -22,7 +22,16 @@
                                     <div class="text-center">
                                         <div class="text-center text-bold text-large {if $invoice.status == 'paid' }text-success{else}text-danger{/if}">{_ $invoice.status}</div>
                                         {if $invoice.paidDate > 0 }<div class="text-center text-bold text-large">{$invoice.paidDate|jDate:"Y/n/j , H-i-s"}</div>{/if}
-                                        <div class="text-center text-bold text-large">{_ "method"} {_ "pay"} : {$invoice.module}</div>
+                                        {if $invoice.status != 'paid' }<div class="text-center text-bold text-large">
+                                        <form method="post">
+                                            <select onchange="this.form.submit()" class="selectpicker" required data-size="7" data-style="btn btn-outline-info btn-round" name="module" >
+                                                {foreach from=$module key=key value=item}
+                                                <option value="{$key}" {if $invoice.module == $key }selected{/if}>{$item}</option>
+                                                {/foreach}
+                                            </select>
+                                        </form>
+                                        <a href="{url current}/{$invoice.module}" class="btn btn-info"> {_ "pay"} </a>
+                                        </div>{/if}
                                     </div>
                                 </div>
 

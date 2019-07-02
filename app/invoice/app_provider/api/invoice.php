@@ -28,6 +28,12 @@ if (!defined('paymentCMS')) die('<link rel="stylesheet" href="http://maxcdn.boot
 
 class invoice extends \App\api\controller\innerController {
 
+	/**
+	 * @param      $serviceId
+	 * @param null $baseData
+	 *
+	 * @return array
+	 */
 	public static function generate($serviceId,$baseData = null) {
 		if (is_null($baseData) or !is_array($baseData)) $baseData = $_POST;
 		$data = request::getFromArray($baseData, 'firstName,lastName,email,phone,price,description,customField,hookAction,returnTo');
@@ -90,7 +96,13 @@ class invoice extends \App\api\controller\innerController {
 					$error = $resultGenerateUser['massage'];
 			}
 		}
-		$invoiceModel->setModule('module ...');
+		$module = parent::callHooks('invoiceGateWays') ;
+		if ( count($module) > 0 )
+			$moduleSelect = $module[0];
+		else
+			$moduleSelect = null ;
+
+		$invoiceModel->setModule($moduleSelect);
 		$invoiceModel->setRequestAction($data['hookAction']);
 		$invoiceId = $invoiceModel->insertToDataBase();
 		if ( $invoiceId !== false ){

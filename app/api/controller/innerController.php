@@ -86,7 +86,13 @@ class innerController {
 		}
 	}
 
-	protected static function callHooks($hookName,$variable){
+	/**
+	 * @param $hookName
+	 * @param $variable
+	 *
+	 * @return array
+	 */
+	protected static function callHooks($hookName,$variable = null){
 		$files = [];
 		$appsActives = cache::get('appStatus', null  ,'paymentCms');
 		if ( is_array($appsActives) and ! empty($appsActives) ) {
@@ -109,6 +115,7 @@ class innerController {
 			}
 		}
 		$menu = new menu('api');
+		$return = [] ;
 		foreach ($files as $file) {
 			$controller = $file['controller'];
 			$aria = $file['aria'] ;
@@ -122,9 +129,10 @@ class innerController {
 				else
 					$mold->path(null,$controller);
 				$Object = new $class($mold,$menu);
-				call_user_func_array([$Object,$method],$variable);
+				$return[$controller] = call_user_func_array([$Object,$method],$variable);
 			}
 		}
+		return $return ;
 	}
 
 
