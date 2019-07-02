@@ -39,23 +39,31 @@ class home extends \controller {
 			}
 			$this->mold->set('service', $service['result']['service']);
 		}
+		$this->mold->set('service', ['firstNameStatus' => 'required','lastNameStatus' => 'required','phoneStatus' => 'required']);
 		$this->mold->view('home.mold.html');
 	}
 
-	public function checkData($serviceId){
+	public function checkData($serviceLink){
+		if ( $serviceLink != null ) {
+			$service = service::info($serviceLink, $this->mold, true);
+			if (!$service['status']) {
+				$this->mold->offAutoCompile();
+				\App\core\controller\httpErrorHandler::E404();
+				return;
+			}
+			$serviceId = $service['result']['service']['serviceId'];
+		} else
+			$serviceId = null ;
 		$result = invoice::generate($serviceId,$_POST);
 		if ( $result['status'] ) {
 			$this->mold->offAutoCompile();
 			Response::redirect($result['result']['link']);
 		} else {
 			$this->alert('danger' , '',$result['massage']);
-			$service = service::info($serviceId,$this->mold);
-			if ( ! $service['status'] ){
-				$this->mold->offAutoCompile();
-				\App\core\controller\httpErrorHandler::E404();
-				return ;
-			}
-			$this->mold->set('service',$service['result']['service']);
+			if ( $serviceLink != null )
+				$this->mold->set('service',$service['result']['service']);
+			else
+				$this->mold->set('service', ['firstNameStatus' => 'required','lastNameStatus' => 'required','phoneStatus' => 'required']);
 			$this->mold->view('home.mold.html');
 		}
 	}

@@ -35,34 +35,53 @@ class invoice extends \App\api\controller\innerController {
 	 *
 	 * @return array
 	 */
-	public static function generate($serviceId,$baseData = null) {
+	public static function generate($serviceId = null ,$baseData = null) {
 		if (is_null($baseData) or !is_array($baseData)) $baseData = $_POST;
 		$data = request::getFromArray($baseData, 'firstName,lastName,email,phone,price,description,customField,hookAction,returnTo');
 		unset($baseData);
-		$tempJsonResult = self::$jsonResponse ;
-		self::$jsonResponse = false;
-		$serviceResult = service::info($serviceId);
-		self::$jsonResponse = $tempJsonResult;
-		if ($serviceResult['status'] == false or (isset($serviceResult['result']) and $serviceResult['result'] == null)) {
-			return self::jsonError('service not found!', 404);
-		}
-		$service = $serviceResult['result']['service'];
-		$fields = $serviceResult['result']['fields'];
-		unset($serviceResult);
-
-
-		/* Validation start */
-		if ($service['lastNameStatus'] == 'required') $rules['lastName'] = ['required', rlang('lastName')];
-		if ($service['firstNameStatus'] == 'required') $rules['firstName'] = ['required', rlang('firstName')];
-		if ($service['emailStatus'] == 'required' or ($service['emailStatus'] == 'visible' and $data['email'] != null)) $rules['email'] = ['required|email', rlang('email')];
-		if ($service['phoneStatus'] == 'required' or ($service['phoneStatus'] == 'visible' and $data['phone'] != null)) $rules['phone'] = ['required|mobile', rlang('phone')];
-		if (isset($rules)) {
-			$valid = validate::check($data, $rules);
-			if ($valid->isFail()) {
-				return self::jsonError($valid->errorsIn());
+		if (  $serviceId != null ) {
+			$tempJsonResult = self::$jsonResponse;
+			self::$jsonResponse = false;
+			$serviceResult = service::info($serviceId);
+			self::$jsonResponse = $tempJsonResult;
+			if ($serviceResult['status'] == false or (isset($serviceResult['result']) and $serviceResult['result'] == null)) {
+				return self::jsonError('service not found!', 404);
 			}
+			$service = $serviceResult['result']['service'];
+			$fields = $serviceResult['result']['fields'];
+			unset($serviceResult);
 		}
-		/* Validation end */
+
+
+		if (  $serviceId != null ) {
+			/* Validation start */
+			if ($service['lastNameStatus'] == 'required') $rules['lastName'] = ['required', rlang('lastName')];
+			if ($service['firstNameStatus'] == 'required') $rules['firstName'] = ['required', rlang('firstName')];
+			if ($service['emailStatus'] == 'required' or ($service['emailStatus'] == 'visible' and $data['email'] != null)) $rules['email'] = ['required|email', rlang('email')];
+			if ($service['phoneStatus'] == 'required' or ($service['phoneStatus'] == 'visible' and $data['phone'] != null)) $rules['phone'] = ['required|mobile', rlang('phone')];
+			if (isset($rules)) {
+				$valid = validate::check($data, $rules);
+				if ($valid->isFail()) {
+					return self::jsonError($valid->errorsIn());
+				}
+			}
+			/* Validation end */
+		} else {
+			$rules['lastName'] = ['required', rlang('lastName')];
+			$rules['firstName'] = ['required', rlang('firstName')];
+			$rules['price'] = ['required|match:>100', rlang('price')];
+			if ($data['email'] != null) $rules['email'] = ['required|email', rlang('email')];
+			if ($data['phone'] != null) $rules['phone'] = ['required|mobile', rlang('phone')];
+			if (isset($rules)) {
+				$valid = validate::check($data, $rules);
+				if ($valid->isFail()) {
+					return self::jsonError($valid->errorsIn());
+				}
+			}
+			$service['price'] = $data['price'];
+			$service['description'] = $data['description'];
+			$service['serviceId'] = null;
+		}
 
 
 		/* start getting user information */
@@ -116,9 +135,11 @@ class invoice extends \App\api\controller\innerController {
 			$itemsModel->setInvoiceId($invoiceModel->getInvoiceId());
 			$itemId = $itemsModel->insertToDataBase();
 			if ( $itemId !== false ){
-				$resultFillOutForm = fieldService::fillOutForm($service['serviceId'],'service',$data['customField'],$invoiceModel->getInvoiceId() , 'invoice');
-				if ( ! $resultFillOutForm['status'] )
-					$error = $resultFillOutForm['massage'];
+				if (  $serviceId != null ) {
+					$resultFillOutForm = fieldService::fillOutForm($service['serviceId'], 'service', $data['customField'], $invoiceModel->getInvoiceId(), 'invoice');
+					if (!$resultFillOutForm['status'])
+						$error = $resultFillOutForm['massage'];
+				}
 			} else {
 				$error = rlang('canNotInsertItems');
 			}

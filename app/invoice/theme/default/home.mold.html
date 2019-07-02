@@ -53,10 +53,10 @@
                                     <input type="text" class="form-control" id="lastName" {if $service.lastNameStatus == 'required'}required{/if} name="lastName">
                                 </div>
                                 {/if}
-                                {if $service.phoneStatus != 'invisible' or $service.phoneStatus != 'admin' }
+                                {if $service.emailStatus != 'invisible' or $service.emailStatus != 'admin' }
                                 <div class="col-md-6 form-group">
-                                    <label for="email" class="bmd-label-floating">{_ "email"} {if $service.phoneStatus == 'required'}<span class="text-danger">*</span>{/if}</label>
-                                    <input type="email" class="form-control" id="email" {if $service.phoneStatus == 'required'}required{/if} name="email">
+                                    <label for="email" class="bmd-label-floating">{_ "email"} {if $service.emailStatus == 'required'}<span class="text-danger">*</span>{/if}</label>
+                                    <input type="email" class="form-control" id="email" {if $service.emailStatus == 'required'}required{/if} name="email">
                                 </div>
                                 {/if}
                                 {if $service.phoneStatus != 'invisible' or $service.phoneStatus != 'admin' }
@@ -66,14 +66,21 @@
                                 </div>
                                 {/if}
                                 {if count($fields) == 0 }
+                                {if isset($service.description)}
                                 <div class="col-md-12 form-group mt-5">
                                     <span class="text-center title">{$service.description}</span>
                                 </div>
+                                {else}
+                                <div class="col-md-12 form-group">
+                                    <label for="price" class="bmd-label-floating">{_ "description"}</label>
+                                    <input type="text" class="form-control" id="description" name="description">
+                                </div>
+                                {/if}
                                 <div class="col-md-12 form-group mt-5">
-                                    <label for="price" class="bmd-label-floating">{_ "price"}</label>
+                                    <label for="price" class="bmd-label-floating">{_ "price"} ({_ "toman"}) <span class="text-danger">*</span></label>
                                     <input type="text"  range="[0,9999999]" class="form-control text-center text-large text-bold" id="price" required name="price">
                                 </div>
-                                <button type="submit" class="btn btn-info col-md-12">Login</button>
+                                <button type="submit" class="btn btn-info col-md-12">{_ "pay"}</button>
                                 {/if}
                                 {call fillOutFieldServiceForm}
                                 <div class="col-md-12 mt-5"><span class="text-danger">*</span> {_ "RequiredFields"}</div>

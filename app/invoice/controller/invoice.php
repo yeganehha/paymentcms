@@ -100,7 +100,7 @@ class invoice extends \controller {
 		Response::redirect(\App\invoice\app_provider\api\invoice::generateUrlEncode($transaction->getInvoiceId()));
 	}
 
-	public static function generate($serviceId,$baseData = null) {
+	public static function generate($serviceId = null ,$baseData = null) {
 		return \App\invoice\app_provider\api\invoice::generate($serviceId,$baseData);
 	}
 
