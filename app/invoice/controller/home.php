@@ -38,8 +38,8 @@ class home extends \controller {
 				return;
 			}
 			$this->mold->set('service', $service['result']['service']);
-		}
-		$this->mold->set('service', ['firstNameStatus' => 'required','lastNameStatus' => 'required','phoneStatus' => 'required']);
+		} else
+			$this->mold->set('service', ['firstNameStatus' => 'required','lastNameStatus' => 'required','phoneStatus' => 'required']);
 		$this->mold->view('home.mold.html');
 	}
 
